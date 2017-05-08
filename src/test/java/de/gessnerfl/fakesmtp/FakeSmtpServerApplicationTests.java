@@ -1,4 +1,4 @@
-package de.gessnerfl;
+package de.gessnerfl.fakesmtp;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
