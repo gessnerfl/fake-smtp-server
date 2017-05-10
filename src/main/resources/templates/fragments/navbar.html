@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/dist/css/bootstrap.min.css}"></link>
+	<link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/dist/css/bootstrap-theme.min.css}"></link>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+	<nav th:fragment="navbar" class="navbar navbar-default navbar-fixed-top navbar-inverse">
+	    <div class="container-fluid">
+      		<a class="navbar-brand" href="#"><img alt="Mail Envelop Icon" src="/gfx/app-icon.png" width="24px" height="24px" style="display: inline-block"/>&nbsp;Fake SMTP Server</a>
+      	</div>
+	</nav>
+</body>
+</html>
