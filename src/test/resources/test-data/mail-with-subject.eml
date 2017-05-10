@@ -1,0 +1,32 @@
+mail-with-subject.emlDelivered-To: receiver@example.com
+Received: by 10.100.155.4 with SMTP id 987654328765;
+        Mon, 8 May 2017 02:12:12 -0700 (PDT)
+X-Received: by 10.223.133.200 with SMTP id 0987654387698.65.098765443543;
+        Mon, 08 May 2017 02:12:12 -0700 (PDT)
+Return-Path: <sender@example.com>
+Received: from host.example.com
+Received-SPF: pass (example.com: domain of sender@example.com designates 123.123.123.123 as permitted sender) client-ip=123.123.123.123;
+Authentication-Results: mx.example.com;
+       dkim=pass header.i=@example.com;
+       spf=pass (example.com: domain of sender@example.com designates 123.123.123.123 as permitted sender) smtp.mailfrom=sender@example.com
+Received: from proxy.example.com ([234.234.234.234]:12345 helo=Authentication)
+	by ns1.example.com with esmtpa (Exim 4.89)
+	(envelope-from <sender@example.com>)
+	id 123456-123456-12
+	for receiver@example.com; Mon, 08 May 2017 11:12:07 +0200
+From: "Sender" <sender@example.com>
+To: "'Receiver'" <receiver@example.com>
+References: <2323232323-2323-2323-2323-232323232323@example.com>
+In-Reply-To: <2323232323-2323-2323-2323-2323232323239@example.com>
+Subject: This is the mail title
+Date: Mon, 8 May 2017 11:12:09 +0200
+Message-ID: <772437572438758852084$@com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Office Outlook 12.0
+Content-Language: de
+
+
+This is the message contet
