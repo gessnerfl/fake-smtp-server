@@ -1,0 +1,21 @@
+language: java
+
+jdk:
+- oraclejdk8
+
+sudo: false
+
+before_install:
+- chmod +x gradlew
+
+notifications:
+  email: false
+
+deploy:
+  provider: releases
+  api_key:
+    secure: NPQy7UMCgXXXhBK1tZ/X/bV3pFkhe6H7i5qJC4UNqj9Ry4fgXSMqWT/mNkflzIagVS74sMP6vO9f+zJrR9//fhyFBDV8RJJF7hJ6aj3Dy7LZ+cs/tG8D5xdkz1002+UpwaPVc4+HxaS0b8D+b8gIWhdGfr30oqZoWM6xWRSg/S5/ebvZp2TV0lE1x8Bim9ATju4N08oQCaR52gn+2MOePGrDExNsKSjXh2c5aTYt7s3SHF9MisbCoTMxOEg2fwgRLt69DxIt6SSYbj1dqxAw78mg1nndMjXHdgRrXRrQiLKizdJZyodYqOjn7lPiU7mgCrFWCKk2/W9bzKBoI0kVOwh4Z/IJAP7RGUpT5HFw7XWiWmuMWILqSeUR1mEs9NFG7ObCbeE6c7oc9nso+vCWiql9aOH6MXtJypfy/nzeO+hbsh1ilnReIKPg2tIwPhGOHR0Y5fO2iTIuVIn62fBP0Tkxq3Sp6qFRVb0bXHvVgLYYHhbKFDSWrgS8iTC2WQ3IoCwuT1y0XyRAutE2EoeYmvSlAJbDAZFSVJcq/89y1eggWsP1DMemWpU2gGy8jqj8Dv+EF2gKsO6bgAgXunX7zZ4sK0gnTDFlJ6c2tmeEKZV2WSbiFzWr7my1MAmDT0m5dmJE9NvKr/pGGFN9HuStLU3MVPMMB83OEDMezV3VrAo=
+  file: build/libs/fake-smtp-server-$TRAVIS_TAG.jar
+  on:
+    repo: gessnerfl/fake-smtp-server
+    tags: true
