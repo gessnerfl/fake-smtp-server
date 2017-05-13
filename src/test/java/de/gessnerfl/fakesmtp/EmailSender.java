@@ -1,6 +1,5 @@
 package de.gessnerfl.fakesmtp;
 
-import org.junit.Test;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -9,8 +8,7 @@ import java.util.Properties;
 
 public class EmailSender {
 
-    @Test
-    public void sendSimpleMessage() {
+    public static void main(String[] args) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo("receiver@exmaple.com");
         message.setFrom("sender@example.com");
@@ -19,7 +17,7 @@ public class EmailSender {
         getEmailSender().send(message);
     }
 
-    private JavaMailSender getEmailSender() {
+    private static JavaMailSender getEmailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("localhost");
         mailSender.setPort(5025);
