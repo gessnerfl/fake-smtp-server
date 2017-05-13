@@ -44,7 +44,7 @@ public class EmailFactoryTest {
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
         assertEquals(content, result.getContent());
-        assertEquals(now, result.getReceivedAt());
+        assertEquals(now, result.getReceivedOn());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class EmailFactoryTest {
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals(EmailFactory.NO_SUBJECT, result.getSubject());
         assertEquals(content, result.getContent());
-        assertEquals(now, result.getReceivedAt());
+        assertEquals(now, result.getReceivedOn());
     }
 
     @Test
@@ -79,6 +79,6 @@ public class EmailFactoryTest {
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals(EmailFactory.NO_SUBJECT, result.getSubject());
         assertEquals(content, result.getContent());
-        assertEquals(now, result.getReceivedAt());
+        assertEquals(now, result.getReceivedOn());
     }
 }

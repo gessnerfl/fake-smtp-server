@@ -23,10 +23,10 @@ public class Email {
     @Basic(optional = false)
     private String subject;
 
-    @Column(name="received_at", nullable = false)
+    @Column(name="received_on", nullable = false)
     @Basic(optional = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date receivedAt;
+    private Date receivedOn;
 
     @Lob
     @Column(name="content", nullable = false)
@@ -65,12 +65,12 @@ public class Email {
         this.subject = subject;
     }
 
-    public Date getReceivedAt() {
-        return receivedAt;
+    public Date getReceivedOn() {
+        return receivedOn;
     }
 
-    public void setReceivedAt(Date receivedAt) {
-        this.receivedAt = receivedAt;
+    public void setReceivedOn(Date receivedOn) {
+        this.receivedOn = receivedOn;
     }
 
     public String getContent() {

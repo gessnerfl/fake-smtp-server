@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:fragment="html-header">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/dist/css/bootstrap.min.css}"></link>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/dist/css/bootstrap-theme.min.css}"></link>
-
-    <link rel="stylesheet" th:href="@{/css/customization.css}"></link>
 
     <script type="text/javascript" th:src="@{/webjars/jquery/3.2.1/dist/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.7/dist/js/bootstrap.min.js}"></script>
@@ -16,20 +14,6 @@
 </head>
 
 <body>
-<div th:replace="fragments/navbar :: navbar"></div>
-<div class="container" style="margin-top:60px">
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="page-header">
-                <h1><i class="glyphicon glyphicon-list-alt" aria-hidden="true"></i>&nbsp;Received emails</h1>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
 
-        </div>
-    </div>
-</div>
 </body>
 </html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/html-header :: html-header"></head>
+
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+<div class="container" style="margin-top:60px">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="page-header">
+                <h1><i class="glyphicon glyphicon-envelope" aria-hidden="true"></i>&nbsp;Email&nbsp;<span th:text="${mail.id}">mail.id</span></h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <dl class="dl-horizontal">
+                <dt>From:</dt>
+                <dd th:text="${mail.fromAddress}">From</dd>
+                <dt>To:</dt>
+                <dd th:text="${mail.toAddress}">To</dd>
+                <dt>Received On:</dt>
+                <dd th:with="df='yyyy-MM-dd HH:mm:ss'" th:text="${#calendars.format(mail.receivedOn,df)}">Received On</dd>
+                <dt>Subject</dt>
+                <dd th:text="${mail.subject}">Subject</dd>
+            </dl>
+            <pre th:text="${mail.content}"></pre>
+        </div>
+    </div>
+</div>
+</body>
+</html>

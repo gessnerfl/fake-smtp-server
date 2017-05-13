@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +40,7 @@ public class EmailFactory {
         Email email = new Email();
         email.setFromAddress(from);
         email.setToAddress(to);
-        email.setReceivedAt(timestampProvider.now());
+        email.setReceivedOn(timestampProvider.now());
         email.setSubject(subject);
         email.setContent(content);
         return email;
