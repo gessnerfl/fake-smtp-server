@@ -1,25 +1,27 @@
 buildscript {
-	ext {
-		springBootVersion = '1.5.3.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
+	ext { springBootVersion = '1.5.3.RELEASE' }
+    repositories { jcenter() }
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 	}
 }
 
+plugins { id "com.cinnober.gradle.semver-git" version "2.2.2" }
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
+group = 'de.gessnerfl'
+description = """Fake SMTP Server :: Simple SMTP Server which stores emails in memory and lists email in a web ui"""
 
-repositories {
-	mavenCentral()
-}
+ext.scmUrl = 'git@github.com:gessnerfl/fake-smtp-server.git'
+ext.projectUrl = 'https://github.com/gessnerfl/fake-smtp-server'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories { jcenter() }
 
 
 dependencies {
@@ -39,4 +41,19 @@ dependencies {
 	runtime('org.springframework.boot:spring-boot-devtools')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('commons-lang:commons-lang:2.6')
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }
