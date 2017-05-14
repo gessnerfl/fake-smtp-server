@@ -25,17 +25,24 @@ Documentation (http://docs.spring.io/spring-boot/docs/current/reference/htmlsing
 The configuration file application.properties can be placed next to the application jar, in a sub-directory config or 
 in any other location when specifying the location with the parameter `-Dspring.config.location=<path to config file>`.
 
-The following paragraphs describe the application specific resp. pre-defined configuration parameters. If more 
-configuration e.g. authentication is needed please check the Spring Boot Documentation for more detail.
+The following paragraphs describe the application specific resp. pre-defined configuration parameters.
 
 ## Fake SMTP Server
-The following snippet shows the configuration of a broker with its default values. You can configure different brokers by using different broker names.
+The following snippet shows the configuration of a fake smtp server with its default values.
 
     fakesmtp.port=5025                        #The SMTP Server Port used by the Fake SMTP Server
     fakesmtp.bindAddress                      #The binding address of the Fake SMTP Server; By default it is bound to 
-                                              #all interfaces
+                                              #all interfaces as no value is defined
     fakesmtp.persistence.maxNumberEmails=100  #The maximum number of emails which should be stored in the database; 
                                               #default 100
+    
+
+### Authentication
+Optionally authentication can be turned on. Configuring authentication does not mean the authentication is enforced. It
+just allows you to test PLAIN and LOGIN SMTP Authentication against the server instance.
+
+    fakesmtp.authentication.username          #Username of the client to be authenticated
+    fakesmtp.authentication.password          #Password of the client to be authenticated
 
 ## Web UI
 The following snippet shows the pre-defined web application configuration

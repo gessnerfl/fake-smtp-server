@@ -1,6 +1,5 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
-import de.gessnerfl.fakesmtp.config.FakeSmtpConfigurationProperties;
 import de.gessnerfl.fakesmtp.server.SmtpServer;
 import de.gessnerfl.fakesmtp.server.SmtpServerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,22 +12,20 @@ import org.subethamail.smtp.server.SMTPServer;
 @Service
 public class SmtpServerFactoryImpl implements SmtpServerFactory {
 
-    private final FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
     private final EmailPersister emailPersister;
+    private final SmtpServerConfigurator configurator;
 
     @Autowired
-    public SmtpServerFactoryImpl(FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties, EmailPersister emailPersister) {
-        this.fakeSmtpConfigurationProperties = fakeSmtpConfigurationProperties;
+    public SmtpServerFactoryImpl(EmailPersister emailPersister, SmtpServerConfigurator configurator) {
         this.emailPersister = emailPersister;
+        this.configurator = configurator;
     }
 
     @Override
-    public SmtpServer create(){
+    public SmtpServer create() {
         SimpleMessageListenerAdapter simpleMessageListenerAdapter = new SimpleMessageListenerAdapter(emailPersister);
-        //TODO Add authentication
         SMTPServer smtpServer = new SMTPServer(simpleMessageListenerAdapter);
-        smtpServer.setPort(fakeSmtpConfigurationProperties.getPort());
-        smtpServer.setBindAddress(fakeSmtpConfigurationProperties.getBindAddress());
+        configurator.configure(smtpServer);
         return new SmtpServerImpl(smtpServer);
     }
 }

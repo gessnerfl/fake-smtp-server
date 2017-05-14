@@ -7,8 +7,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -18,6 +18,8 @@ public class EmailRetentionTimerTest {
     private FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
     @Mock
     private EmailRepository emailRepository;
+    @Mock
+    private Logger logger;
 
     @InjectMocks
     private EmailRetentionTimer sut;

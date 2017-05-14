@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,6 +25,8 @@ public class EmailPersisterTest {
     private EmailFactory emailFactory;
     @Mock
     private EmailRepository emailRepository;
+    @Mock
+    private Logger logger;
 
     @InjectMocks
     private EmailPersister sut;

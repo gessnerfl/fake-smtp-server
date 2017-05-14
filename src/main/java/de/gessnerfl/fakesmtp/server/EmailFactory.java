@@ -4,7 +4,6 @@ import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +18,16 @@ import java.util.regex.Pattern;
 
 @Service
 public class EmailFactory {
-    private final static Logger LOGGER = LoggerFactory.getLogger(EmailFactory.class);
     private final static Pattern SUBJECT_PATTERN = Pattern.compile("^Subject: (.*)$");
     public static final String NO_SUBJECT = "<no subject>";
 
     private final TimestampProvider timestampProvider;
+    private final Logger logger;
 
     @Autowired
-    public EmailFactory(TimestampProvider timestampProvider) {
+    public EmailFactory(TimestampProvider timestampProvider, Logger logger) {
         this.timestampProvider = timestampProvider;
+        this.logger = logger;
     }
 
     public Email convert(String from, String to, InputStream data) throws IOException {
@@ -61,7 +61,7 @@ public class EmailFactory {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Failed to parse subject from email", e);
+            logger.error("Failed to parse subject from email", e);
         }
         return Optional.empty();
     }

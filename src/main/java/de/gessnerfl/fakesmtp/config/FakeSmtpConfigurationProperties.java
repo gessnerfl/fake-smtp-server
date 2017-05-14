@@ -52,7 +52,9 @@ public class FakeSmtpConfigurationProperties {
     }
 
     public static class Authentication {
+        @NotNull
         private String username;
+        @NotNull
         private String password;
 
         public String getUsername() {

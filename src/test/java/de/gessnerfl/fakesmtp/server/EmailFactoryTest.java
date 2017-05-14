@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -25,6 +26,8 @@ public class EmailFactoryTest {
 
     @Mock
     private TimestampProvider timestampProvider;
+    @Mock
+    private Logger logger;
 
     @InjectMocks
     private EmailFactory sut;
