@@ -31,5 +31,6 @@ deploy:
       tags: true
   - provider: script
     script: deploy-to-docker.sh
+    skip_cleanup: true
     on:
       tags: true
