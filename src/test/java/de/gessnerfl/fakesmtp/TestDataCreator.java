@@ -6,14 +6,22 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
-public class EmailSender {
+public class TestDataCreator {
+
+    public static final int NUMBER_OF_TEST_EMAILS = 45;
 
     public static void main(String[] args) {
+        for(int i = 0; i < NUMBER_OF_TEST_EMAILS; i++){
+            createEmail(i);
+        }
+    }
+
+    private static void createEmail(int i) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo("receiver@exmaple.com");
         message.setFrom("sender@example.com");
-        message.setSubject("Test-Mail");
-        message.setText("This is a test mail");
+        message.setSubject("Test-Mail " + i);
+        message.setText("This is the test mail number "+i);
         getEmailSender().send(message);
     }
 

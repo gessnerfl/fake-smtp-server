@@ -9,23 +9,21 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
 public class EmailController {
     private static final Sort DEFAULT_SORT = new Sort(Sort.Direction.DESC, "receivedOn");
-    static final int DEFAULT_PAGE_SIZE = 25;
+    private static final int DEFAULT_PAGE_SIZE = 10;
     static final String EMAIL_LIST_VIEW = "email-list";
     static final String EMAIL_LIST_MODEL_NAME = "mails";
     static final String SINGLE_EMAIL_VIEW = "email";
     static final String SINGLE_EMAIL_MODEL_NAME = "mail";
-    static final String ERROR_MODEL_NAME = "error";
-    static final String ERROR_MESSAGE_MODEL_NAME = "errorMessage";
-    public static final String EMAIL_NOT_FOUND_MESSAGE = "Email with ID %d does not exist.";
+    static final String REDIRECT_EMAIL_LIST_VIEW = "redirect:/email";
 
     private final EmailRepository emailRepository;
 
@@ -35,30 +33,30 @@ public class EmailController {
     }
 
     @RequestMapping({"/", "/email"})
-    public ModelAndView getAll(@RequestParam(value = "p", defaultValue = "0") int page, @RequestParam(value = "s", defaultValue = "" + DEFAULT_PAGE_SIZE) int size) {
-        return getAllEmailsPaged(page, size);
+    public String getAll(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "" + DEFAULT_PAGE_SIZE) int size, Model model) {
+        return getAllEmailsPaged(page, size, model);
     }
 
-    private ModelAndView getAllEmailsPaged(int page, int size) {
-        final int pageNumber = page < 0 ? 0 : page;
-        final int pageSize = size < 0 ? DEFAULT_PAGE_SIZE : size;
-        Page<Email> result = emailRepository.findAll(new PageRequest(pageNumber, pageSize, DEFAULT_SORT));
-        if (result.getNumber() >= result.getTotalPages()) {
-            result = emailRepository.findAll(new PageRequest(0, pageSize, DEFAULT_SORT));
+    private String getAllEmailsPaged(int page, int size, Model model) {
+        if(page < 0 || size <= 0){
+            return "redirect:/email";
         }
-        return new ModelAndView(EMAIL_LIST_VIEW, EMAIL_LIST_MODEL_NAME, result);
+        Page<Email> result = emailRepository.findAll(new PageRequest(page, size, DEFAULT_SORT));
+        if (result.getNumber() != 0 && result.getNumber() >= result.getTotalPages()) {
+            return "redirect:/email";
+        }
+        model.addAttribute(EMAIL_LIST_MODEL_NAME, result);
+        return EMAIL_LIST_VIEW;
     }
 
     @RequestMapping({"/email/{id}"})
-    public ModelAndView getEmailById(@PathVariable Long id) {
+    public String getEmailById(@PathVariable Long id, Model model) {
         Email email = emailRepository.findOne(id);
         if (email != null) {
-            return new ModelAndView(SINGLE_EMAIL_VIEW, SINGLE_EMAIL_MODEL_NAME, email);
+            model.addAttribute(SINGLE_EMAIL_MODEL_NAME, email);
+            return SINGLE_EMAIL_VIEW;
         }
-        ModelAndView result = getAllEmailsPaged(0, DEFAULT_PAGE_SIZE);
-        result.addObject(ERROR_MODEL_NAME, true);
-        result.addObject(ERROR_MESSAGE_MODEL_NAME, String.format(EMAIL_NOT_FOUND_MESSAGE, id));
-        return result;
+        return REDIRECT_EMAIL_LIST_VIEW;
     }
 
 }

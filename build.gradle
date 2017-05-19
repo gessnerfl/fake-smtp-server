@@ -10,6 +10,7 @@ plugins { id "com.cinnober.gradle.semver-git" version "2.2.2" }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 
 group = 'de.gessnerfl'
@@ -36,6 +37,7 @@ dependencies {
 
     compile('org.webjars.bower:jquery:3.2.1')
     compile('org.webjars.bower:bootstrap:3.3.7')
+	compile('org.webjars:font-awesome:4.7.0')
 
     runtime'com.h2database:h2'
 	runtime('org.springframework.boot:spring-boot-devtools')

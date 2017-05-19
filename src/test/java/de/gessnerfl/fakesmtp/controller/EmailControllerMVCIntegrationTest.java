@@ -22,9 +22,7 @@ import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("integrationtest")
 @RunWith(SpringRunner.class)
@@ -44,10 +42,9 @@ public class EmailControllerMVCIntegrationTest {
 
     @Test
     public void shouldReturnEmptyListWhenNoEmailsAreAvailable() throws Exception {
-        this.mockMvc.perform(get("/email?p"))
+        this.mockMvc.perform(get("/email?page"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mails", emptyIterableOf(Email.class)))
-                .andExpect(model().attributeDoesNotExist("error", "errorMessage"))
                 .andExpect(view().name("email-list"));
     }
 
@@ -57,31 +54,27 @@ public class EmailControllerMVCIntegrationTest {
         Email email2 = createRandomEmail(2);
         Email email3 = createRandomEmail(1);
 
-        this.mockMvc.perform(get("/email?p=0&s=2"))
+        this.mockMvc.perform(get("/email?page=0&size=2"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mails", iterableWithSize(2)))
                 .andExpect(model().attribute("mails", contains(equalTo(email3), equalTo(email2))))
-                .andExpect(model().attributeDoesNotExist("error", "errorMessage"))
                 .andExpect(view().name("email-list"));
 
-        this.mockMvc.perform(get("/email?p=1&s=2"))
+        this.mockMvc.perform(get("/email?page=1&size=2"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mails", iterableWithSize(1)))
                 .andExpect(model().attribute("mails", contains(equalTo(email1))))
-                .andExpect(model().attributeDoesNotExist("error", "errorMessage"))
                 .andExpect(view().name("email-list"));
     }
 
     @Test
     public void shouldReturnFirstPageWhenGivenPageIsOutOfRange() throws Exception {
-        Email email = createRandomEmail(1);
+        createRandomEmail(1);
 
-        this.mockMvc.perform(get("/email?p=1&s=2"))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("mails", iterableWithSize(1)))
-                .andExpect(model().attribute("mails", contains(equalTo(email))))
-                .andExpect(model().attributeDoesNotExist("error", "errorMessage"))
-                .andExpect(view().name("email-list"));
+        this.mockMvc.perform(get("/email?page=1&size=2"))
+                .andExpect(status().isFound())
+                .andExpect(model().attributeDoesNotExist("mails"))
+                .andExpect(redirectedUrl("/email"));
     }
 
     @Test
@@ -91,18 +84,15 @@ public class EmailControllerMVCIntegrationTest {
         this.mockMvc.perform(get("/email/"+email.getId()))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mail", equalsMail(email)))
-                .andExpect(model().attributeDoesNotExist("error", "errorMessage"))
                 .andExpect(view().name("email"));
     }
 
     @Test
     public void shouldReturnErrorWhenMailIdIsNotValid() throws Exception {
         this.mockMvc.perform(get("/email/123"))
-                .andExpect(view().name("email-list"))
-                .andExpect(model().attribute("mails", emptyIterableOf(Email.class)))
-                .andExpect(model().attribute("error", equalTo(true)))
-                .andExpect(model().attribute("errorMessage", not(isEmptyString())))
-                .andExpect(status().is(200));
+                .andExpect(redirectedUrl("/email"))
+                .andExpect(model().attributeDoesNotExist("mails", "mail"))
+                .andExpect(status().isFound());
     }
 
     private Matcher<Email> equalsMail(Email email) {

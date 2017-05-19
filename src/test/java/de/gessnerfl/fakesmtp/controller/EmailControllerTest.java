@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.ui.Model;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -20,7 +20,8 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EmailControllerTest {
-
+    @Mock
+    private Model model;
     @Mock
     private EmailRepository emailRepository;
     @InjectMocks
@@ -31,17 +32,17 @@ public class EmailControllerTest {
         final Page<Email> page = createFirstPageEmail();
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        ModelAndView result = sut.getAll(0, 5);
+        String result = sut.getAll(0, 5, model);
 
-        assertSame(page, result.getModel().get(EmailController.EMAIL_LIST_MODEL_NAME));
-        assertNull(result.getModel().get(EmailController.ERROR_MODEL_NAME));
-        assertEquals(EmailController.EMAIL_LIST_VIEW, result.getViewName());
+        assertEquals(EmailController.EMAIL_LIST_VIEW, result);
 
         verify(emailRepository).findAll(argThat(matchPageable(0, 5)));
+        verifyNoMoreInteractions(emailRepository);
+        verify(model).addAttribute(EmailController.EMAIL_LIST_MODEL_NAME, page);
     }
 
     @Test
-    public void shouldReturnFirstPageWhenRequestedPageIsOutOfRange() {
+    public void shouldReturnRedirectToFirstPageWhenRequestedPageIsOutOfRange() {
         final Page<Email> page = mock(Page.class);
         when(page.getTotalElements()).thenReturn(8L);
         when(page.getTotalPages()).thenReturn(2);
@@ -49,71 +50,64 @@ public class EmailControllerTest {
         when(page.getNumberOfElements()).thenReturn(0, 5);
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        ModelAndView result = sut.getAll(2, 5);
+        String result = sut.getAll(2, 5, model);
 
-        Page<Email> mails = (Page) result.getModel().get(EmailController.EMAIL_LIST_MODEL_NAME);
-        assertSame(page, mails);
-        assertEquals(0, page.getNumber());
-        assertNull(result.getModel().get(EmailController.ERROR_MODEL_NAME));
-        assertEquals(EmailController.EMAIL_LIST_VIEW, result.getViewName());
+        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
 
         verify(emailRepository).findAll(argThat(matchPageable(2, 5)));
-        verify(emailRepository).findAll(argThat(matchPageable(0, 5)));
+        verifyNoMoreInteractions(emailRepository);
     }
 
     @Test
-    public void shouldNormalizePageNumberToAPositiveInteger(){
-        final Page<Email> page = createFirstPageEmail();
-        when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
+    public void shouldRedirectToFirstPageWhenPageNumberIsBelowNull() {
+        String result = sut.getAll(-1, 5, model);
 
-        sut.getAll(-1, 5);
-
-        verify(emailRepository).findAll(argThat(matchPageable(0, 5)));
+        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
+        verifyZeroInteractions(emailRepository);
     }
 
     @Test
-    public void shouldNormalizePageSizeToAPositiveInteger(){
-        final Page<Email> page = createFirstPageEmail();
-        when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
+    public void shouldRedirectToFirstPageWhenPageSizeIsNull() {
+        String result = sut.getAll(0, 0, model);
 
-        sut.getAll(0, -1);
-
-        verify(emailRepository).findAll(argThat(matchPageable(0, EmailController.DEFAULT_PAGE_SIZE)));
+        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
+        verifyZeroInteractions(emailRepository);
     }
 
     @Test
-    public void shouldReturnSingleEmailWhenIdIsValid(){
+    public void shouldRedirectToFirstPageWhenPageSizeIsBelowNull() {
+        String result = sut.getAll(0, -1, model);
+
+        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
+        verifyZeroInteractions(emailRepository);
+    }
+
+    @Test
+    public void shouldReturnSingleEmailWhenIdIsValid() {
         final long id = 12L;
         final Email mail = mock(Email.class);
         when(emailRepository.findOne(id)).thenReturn(mail);
 
-        ModelAndView result = sut.getEmailById(id);
+        String result = sut.getEmailById(id, model);
 
-        assertSame(mail, result.getModel().get(EmailController.SINGLE_EMAIL_MODEL_NAME));
-        assertNull(result.getModel().get(EmailController.ERROR_MODEL_NAME));
-        assertEquals(EmailController.SINGLE_EMAIL_VIEW, result.getViewName());
+        assertEquals(EmailController.SINGLE_EMAIL_VIEW, result);
 
         verify(emailRepository).findOne(id);
-        verify(emailRepository, never()).findAll(any(Pageable.class));
+        verify(model).addAttribute(EmailController.SINGLE_EMAIL_MODEL_NAME, mail);
     }
 
     @Test
-    public void shouldReturnMainPageWithErrorMessageWhenIdIsNotValid(){
+    public void shouldReturnRedirectToListPageWhenIdIsNotValid() {
         final long id = 12L;
         final Page<Email> page = createFirstPageEmail();
         when(emailRepository.findOne(id)).thenReturn(null);
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        ModelAndView result = sut.getEmailById(id);
+        String result = sut.getEmailById(id, model);
 
-        assertNull(result.getModel().get(EmailController.SINGLE_EMAIL_MODEL_NAME));
-        assertSame(page, result.getModel().get(EmailController.EMAIL_LIST_MODEL_NAME));
-        assertEquals(Boolean.TRUE, result.getModel().get(EmailController.ERROR_MODEL_NAME));
-        assertEquals("Email with ID 12 does not exist.",  result.getModel().get(EmailController.ERROR_MESSAGE_MODEL_NAME));
-        assertEquals(EmailController.EMAIL_LIST_VIEW, result.getViewName());
+        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
 
         verify(emailRepository).findOne(id);
-        verify(emailRepository).findAll(any(Pageable.class));
     }
 
     private Page<Email> createFirstPageEmail() {
