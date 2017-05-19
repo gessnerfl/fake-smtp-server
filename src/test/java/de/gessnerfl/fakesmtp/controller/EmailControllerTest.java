@@ -46,15 +46,32 @@ public class EmailControllerTest {
         final Page<Email> page = mock(Page.class);
         when(page.getTotalElements()).thenReturn(8L);
         when(page.getTotalPages()).thenReturn(2);
-        when(page.getNumber()).thenReturn(3, 0);
-        when(page.getNumberOfElements()).thenReturn(0, 5);
+        when(page.getNumber()).thenReturn(3);
+        when(page.getNumberOfElements()).thenReturn(5);
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        String result = sut.getAll(2, 5, model);
+        String result = sut.getAll(3, 5, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
 
-        verify(emailRepository).findAll(argThat(matchPageable(2, 5)));
+        verify(emailRepository).findAll(argThat(matchPageable(3, 5)));
+        verifyNoMoreInteractions(emailRepository);
+    }
+
+    @Test
+    public void shouldNotRedirectToFirstPageWhenNoDataIsAvailable() {
+        final Page<Email> page = mock(Page.class);
+        when(page.getTotalElements()).thenReturn(0L);
+        when(page.getTotalPages()).thenReturn(0);
+        when(page.getNumber()).thenReturn(0);
+        when(page.getNumberOfElements()).thenReturn(0);
+        when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
+
+        String result = sut.getAll(0, 5, model);
+
+        assertEquals(EmailController.EMAIL_LIST_VIEW, result);
+
+        verify(emailRepository).findAll(argThat(matchPageable(0, 5)));
         verifyNoMoreInteractions(emailRepository);
     }
 
