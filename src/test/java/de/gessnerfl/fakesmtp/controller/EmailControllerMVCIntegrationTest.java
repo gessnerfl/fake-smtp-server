@@ -1,5 +1,6 @@
 package de.gessnerfl.fakesmtp.controller;
 
+import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.apache.commons.lang.RandomStringUtils;
@@ -122,9 +123,11 @@ public class EmailControllerMVCIntegrationTest {
         Email mail = new Email();
         mail.setSubject("Test Subject "+randomToken);
         mail.setContent("Test Content "+randomToken);
+        mail.setRawData("Test Content "+randomToken);
         mail.setReceivedOn(receivedOn);
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
+        mail.setContentType(ContentType.PLAIN);
         return emailRepository.save(mail);
     }
 

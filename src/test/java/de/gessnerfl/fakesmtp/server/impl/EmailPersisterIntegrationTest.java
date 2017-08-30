@@ -42,7 +42,7 @@ public class EmailPersisterIntegrationTest {
     public void shouldCreateEmailForEmlFileWithSubject() throws Exception {
         String testFilename = "mail-with-subject.eml";
         InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String content = TestResourceUtil.getTestFileContent(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
 
         sut.deliver(SENDER, RECEIVER, data);
 
@@ -55,7 +55,8 @@ public class EmailPersisterIntegrationTest {
         assertEquals(SENDER, mail.getFromAddress());
         assertEquals(RECEIVER, mail.getToAddress());
         assertEquals("This is the mail title", mail.getSubject());
-        assertEquals(content, mail.getContent());
+        assertEquals(rawData, mail.getRawData());
+        assertEquals("This is the message content", mail.getContent());
         assertNotNull(mail.getReceivedOn());
     }
 
@@ -63,7 +64,7 @@ public class EmailPersisterIntegrationTest {
     public void shouldCreateEmailForEmlFileWithoutSubject() throws Exception {
         String testFilename = "mail-without-subject.eml";
         InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String content = TestResourceUtil.getTestFileContent(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
 
         sut.deliver(SENDER, RECEIVER, data);
 
@@ -75,15 +76,16 @@ public class EmailPersisterIntegrationTest {
         assertNotNull(mail.getId());
         assertEquals(SENDER, mail.getFromAddress());
         assertEquals(RECEIVER, mail.getToAddress());
-        assertEquals(EmailFactory.NO_SUBJECT, mail.getSubject());
-        assertEquals(content, mail.getContent());
+        assertEquals(EmailFactory.UNDEFINED, mail.getSubject());
+        assertEquals(rawData, mail.getRawData());
+        assertEquals("This is the message content", mail.getContent());
         assertNotNull(mail.getReceivedOn());
     }
 
     @Test
     public void shouldCreateMailForPlainText() throws Exception {
-        String content = "this is just some dummy content";
-        InputStream data = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        String rawData = "this is just some dummy content";
+        InputStream data = new ByteArrayInputStream(rawData.getBytes(StandardCharsets.UTF_8));
 
         sut.deliver(SENDER, RECEIVER, data);
 
@@ -95,8 +97,9 @@ public class EmailPersisterIntegrationTest {
         assertNotNull(mail.getId());
         assertEquals(SENDER, mail.getFromAddress());
         assertEquals(RECEIVER, mail.getToAddress());
-        assertEquals(EmailFactory.NO_SUBJECT, mail.getSubject());
-        assertEquals(content, mail.getContent());
+        assertEquals(EmailFactory.UNDEFINED, mail.getSubject());
+        assertEquals(rawData, mail.getRawData());
+        assertEquals(rawData, mail.getContent());
         assertNotNull(mail.getReceivedOn());
     }
 }

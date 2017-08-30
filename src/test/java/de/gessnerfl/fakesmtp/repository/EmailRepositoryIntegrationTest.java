@@ -1,5 +1,6 @@
 package de.gessnerfl.fakesmtp.repository;
 
+import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
@@ -78,10 +79,12 @@ public class EmailRepositoryIntegrationTest {
         Date receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
         Email mail = new Email();
         mail.setSubject("Test Subject "+randomToken);
+        mail.setRawData("Test Content "+randomToken);
         mail.setContent("Test Content "+randomToken);
         mail.setReceivedOn(receivedOn);
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
+        mail.setContentType(ContentType.PLAIN);
         return sut.save(mail);
     }
 

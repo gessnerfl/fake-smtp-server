@@ -1,6 +1,7 @@
 package de.gessnerfl.fakesmtp.server;
 
 import de.gessnerfl.fakesmtp.TestResourceUtil;
+import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
 import org.junit.Test;
@@ -33,11 +34,11 @@ public class EmailFactoryTest {
     private EmailFactory sut;
 
     @Test
-    public void shouldCreateEmailForEmlFileWithSubject() throws Exception {
+    public void shouldCreateEmailForEmlFileWithSubjectAndContentTypePlain() throws Exception {
         Date now = new Date();
         String testFilename = "mail-with-subject.eml";
         InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String content = TestResourceUtil.getTestFileContent(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
 
         when(timestampProvider.now()).thenReturn(now);
 
@@ -46,16 +47,18 @@ public class EmailFactoryTest {
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
-        assertEquals(content, result.getContent());
+        assertEquals(rawData, result.getRawData());
+        assertEquals("This is the message content", result.getContent());
         assertEquals(now, result.getReceivedOn());
+        assertEquals(ContentType.PLAIN, result.getContentType());
     }
 
     @Test
-    public void shouldCreateEmailForEmlFileWithoutSubject() throws Exception {
+    public void shouldCreateEmailForEmlFileWithSubjectAndContentTypeHtml() throws Exception {
         Date now = new Date();
-        String testFilename = "mail-without-subject.eml";
+        String testFilename = "mail-with-subject-and-content-type-html.eml";
         InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String content = TestResourceUtil.getTestFileContent(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
 
         when(timestampProvider.now()).thenReturn(now);
 
@@ -63,16 +66,58 @@ public class EmailFactoryTest {
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
-        assertEquals(EmailFactory.NO_SUBJECT, result.getSubject());
-        assertEquals(content, result.getContent());
+        assertEquals("This is the mail title", result.getSubject());
+        assertEquals(rawData, result.getRawData());
+        assertEquals("<html><head></head><body>Mail Body</body></html>", result.getContent());
         assertEquals(now, result.getReceivedOn());
+        assertEquals(ContentType.HTML, result.getContentType());
+    }
+
+    @Test
+    public void shouldCreateEmailForEmlFileWithSubjectAndWithoutContentType() throws Exception {
+        Date now = new Date();
+        String testFilename = "mail-with-subject-without-content-type.eml";
+        InputStream data = TestResourceUtil.getTestFile(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        Email result = sut.convert(SENDER, RECEIVER, data);
+
+        assertEquals(SENDER, result.getFromAddress());
+        assertEquals(RECEIVER, result.getToAddress());
+        assertEquals("This is the mail title", result.getSubject());
+        assertEquals(rawData, result.getRawData());
+        assertEquals("This is the message content", result.getContent());
+        assertEquals(now, result.getReceivedOn());
+        assertEquals(ContentType.PLAIN, result.getContentType());
+    }
+
+    @Test
+    public void shouldCreateEmailForEmlFileWithoutSubjectAndContentTypePlain() throws Exception {
+        Date now = new Date();
+        String testFilename = "mail-without-subject.eml";
+        InputStream data = TestResourceUtil.getTestFile(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        Email result = sut.convert(SENDER, RECEIVER, data);
+
+        assertEquals(SENDER, result.getFromAddress());
+        assertEquals(RECEIVER, result.getToAddress());
+        assertEquals(EmailFactory.UNDEFINED, result.getSubject());
+        assertEquals(rawData, result.getRawData());
+        assertEquals("This is the message content", result.getContent());
+        assertEquals(now, result.getReceivedOn());
+        assertEquals(ContentType.PLAIN, result.getContentType());
     }
 
     @Test
     public void shouldCreateMailForPlainText() throws Exception {
         Date now = new Date();
-        String content = "this is just some dummy content";
-        InputStream data = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        String rawData = "this is just some dummy content";
+        InputStream data = new ByteArrayInputStream(rawData.getBytes(StandardCharsets.UTF_8));
 
         when(timestampProvider.now()).thenReturn(now);
 
@@ -80,8 +125,10 @@ public class EmailFactoryTest {
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
-        assertEquals(EmailFactory.NO_SUBJECT, result.getSubject());
-        assertEquals(content, result.getContent());
+        assertEquals(EmailFactory.UNDEFINED, result.getSubject());
+        assertEquals(rawData, result.getRawData());
+        assertEquals(rawData, result.getContent());
         assertEquals(now, result.getReceivedOn());
+        assertEquals(ContentType.PLAIN, result.getContentType());
     }
 }

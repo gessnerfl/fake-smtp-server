@@ -27,6 +27,7 @@
                             <th>To</th>
                             <th>Received On</th>
                             <th>Subject</th>
+                            <th>Content Type</th>
                             <th>Details</th>
                         </tr>
                     </thead>
@@ -37,6 +38,7 @@
                             <td th:text="${mail.toAddress}">To</td>
                             <td th:with="df='yyyy-MM-dd HH:mm:ss'" th:text="${#calendars.format(mail.receivedOn,df)}">Received On</td>
                             <td th:text="${mail.subject}"></td>
+                            <td th:text="${mail.contentType}"></td>
                             <td><a alt="Details" th:href="@{|/email/${mail.id}|}"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a></td>
                         </tr>
                     </tbody>
