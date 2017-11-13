@@ -131,4 +131,64 @@ public class EmailFactoryTest {
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.PLAIN, result.getContentType());
     }
+
+    @Test
+    public void shouldCreateMailForMultipartWithContentTypeHtml() throws Exception {
+        Date now = new Date();
+        String testFilename = "multipart-mail.eml";
+        InputStream data = TestResourceUtil.getTestFile(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        Email result = sut.convert(SENDER, RECEIVER, data);
+
+        assertEquals(SENDER, result.getFromAddress());
+        assertEquals(RECEIVER, result.getToAddress());
+        assertEquals("This is the mail title", result.getSubject());
+        assertEquals(rawData, result.getRawData());
+        assertEquals("<html><head></head><body>Mail Body</body></html>", result.getContent());
+        assertEquals(now, result.getReceivedOn());
+        assertEquals(ContentType.HTML, result.getContentType());
+    }
+
+    @Test
+    public void shouldCreateMailForMultipartWithoutContentTypeHtml() throws Exception {
+        Date now = new Date();
+        String testFilename = "multipart-mail-plain-only.eml";
+        InputStream data = TestResourceUtil.getTestFile(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        Email result = sut.convert(SENDER, RECEIVER, data);
+
+        assertEquals(SENDER, result.getFromAddress());
+        assertEquals(RECEIVER, result.getToAddress());
+        assertEquals("This is the mail title", result.getSubject());
+        assertEquals(rawData, result.getRawData());
+        assertEquals("This is the message content", result.getContent());
+        assertEquals(now, result.getReceivedOn());
+        assertEquals(ContentType.PLAIN, result.getContentType());
+    }
+
+    @Test
+    public void shouldCreateMailForMultipartWithUnknownContentType() throws Exception {
+        Date now = new Date();
+        String testFilename = "multipart-mail-unknown-content-type.eml";
+        InputStream data = TestResourceUtil.getTestFile(testFilename);
+        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        Email result = sut.convert(SENDER, RECEIVER, data);
+
+        assertEquals(SENDER, result.getFromAddress());
+        assertEquals(RECEIVER, result.getToAddress());
+        assertEquals("This is the mail title", result.getSubject());
+        assertEquals(rawData, result.getRawData());
+        assertEquals("This is the message content", result.getContent());
+        assertEquals(now, result.getReceivedOn());
+        assertEquals(ContentType.PLAIN, result.getContentType());
+    }
 }
