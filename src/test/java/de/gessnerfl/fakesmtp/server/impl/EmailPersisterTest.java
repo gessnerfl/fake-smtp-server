@@ -4,6 +4,7 @@ import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -39,14 +40,21 @@ public class EmailPersisterTest {
     public void shouldCreateEmailEntityAndStoreItInDatabaseWhenEmailIsDelivered() throws IOException {
         final String from = "from";
         final String to = "to";
-        final byte[] content = "content".getBytes(StandardCharsets.UTF_8);
+        String contentString = "content";
+        final byte[] content = contentString.getBytes(StandardCharsets.UTF_8);
         final InputStream contentStream = new ByteArrayInputStream(content);
         final Email mail = mock(Email.class);
 
-        when(emailFactory.convert(from, to, contentStream)).thenReturn(mail);
+        when(emailFactory.convert(any(RawData.class))).thenReturn(mail);
 
         sut.deliver(from, to, contentStream);
 
+        ArgumentCaptor<RawData> argumentCaptor = ArgumentCaptor.forClass(RawData.class);
+        verify(emailFactory).convert(argumentCaptor.capture());
+        RawData rawData = argumentCaptor.getValue();
+        assertEquals(from, rawData.getFrom());
+        assertEquals(to, rawData.getTo());
+        assertEquals(contentString, rawData.getContentAsString());
         verify(emailRepository).save(mail);
     }
 
@@ -57,7 +65,7 @@ public class EmailPersisterTest {
         final byte[] content = "content".getBytes(StandardCharsets.UTF_8);
         final InputStream contentStream = new ByteArrayInputStream(content);
 
-        when(emailFactory.convert(from, to, contentStream)).thenThrow(new IOException("foo"));
+        when(emailFactory.convert(any(RawData.class))).thenThrow(new IOException("foo"));
 
         sut.deliver(from, to, contentStream);
 

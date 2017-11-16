@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,9 @@ public class EmailPersister implements SimpleMessageListener {
     @Override
     public void deliver(String sender, String recipient, InputStream data) throws TooMuchDataException, IOException {
         logger.info("Received email from {} for {}", sender, recipient);
-        Email email = emailFactory.convert(sender, recipient, data);
+
+        RawData rawData = new RawData(sender, recipient, IOUtils.toByteArray(data));
+        Email email = emailFactory.convert(rawData);
         emailRepository.save(email);
     }
 }

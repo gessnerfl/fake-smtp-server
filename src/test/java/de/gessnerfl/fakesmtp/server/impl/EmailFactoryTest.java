@@ -3,17 +3,13 @@ package de.gessnerfl.fakesmtp.server.impl;
 import de.gessnerfl.fakesmtp.TestResourceUtil;
 import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
-import de.gessnerfl.fakesmtp.server.impl.EmailFactory;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -28,8 +24,6 @@ public class EmailFactoryTest {
 
     @Mock
     private TimestampProvider timestampProvider;
-    @Mock
-    private Logger logger;
 
     @InjectMocks
     private EmailFactory sut;
@@ -38,17 +32,18 @@ public class EmailFactoryTest {
     public void shouldCreateEmailForEmlFileWithSubjectAndContentTypePlain() throws Exception {
         Date now = new Date();
         String testFilename = "mail-with-subject.eml";
-        InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        String dataAsString = new String(data, StandardCharsets.UTF_8);
+        RawData rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(SENDER, RECEIVER, data);
+        Email result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
-        assertEquals(rawData, result.getRawData());
+        assertEquals(dataAsString, result.getRawData());
         assertEquals("This is the message content", result.getContent());
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.PLAIN, result.getContentType());
@@ -58,17 +53,18 @@ public class EmailFactoryTest {
     public void shouldCreateEmailForEmlFileWithSubjectAndContentTypeHtml() throws Exception {
         Date now = new Date();
         String testFilename = "mail-with-subject-and-content-type-html.eml";
-        InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        String dataAsString = new String(data, StandardCharsets.UTF_8);
+        RawData rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(SENDER, RECEIVER, data);
+        Email result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
-        assertEquals(rawData, result.getRawData());
+        assertEquals(dataAsString, result.getRawData());
         assertEquals("<html><head></head><body>Mail Body</body></html>", result.getContent());
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.HTML, result.getContentType());
@@ -78,17 +74,18 @@ public class EmailFactoryTest {
     public void shouldCreateEmailForEmlFileWithSubjectAndWithoutContentType() throws Exception {
         Date now = new Date();
         String testFilename = "mail-with-subject-without-content-type.eml";
-        InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        String dataAsString = new String(data, StandardCharsets.UTF_8);
+        RawData rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(SENDER, RECEIVER, data);
+        Email result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
-        assertEquals(rawData, result.getRawData());
+        assertEquals(dataAsString, result.getRawData());
         assertEquals("This is the message content", result.getContent());
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.PLAIN, result.getContentType());
@@ -98,17 +95,18 @@ public class EmailFactoryTest {
     public void shouldCreateEmailForEmlFileWithoutSubjectAndContentTypePlain() throws Exception {
         Date now = new Date();
         String testFilename = "mail-without-subject.eml";
-        InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        String dataAsString = new String(data, StandardCharsets.UTF_8);
+        RawData rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(SENDER, RECEIVER, data);
+        Email result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals(EmailFactory.UNDEFINED, result.getSubject());
-        assertEquals(rawData, result.getRawData());
+        assertEquals(dataAsString, result.getRawData());
         assertEquals("This is the message content", result.getContent());
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.PLAIN, result.getContentType());
@@ -117,18 +115,19 @@ public class EmailFactoryTest {
     @Test
     public void shouldCreateMailForPlainText() throws Exception {
         Date now = new Date();
-        String rawData = "this is just some dummy content";
-        InputStream data = new ByteArrayInputStream(rawData.getBytes(StandardCharsets.UTF_8));
+        String dataAsString = "this is just some dummy content";
+        byte[] data = dataAsString.getBytes(StandardCharsets.UTF_8);
+        RawData rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(SENDER, RECEIVER, data);
+        Email result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals(EmailFactory.UNDEFINED, result.getSubject());
-        assertEquals(rawData, result.getRawData());
-        assertEquals(rawData, result.getContent());
+        assertEquals(dataAsString, result.getRawData());
+        assertEquals(dataAsString, result.getContent());
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.PLAIN, result.getContentType());
     }
@@ -137,17 +136,18 @@ public class EmailFactoryTest {
     public void shouldCreateMailForMultipartWithContentTypeHtml() throws Exception {
         Date now = new Date();
         String testFilename = "multipart-mail.eml";
-        InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        String dataAsString = new String(data, StandardCharsets.UTF_8);
+        RawData rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(SENDER, RECEIVER, data);
+        Email result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
-        assertEquals(rawData, result.getRawData());
+        assertEquals(dataAsString, result.getRawData());
         assertEquals("<html><head></head><body>Mail Body</body></html>", result.getContent());
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.HTML, result.getContentType());
@@ -157,17 +157,18 @@ public class EmailFactoryTest {
     public void shouldCreateMailForMultipartWithoutContentTypeHtml() throws Exception {
         Date now = new Date();
         String testFilename = "multipart-mail-plain-only.eml";
-        InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        String dataAsString = new String(data, StandardCharsets.UTF_8);
+        RawData rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(SENDER, RECEIVER, data);
+        Email result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
-        assertEquals(rawData, result.getRawData());
+        assertEquals(dataAsString, result.getRawData());
         assertEquals("This is the message content", result.getContent());
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.PLAIN, result.getContentType());
@@ -177,17 +178,18 @@ public class EmailFactoryTest {
     public void shouldCreateMailForMultipartWithUnknownContentType() throws Exception {
         Date now = new Date();
         String testFilename = "multipart-mail-unknown-content-type.eml";
-        InputStream data = TestResourceUtil.getTestFile(testFilename);
-        String rawData = TestResourceUtil.getTestFileContent(testFilename);
+        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        String dataAsString = new String(data, StandardCharsets.UTF_8);
+        RawData rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(SENDER, RECEIVER, data);
+        Email result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
-        assertEquals(rawData, result.getRawData());
+        assertEquals(dataAsString, result.getRawData());
         assertEquals("This is the message content", result.getContent());
         assertEquals(now, result.getReceivedOn());
         assertEquals(ContentType.PLAIN, result.getContentType());
