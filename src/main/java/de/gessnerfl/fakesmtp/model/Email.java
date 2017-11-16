@@ -121,4 +121,58 @@ public class Email {
     public int hashCode() {
         return id.hashCode();
     }
+
+    public static class Builder {
+        private String fromAddress;
+        private String toAddress;
+        private Date receivedOn;
+        private String subject;
+        private String rawData;
+        private String content;
+        private ContentType contentType;
+
+        public Builder fromAddress(String fromAddress) {
+            this.fromAddress = fromAddress;
+            return this;
+        }
+        public Builder toAddress(String toAddress) {
+            this.toAddress = toAddress;
+            return this;
+        }
+        public Builder receivedOn(Date receivedOn) {
+            this.receivedOn = receivedOn;
+            return this;
+        }
+        public Builder subject(String subject) {
+            this.subject = subject;
+            return this;
+        }
+        public Builder rawData(String rawData) {
+            this.rawData = rawData;
+            return this;
+        }
+        public Builder content(String content) {
+            this.content = content;
+            return this;
+        }
+        public Builder contentType(ContentType contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
+        public Email build() {
+            Email email = new Email();
+            email.setFromAddress(this.fromAddress);
+            email.setToAddress(this.toAddress);
+            email.setReceivedOn(this.receivedOn);
+            email.setSubject(this.subject);
+            email.setRawData(this.rawData);
+            if (this.content != null && !this.content.isEmpty())
+                email.setContent(this.content);
+            else
+                email.setContent(this.rawData);
+            email.setContentType(this.contentType);
+            return email;
+        }
+    }
 }
