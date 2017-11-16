@@ -2,7 +2,6 @@ package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import de.gessnerfl.fakesmtp.server.EmailFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

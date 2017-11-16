@@ -1,8 +1,9 @@
-package de.gessnerfl.fakesmtp.server;
+package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.TestResourceUtil;
 import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.server.impl.EmailFactory;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;

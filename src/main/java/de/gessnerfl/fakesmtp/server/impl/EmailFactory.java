@@ -1,4 +1,4 @@
-package de.gessnerfl.fakesmtp.server;
+package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
