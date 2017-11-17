@@ -26,6 +26,8 @@ addons:
     organization: "gessnerfl-github"
     token:
       secure: "mmHtKZvvtIC3Ggzn/ppgW+XtWz77DCwjV4kN28ZEMxddcCHMCw0kV7GNRt9AcVxWv6WIXEdFCHChIcVafpDCTBefunVPnanhYZhfXE5IYiy29UAbyArwXcB0EuioR07dANCIIfDelYpOGUh+/Lw2SkBot4uUGsmQFakSz4oZDxhJU8V6DPARaJSK8E7hBOPB/4kAazAkwoWSg6VcNk8vB2I5RxXXtEqWlvUAERE2yVNoQ17+eFWLhGp0yEfB+zBghq5nuFHj3tb79FyjM78sz2Y1vMx6EbnUl8qN8BY8YMtovOgg763Fai6hM/MJoODVSbYsHf/Wheq71Q1+vRaVEurfWw98iEJ0i+5pHCqL1fO/Lxck2jE+nO9SI2qjZ6RgHL/C7M9MUcOsXNLDmfZcFBdR756VWPO356A6AjUzRGo4DCXdyiNuC+NGYg2koOarzloUQSe07qb6EB3sYijbNQmBAxs2nNwXmGqwdrnD+pvqZPOFHHN6DGhg8q7ZVlAyTdaMbWJOlPXybcySGOkzHDPEDTpONppSNkp0kZREpgmk32GYCWSTt7WdKx+WrKzrS4ZxXgElWmJWiRHmrgxMVPft57XsRjxPyHnGmQYQ8x9LVlVy7dNm1Jr4vlxuq8xjhUpPeEvvyPMi4qRmy8HMKhy+HXEkFROqYP01X2l4UcE="
+    script:
+      - sonar-scanner
     branches:
       - master
 
