@@ -10,7 +10,7 @@ import java.net.InetAddress;
 @ConfigurationProperties(prefix = "fakesmtp")
 public class FakeSmtpConfigurationProperties {
 
-    public static final int DEFAULT_PORT = 25;
+    private static final int DEFAULT_PORT = 25;
 
     @NotNull
     private Integer port = DEFAULT_PORT;
@@ -75,7 +75,7 @@ public class FakeSmtpConfigurationProperties {
     }
 
     public static class Persistence {
-        public static int DEFAULT_MAX_NUMBER_EMAILS = 100;
+        final static int DEFAULT_MAX_NUMBER_EMAILS = 100;
 
         @NotNull
         private Integer maxNumberEmails = DEFAULT_MAX_NUMBER_EMAILS;
