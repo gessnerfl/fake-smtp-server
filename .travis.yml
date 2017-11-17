@@ -17,6 +17,10 @@ services:
 
 before_install:
 - chmod +x gradlew
+- chmod +x buildViaTravisCI.sh
+
+script:
+ - ./buildViaTravisCI.sh
 
 notifications:
   email: false
