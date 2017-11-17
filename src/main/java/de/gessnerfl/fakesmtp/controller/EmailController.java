@@ -39,11 +39,11 @@ public class EmailController {
 
     private String getAllEmailsPaged(int page, int size, Model model) {
         if(page < 0 || size <= 0){
-            return "redirect:/email";
+            return REDIRECT_EMAIL_LIST_VIEW;
         }
         Page<Email> result = emailRepository.findAll(new PageRequest(page, size, DEFAULT_SORT));
         if (result.getNumber() != 0 && result.getNumber() >= result.getTotalPages()) {
-            return "redirect:/email";
+            return REDIRECT_EMAIL_LIST_VIEW;
         }
         model.addAttribute(EMAIL_LIST_MODEL_NAME, result);
         return EMAIL_LIST_VIEW;

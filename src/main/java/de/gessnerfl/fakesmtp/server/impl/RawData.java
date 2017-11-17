@@ -1,7 +1,6 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -24,7 +23,7 @@ class RawData {
         return to;
     }
 
-    public String getContentAsString() throws IOException {
+    public String getContentAsString() {
         return new String(content, StandardCharsets.UTF_8);
     }
 

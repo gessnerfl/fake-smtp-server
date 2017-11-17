@@ -75,7 +75,7 @@ public class FakeSmtpConfigurationProperties {
     }
 
     public static class Persistence {
-        final static int DEFAULT_MAX_NUMBER_EMAILS = 100;
+        static final int DEFAULT_MAX_NUMBER_EMAILS = 100;
 
         @NotNull
         private Integer maxNumberEmails = DEFAULT_MAX_NUMBER_EMAILS;

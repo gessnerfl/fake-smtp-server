@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.subethamail.smtp.TooMuchDataException;
 import org.subethamail.smtp.helper.SimpleMessageListener;
 
 import java.io.IOException;
@@ -34,7 +33,7 @@ public class EmailPersister implements SimpleMessageListener {
     }
 
     @Override
-    public void deliver(String sender, String recipient, InputStream data) throws TooMuchDataException, IOException {
+    public void deliver(String sender, String recipient, InputStream data) throws IOException {
         logger.info("Received email from {} for {}", sender, recipient);
 
         RawData rawData = new RawData(sender, recipient, IOUtils.toByteArray(data));
