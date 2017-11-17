@@ -12,6 +12,8 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'jacoco'
+apply plugin: "org.sonarqube"
 
 group = 'de.gessnerfl'
 description = """Fake SMTP Server :: Simple SMTP Server which stores emails in memory and lists email in a web ui"""
@@ -58,4 +60,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives sourcesJar
     archives javadocJar
+}
+
+sonarqube {
+	properties {
+		property "sonar.projectName", "Fake SMTP Server"
+		property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
+	}
 }
