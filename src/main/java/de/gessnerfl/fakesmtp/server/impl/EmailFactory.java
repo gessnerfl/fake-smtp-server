@@ -48,7 +48,7 @@ public class EmailFactory {
         }
     }
 
-    private Email buildPlainOrHtmlEmail(RawData rawData, String subject, ContentType contentType, Object messageContent) throws IOException {
+    private Email buildPlainOrHtmlEmail(RawData rawData, String subject, ContentType contentType, Object messageContent) {
         return new Email.Builder()
                 .fromAddress(rawData.getFrom())
                 .toAddress(rawData.getTo())
@@ -80,7 +80,7 @@ public class EmailFactory {
         return email;
     }
 
-    private Email buildFallbackEmail(RawData rawData) throws IOException {
+    private Email buildFallbackEmail(RawData rawData) {
         return new Email.Builder()
                 .fromAddress(rawData.getFrom())
                 .toAddress(rawData.getTo())
