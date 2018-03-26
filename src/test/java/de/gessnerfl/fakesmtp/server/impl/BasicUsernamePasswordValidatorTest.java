@@ -5,10 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.subethamail.smtp.auth.LoginFailedException;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,7 +44,6 @@ public class BasicUsernamePasswordValidatorTest {
         final String password = "password";
         final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
-        when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
         sut.login(invalidUsername, password);
@@ -79,7 +77,6 @@ public class BasicUsernamePasswordValidatorTest {
         final String password = "password";
         final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(null);
-        when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
         sut.login(username, password);

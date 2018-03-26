@@ -41,7 +41,7 @@ public class EmailController {
         if(page < 0 || size <= 0){
             return REDIRECT_EMAIL_LIST_VIEW;
         }
-        Page<Email> result = emailRepository.findAll(new PageRequest(page, size, DEFAULT_SORT));
+        Page<Email> result = emailRepository.findAll(PageRequest.of(page, size, DEFAULT_SORT));
         if (result.getNumber() != 0 && result.getNumber() >= result.getTotalPages()) {
             return REDIRECT_EMAIL_LIST_VIEW;
         }
@@ -51,12 +51,12 @@ public class EmailController {
 
     @RequestMapping({"/email/{id}"})
     public String getEmailById(@PathVariable Long id, Model model) {
-        Email email = emailRepository.findOne(id);
-        if (email != null) {
-            model.addAttribute(SINGLE_EMAIL_MODEL_NAME, email);
-            return SINGLE_EMAIL_VIEW;
-        }
-        return REDIRECT_EMAIL_LIST_VIEW;
+        return emailRepository.findById(id).map(email -> appendToModelAndReturnView(model, email)).orElse(REDIRECT_EMAIL_LIST_VIEW);
+    }
+
+    private String appendToModelAndReturnView(Model model, Email email) {
+        model.addAttribute(SINGLE_EMAIL_MODEL_NAME, email);
+        return SINGLE_EMAIL_VIEW;
     }
 
 }

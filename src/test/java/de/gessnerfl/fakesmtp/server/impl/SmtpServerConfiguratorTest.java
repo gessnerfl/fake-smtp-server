@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.subethamail.smtp.AuthenticationHandlerFactory;
 import org.subethamail.smtp.auth.EasyAuthenticationHandlerFactory;
@@ -73,10 +73,8 @@ public class SmtpServerConfiguratorTest {
 
     @Test
     public void shouldSkipConfigurationOfAuthenticationWhenUsernameIsNull(){
-        final String password = "password";
         final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(null);
-        when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
         final SMTPServer smtpServer = mock(SMTPServer.class);
@@ -89,10 +87,8 @@ public class SmtpServerConfiguratorTest {
 
     @Test
     public void shouldSkipConfigurationOfAuthenticationWhenUsernameIsEmptyString(){
-        final String password = "password";
         final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn("");
-        when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
         final SMTPServer smtpServer = mock(SMTPServer.class);

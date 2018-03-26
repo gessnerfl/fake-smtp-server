@@ -2,17 +2,17 @@ package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
+
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -44,10 +44,8 @@ public class EmailControllerTest {
     @Test
     public void shouldReturnRedirectToFirstPageWhenRequestedPageIsOutOfRange() {
         final Page<Email> page = mock(Page.class);
-        when(page.getTotalElements()).thenReturn(8L);
         when(page.getTotalPages()).thenReturn(2);
         when(page.getNumber()).thenReturn(3);
-        when(page.getNumberOfElements()).thenReturn(5);
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
         String result = sut.getAll(3, 5, model);
@@ -61,10 +59,7 @@ public class EmailControllerTest {
     @Test
     public void shouldNotRedirectToFirstPageWhenNoDataIsAvailable() {
         final Page<Email> page = mock(Page.class);
-        when(page.getTotalElements()).thenReturn(0L);
-        when(page.getTotalPages()).thenReturn(0);
         when(page.getNumber()).thenReturn(0);
-        when(page.getNumberOfElements()).thenReturn(0);
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
         String result = sut.getAll(0, 5, model);
@@ -103,56 +98,36 @@ public class EmailControllerTest {
     public void shouldReturnSingleEmailWhenIdIsValid() {
         final long id = 12L;
         final Email mail = mock(Email.class);
-        when(emailRepository.findOne(id)).thenReturn(mail);
+        when(emailRepository.findById(id)).thenReturn(Optional.of(mail));
 
         String result = sut.getEmailById(id, model);
 
         assertEquals(EmailController.SINGLE_EMAIL_VIEW, result);
 
-        verify(emailRepository).findOne(id);
+        verify(emailRepository).findById(id);
         verify(model).addAttribute(EmailController.SINGLE_EMAIL_MODEL_NAME, mail);
     }
 
     @Test
     public void shouldReturnRedirectToListPageWhenIdIsNotValid() {
         final long id = 12L;
-        final Page<Email> page = createFirstPageEmail();
-        when(emailRepository.findOne(id)).thenReturn(null);
-        when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
+        when(emailRepository.findById(id)).thenReturn(Optional.empty());
 
         String result = sut.getEmailById(id, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
 
-        verify(emailRepository).findOne(id);
+        verify(emailRepository).findById(id);
     }
 
     private Page<Email> createFirstPageEmail() {
         Page<Email> page = mock(Page.class);
-        when(page.getTotalElements()).thenReturn(8L);
-        when(page.getTotalPages()).thenReturn(2);
         when(page.getNumber()).thenReturn(0);
-        when(page.getNumberOfElements()).thenReturn(5);
         return page;
     }
 
 
-    private Matcher<Pageable> matchPageable(int page, int size) {
-        return new BaseMatcher<Pageable>() {
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Pagable should have pageNumber ").appendValue(page).appendText(" and pageSize ").appendValue(size);
-            }
-
-            @Override
-            public boolean matches(Object item) {
-                if (item instanceof Pageable) {
-                    Pageable p = (Pageable) item;
-                    return p.getPageNumber() == page && p.getPageSize() == size;
-                }
-                return false;
-            }
-        };
+    private ArgumentMatcher<Pageable> matchPageable(int page, int size) {
+        return (item) ->  item.getPageNumber() == page && item.getPageSize() == size;
     }
 }

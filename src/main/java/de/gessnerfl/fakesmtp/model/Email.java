@@ -7,7 +7,8 @@ import java.util.Date;
 @Table(name = "email")
 public class Email {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @SequenceGenerator(name = "email_generator", sequenceName = "email_sequence", allocationSize = 1)
+    @GeneratedValue(generator = "email_generator")
     private Long id;
 
     @Column(name="from_address", length = 255, nullable = false)

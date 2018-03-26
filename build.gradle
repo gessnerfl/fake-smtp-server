@@ -1,20 +1,23 @@
 buildscript {
-	ext { springBootVersion = '1.5.6.RELEASE' }
+	ext { springBootVersion = '2.0.0.RELEASE' }
     repositories {
 		jcenter()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5")
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2")
 	}
 }
 
-plugins { id "com.cinnober.gradle.semver-git" version "2.2.2" }
+plugins {
+	id "com.cinnober.gradle.semver-git" version "2.3.1"
+	id 'org.springframework.boot' version '2.0.0.RELEASE'
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 apply plugin: 'jacoco'
 apply plugin: 'org.sonarqube'
 
@@ -36,18 +39,18 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-mail')
-	compile('commons-io:commons-io:2.5')
+	compile('commons-io:commons-io:2.6')
 	compile('org.subethamail:subethasmtp:3.1.7')
 	compile('org.flywaydb:flyway-core')
 
-    compile('org.webjars.bower:jquery:3.2.1')
+    compile('org.webjars.bower:jquery:3.3.1')
     compile('org.webjars.bower:bootstrap:3.3.7')
-	compile('org.webjars:font-awesome:4.7.0')
+	compile('org.webjars:font-awesome:5.0.6')
 
     runtime'com.h2database:h2'
 	runtime('org.springframework.boot:spring-boot-devtools')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('commons-lang:commons-lang:2.6')
+	testCompile('org.apache.commons:commons-lang3:3.7')
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
