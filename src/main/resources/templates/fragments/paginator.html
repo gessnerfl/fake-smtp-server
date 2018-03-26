@@ -16,19 +16,19 @@
 				<div class="text-center">
 					<ul class='pagination pagination-centered'>
 						<li th:class="${page.first}?'disabled':''">
-							<span th:if='${page.first}'><i class="fa fa-angle-double-left" aria-hidden="true"></i>&nbsp;First</span>
+							<span th:if='${page.first}'><i class="fas fa-angle-double-left" aria-hidden="true"></i>&nbsp;First</span>
 							<a th:if='${not page.first}' th:href='@{${url}(page=0,size=${page.size})}' title="Go to first page"><i class="fa fa-angle-double-left" aria-hidden="true"></i>&nbsp;First</a>
 						</li>
 						<li th:class="${page.hasPrevious()}? '' : 'disabled'">
-							<span th:if='${not page.hasPrevious()}'><i class="fa fa-angle-left" aria-hidden="true"></i>&nbsp;Previous</span>
+							<span th:if='${not page.hasPrevious()}'><i class="fas fa-angle-left" aria-hidden="true"></i>&nbsp;Previous</span>
 							<a th:if='${page.hasPrevious()}' th:href='@{${url}(page=${page.number-2},size=${page.size})}' title='Go to previous page'><i class="fa fa-angle-left" aria-hidden="true"></i>&nbsp;Previous</a>
 						</li>
 						<li th:class="${page.hasNext()}? '' : 'disabled'">
-							<span th:if='${not page.hasNext()}'>Next&nbsp;<i class="fa fa-angle-right" aria-hidden="true"></i></span>
+							<span th:if='${not page.hasNext()}'>Next&nbsp;<i class="fas fa-angle-right" aria-hidden="true"></i></span>
 							<a th:if='${page.hasNext()}' th:href='@{${url}(page=${page.number+1},size=${page.size})}' title='Go to next page'>Next&nbsp;<i class="fa fa-angle-right" aria-hidden="true"></i></a>
 						</li>
 						<li th:class="${page.last}? 'disabled' : ''">
-							<span th:if='${page.last}'>Last&nbsp;<i class="fa fa-angle-double-right" aria-hidden="true"></i></span>
+							<span th:if='${page.last}'>Last&nbsp;<i class="fas fa-angle-double-right" aria-hidden="true"></i></span>
 							<a th:if='${not page.last}' th:href='@{${url}(page=${page.totalPages - 1},size=${page.size})}' title="Go to last page">Last&nbsp;<i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
 						</li>
 					</ul>
