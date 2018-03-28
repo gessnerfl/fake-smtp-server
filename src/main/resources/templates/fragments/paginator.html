@@ -16,19 +16,19 @@
 				<div class="text-center">
 					<ul class='pagination justify-content-center'>
 						<li class="waves-effect" th:class="${page.first}?'disabled':''">
-							<span th:if='${page.first}'><i class="material-icons">first_page</i></span>
+							<a th:if='${page.first}'><i class="material-icons">first_page</i></a>
 							<a th:if='${not page.first}' th:href='@{${url}(page=0,size=${page.size})}' title="Go to first page"><i class="material-icons">first_page</i></a>
 						</li>
 						<li class="waves-effect" th:class="${page.hasPrevious()}? '' : 'disabled'">
-							<span th:if='${not page.hasPrevious()}'><i class="material-icons">navigate_before</i></span>
+							<a th:if='${not page.hasPrevious()}'><i class="material-icons">navigate_before</i></a>
 							<a th:if='${page.hasPrevious()}' th:href='@{${url}(page=${page.number-2},size=${page.size})}' title='Go to previous page'><i class="material-icons">navigate_before</i></a>
 						</li>
 						<li class="waves-effect" th:class="${page.hasNext()}? '' : 'disabled'">
-							<span th:if='${not page.hasNext()}'><i class="material-icons">navigate_next</i></span>
+							<a th:if='${not page.hasNext()}'><i class="material-icons">navigate_next</i></a>
 							<a th:if='${page.hasNext()}' th:href='@{${url}(page=${page.number+1},size=${page.size})}' title='Go to next page'><i class="material-icons">navigate_next</i></a>
 						</li>
 						<li class="waves-effect" th:class="${page.last}? 'disabled' : ''">
-							<span th:if='${page.last}'><i class="material-icons">last_page</i></span>
+							<a th:if='${page.last}'><i class="material-icons">last_page</i></a>
 							<a th:if='${not page.last}' th:href='@{${url}(page=${page.totalPages - 1},size=${page.size})}' title="Go to last page"><i class="material-icons">last_page</i></a>
 						</li>
 					</ul>
