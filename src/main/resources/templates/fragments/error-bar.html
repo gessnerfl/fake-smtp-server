@@ -5,8 +5,10 @@
 
 <body>
 	<div class="row">
-		<div class="col-xs-12">
-			<div th:if="${error}" th:fragment="error-bar" class="alert alert-danger" role="alert" th:text="${errorMessage}">errorMessage</div>
+		<div class="col s12">
+			<div th:if="${error}" th:fragment="error-bar" class="card red darken-4" role="alert">
+				<div class="card-content white-text" th:text="${errorMessage}">errorMessage</div>
+			</div>
 		</div>
 	</div>
 </body>

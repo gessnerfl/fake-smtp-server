@@ -44,8 +44,9 @@ dependencies {
 	compile('org.flywaydb:flyway-core')
 
     compile('org.webjars.bower:jquery:3.3.1')
-    compile('org.webjars.bower:bootstrap:3.3.7')
+    compile('org.webjars:materializecss:0.100.2')
 	compile('org.webjars:font-awesome:5.0.6')
+	compile('org.webjars:material-design-icons:3.0.1')
 
     runtime'com.h2database:h2'
 	runtime('org.springframework.boot:spring-boot-devtools')
