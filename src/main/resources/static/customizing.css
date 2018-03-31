@@ -13,3 +13,9 @@
 .tabs .indicator {
     background-color:#01579b;
 }
+
+.btn-floating.top-right {
+    position: absolute;
+    right: 24px;
+    top: 20px;
+}
