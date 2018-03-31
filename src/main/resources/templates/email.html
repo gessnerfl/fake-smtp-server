@@ -7,41 +7,40 @@
 <div class="container" style="margin-top:60px">
     <div class="row">
         <div class="col s12">
-            <div class="page-header">
-                <h1><i class="fas fa-envelope" aria-hidden="true"></i>&nbsp;Email&nbsp;<span th:text="${mail.id}">mail.id</span></h1>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col s12">
-            <dl class="dl-horizontal">
-                <dt>From:</dt>
-                <dd th:text="${mail.fromAddress}">From</dd>
-                <dt>To:</dt>
-                <dd th:text="${mail.toAddress}">To</dd>
-                <dt>Received On:</dt>
-                <dd th:with="df='yyyy-MM-dd HH:mm:ss'" th:text="${#calendars.format(mail.receivedOn,df)}">Received On</dd>
-                <dt>Subject</dt>
-                <dd th:text="${mail.subject}">Subject</dd>
-            </dl>
-
-            <div>
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" th:classappend="${mail.contentType.name() == 'HTML'} ? 'active' : ''" th:if="${mail.contentType.name() == 'HTML'}"><a href="#mail-content-html" aria-controls="mail-content-html" role="tab" data-toggle="tab">HTML</a></li>
-                    <li role="presentation" th:classappend="${mail.contentType.name() == 'HTML'} ? '' : 'active'" th:if="${mail.contentType.name() != 'HTML'}"><a href="#mail-content-plain" aria-controls="mail-content-plain" role="tab" data-toggle="tab">Plain</a></li>
-                    <li role="presentation"><a href="#mail-content-raw" aria-controls="mail-content-raw" role="tab" data-toggle="tab">Raw</a></li>
-                </ul>
-
-                <!-- Tab panes -->
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane" id="mail-content-html" th:classappend="${mail.contentType.name() == 'HTML'} ? 'active' : ''" th:if="${mail.contentType.name() == 'HTML'}">
-                        <div class="panel-body" th:utext="${mail.content}"></div>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="mail-content-plain" th:classappend="${mail.contentType.name() == 'HTML'} ? '' : 'active'" th:if="${mail.contentType.name() != 'HTML'}">
-                        <div class="panel-body" th:text="${mail.content}"></div>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="mail-content-raw">
-                        <pre th:text="${mail.rawData}"></pre>
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title"><i class="material-icons" style="vertical-align: bottom;">email</i>&nbsp;Email&nbsp;<span th:text="${mail.id}">mail.id</span></span>
+                    <table>
+                        <tr>
+                            <th>From:</th>
+                            <td th:text="${mail.fromAddress}">From</td>
+                        </tr>
+                        <tr>
+                            <th>To:</th>
+                            <td th:text="${mail.toAddress}">To</td>
+                        </tr>
+                        <tr>
+                            <th>Received On:</th>
+                            <td th:with="df='yyyy-MM-dd HH:mm:ss'" th:text="${#calendars.format(mail.receivedOn,df)}">Received On</td>
+                        </tr>
+                        <tr>
+                            <th>Subject:</th>
+                            <td th:text="${mail.subject}">Subject</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-tabs">
+                    <ul class="tabs tabs-fixed-width">
+                        <li class="tab col s6" th:classappend="${mail.contentType.name() == 'HTML'} ? 'active' : ''" th:if="${mail.contentType.name() == 'HTML'}"><a href="#mail-content-html">HTML</a></li>
+                        <li class="tab col s6" th:classappend="${mail.contentType.name() == 'HTML'} ? '' : 'active'" th:if="${mail.contentType.name() != 'HTML'}"><a href="#mail-content-plain">Plain</a></li>
+                        <li class="tab col s6"><a href="#mail-content-raw" aria-controls="mail-content-raw">Raw</a></li>
+                    </ul>
+                </div>
+                <div class="card-content">
+                    <div id="mail-content-html" th:utext="${mail.content}" th:if="${mail.contentType.name() == 'HTML'}"></div>
+                    <div id="mail-content-plain" th:text="${mail.content}" th:if="${mail.contentType.name() != 'HTML'}"></div>
+                    <div id="mail-content-raw" class="grey lighten-4">
+                        <pre class="card-content" th:text="${mail.rawData}"></pre>
                     </div>
                 </div>
             </div>
