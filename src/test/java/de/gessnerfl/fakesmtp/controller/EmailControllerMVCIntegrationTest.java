@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -14,10 +15,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -97,6 +101,35 @@ public class EmailControllerMVCIntegrationTest {
                 .andExpect(status().isFound());
     }
 
+    @Test
+    public void shouldReturnAttachmentForEmail() throws Exception {
+        Email email = createRandomEmail(1);
+        EmailAttachment attachment = email.getAttachments().get(0);
+
+        this.mockMvc.perform(get("/email/"+email.getId()+"/attachment/" + attachment.getId()))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename=" + attachment.getFilename()))
+                .andExpect(header().string(HttpHeaders.CONTENT_LENGTH,"" + attachment.getData().length))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE))
+                .andExpect(content().bytes(attachment.getData()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
+        Email email = createRandomEmail(1);
+
+        this.mockMvc.perform(get("/email/"+email.getId()+"/attachment/123"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
+        Email email = createRandomEmail(1);
+
+        this.mockMvc.perform(get("/email/123/attachment/"+email.getAttachments().get(0).getId()))
+                .andExpect(status().isNotFound());
+    }
+
     private Matcher<Email> equalsMail(Email email) {
         return new BaseMatcher<Email>() {
             @Override
@@ -126,6 +159,10 @@ public class EmailControllerMVCIntegrationTest {
         content.setContentType(ContentType.PLAIN);
         content.setData("Test Content "+randomToken);
 
+        EmailAttachment attachment = new EmailAttachment();
+        attachment.setFilename("test.txt");
+        attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
+
         Email mail = new Email();
         mail.setSubject("Test Subject "+randomToken);
         mail.setRawData("Test Content "+randomToken);
@@ -133,6 +170,7 @@ public class EmailControllerMVCIntegrationTest {
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
         mail.addContent(content);
+        mail.addAttachment(attachment);
         return emailRepository.save(mail);
     }
 
