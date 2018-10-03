@@ -19,9 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.util.MimeType;
 
-import javax.persistence.EntityNotFoundException;
 import javax.servlet.ServletContext;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -176,7 +174,7 @@ public class EmailControllerTest {
         assertArrayEquals(fileContent, result.getBody().getByteArray());
     }
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test(expected = AttachmentNotFoundException.class)
     public void shouldThrowExceptionWhenNoAttachmentExistsForTheGivenId(){
         final long emailId = 123L;
         final long attachmentId = 456L;
@@ -190,7 +188,7 @@ public class EmailControllerTest {
         sut.getEmailAttachmentById(emailId, attachmentId);
     }
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test(expected = AttachmentNotFoundException.class)
     public void shouldThrowExceptionWhenAttachmentExistsForTheGivenIdButTheEmailIdDoesNotMatch(){
         final long emailId = 123L;
         final long attachmentId = 456L;
