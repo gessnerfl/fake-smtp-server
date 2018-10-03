@@ -32,14 +32,12 @@
                 </div>
                 <div class="card-tabs">
                     <ul class="tabs tabs-fixed-width">
-                        <li class="tab col s6" th:classappend="${mail.contentType.name() == 'HTML'} ? 'active' : ''" th:if="${mail.contentType.name() == 'HTML'}"><a href="#mail-content-html">HTML</a></li>
-                        <li class="tab col s6" th:classappend="${mail.contentType.name() == 'HTML'} ? '' : 'active'" th:if="${mail.contentType.name() != 'HTML'}"><a href="#mail-content-plain">Plain</a></li>
+                        <li class="tab col s6" th:each="c,is : ${mail.contents}" th:classappend="${is.first} ? 'active' : ''"><a th:href="'#mail-content-'+${c.id}" th:text="${c.contentType}">Plain</a></li>
                         <li class="tab col s6"><a href="#mail-content-raw" aria-controls="mail-content-raw">Raw</a></li>
                     </ul>
                 </div>
                 <div class="card-content">
-                    <div id="mail-content-html" th:utext="${mail.content}" th:if="${mail.contentType.name() == 'HTML'}"></div>
-                    <div id="mail-content-plain" th:text="${mail.content}" th:if="${mail.contentType.name() != 'HTML'}"></div>
+                    <div th:each="c,is : ${mail.contents}" th:id="'mail-content-'+${c.id}" th:utext="${c.data}"></div>
                     <div id="mail-content-raw" class="grey lighten-4">
                         <pre class="card-content" th:text="${mail.rawData}"></pre>
                     </div>

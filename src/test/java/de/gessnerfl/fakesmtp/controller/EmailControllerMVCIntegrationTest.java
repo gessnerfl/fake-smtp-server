@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.BaseMatcher;
@@ -120,14 +121,18 @@ public class EmailControllerMVCIntegrationTest {
         final String randomToken = RandomStringUtils.randomAlphanumeric(6);
         LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
         Date receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+
+        EmailContent content = new EmailContent();
+        content.setContentType(ContentType.PLAIN);
+        content.setData("Test Content "+randomToken);
+
         Email mail = new Email();
         mail.setSubject("Test Subject "+randomToken);
-        mail.setContent("Test Content "+randomToken);
         mail.setRawData("Test Content "+randomToken);
         mail.setReceivedOn(receivedOn);
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
-        mail.setContentType(ContentType.PLAIN);
+        mail.addContent(content);
         return emailRepository.save(mail);
     }
 

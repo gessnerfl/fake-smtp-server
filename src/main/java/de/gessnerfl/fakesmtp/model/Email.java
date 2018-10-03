@@ -1,7 +1,11 @@
 package de.gessnerfl.fakesmtp.model;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "email")
@@ -34,15 +38,11 @@ public class Email {
     @Basic(optional = false)
     private String rawData;
 
-    @Lob
-    @Column(name="content", nullable = false)
-    @Basic(optional = false)
-    private String content;
+    @OneToMany(mappedBy="email", cascade = CascadeType.ALL, orphanRemoval=true)
+    private List<EmailContent> contents = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    @Column(name="content_type", nullable = false)
-    @Basic(optional = false)
-    private ContentType contentType;
+    @OneToMany(mappedBy="email", cascade = CascadeType.ALL, orphanRemoval=true)
+    private List<EmailAttachment> attachments = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -92,20 +92,34 @@ public class Email {
         return rawData;
     }
 
-    public String getContent() {
-        return content;
+    public void addContent(EmailContent content) {
+        content.setEmail(this);
+        contents.add(content);
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public List<EmailContent> getContents() {
+        return contents.stream().sorted(comparing(EmailContent::getContentType)).collect(toList());
     }
 
-    public ContentType getContentType() {
-        return contentType;
+    public Optional<EmailContent> getPlainContent(){
+        return getContentOfType(ContentType.PLAIN);
     }
 
-    public void setContentType(ContentType contentType) {
-        this.contentType = contentType;
+    public Optional<EmailContent> getHtmlContent(){
+        return getContentOfType(ContentType.HTML);
+    }
+
+    private Optional<EmailContent> getContentOfType(ContentType contentType){
+        return contents.stream().filter(c -> contentType.equals(c.getContentType())).findFirst();
+    }
+
+    public void addAttachment(EmailAttachment attachment) {
+        attachment.setEmail(this);
+        attachments.add(attachment);
+    }
+
+    public List<EmailAttachment> getAttachments() {
+        return attachments;
     }
 
     @Override
@@ -121,59 +135,5 @@ public class Email {
     @Override
     public int hashCode() {
         return id.hashCode();
-    }
-
-    public static class Builder {
-        private String fromAddress;
-        private String toAddress;
-        private Date receivedOn;
-        private String subject;
-        private String rawData;
-        private String content;
-        private ContentType contentType;
-
-        public Builder fromAddress(String fromAddress) {
-            this.fromAddress = fromAddress;
-            return this;
-        }
-        public Builder toAddress(String toAddress) {
-            this.toAddress = toAddress;
-            return this;
-        }
-        public Builder receivedOn(Date receivedOn) {
-            this.receivedOn = receivedOn;
-            return this;
-        }
-        public Builder subject(String subject) {
-            this.subject = subject;
-            return this;
-        }
-        public Builder rawData(String rawData) {
-            this.rawData = rawData;
-            return this;
-        }
-        public Builder content(String content) {
-            this.content = content;
-            return this;
-        }
-        public Builder contentType(ContentType contentType) {
-            this.contentType = contentType;
-            return this;
-        }
-
-        public Email build() {
-            Email email = new Email();
-            email.setFromAddress(this.fromAddress);
-            email.setToAddress(this.toAddress);
-            email.setReceivedOn(this.receivedOn);
-            email.setSubject(this.subject);
-            email.setRawData(this.rawData);
-            if (this.content != null && !this.content.isEmpty())
-                email.setContent(this.content);
-            else
-                email.setContent(this.rawData);
-            email.setContentType(this.contentType);
-            return email;
-        }
     }
 }
