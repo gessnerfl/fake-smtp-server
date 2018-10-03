@@ -1,0 +1,76 @@
+Received: from 192.168.0.157 (localhost [127.0.0.1])
+        by 192.168.0.157
+        with SMTP (SubEthaSMTP 3.1.7) id JMT3KYBE
+        for receiver@exmaple.com;
+        Wed, 03 Oct 2018 13:57:44 +0200 (CEST)
+Date: Wed, 3 Oct 2018 13:57:44 +0200 (CEST)
+From: sender@example.com
+To: receiver@exmaple.com
+Message-ID: <335471116.29.1538567864763@[192.168.0.157]>
+Subject: Test-Alternative-Mail 4
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_26_1121172875.1538567864761"
+
+------=_Part_26_1121172875.1538567864761
+Content-Type: multipart/related;
+	boundary="----=_Part_27_649734728.1538567864761"
+
+------=_Part_27_649734728.1538567864761
+Content-Type: multipart/alternative;
+	boundary="----=_Part_28_1595953398.1538567864761"
+
+------=_Part_28_1595953398.1538567864761
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+This is the test mail number4
+------=_Part_28_1595953398.1538567864761
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<html><head></head><body>This is the test mail number 4</body>
+------=_Part_28_1595953398.1538567864761--
+
+------=_Part_27_649734728.1538567864761--
+
+------=_Part_26_1121172875.1538567864761
+Content-Type: image/png; name=app-icon.png
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=app-icon.png
+
+iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAolBMVEUAAAA0mNs0mNs0mNs0mNs0
+mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0
+mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0
+mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNuo1pBsAAAANXRSTlMAAQMEBQYHCQsMDQ4P
+EB0eKi0uOTs8PT5KTGdpa2xzdHuGiKiqq621t7m+xcfO2dze4unt+xTcEm4AAACdSURBVCjPrY/J
+EsFQFAX7IcQ8xDzPhBiT8/+/ZoFQPAtK72533cWBr8lvZMHPsZQVn7M9nBjbw5Dk3uYPKcgE7z7I
+QAPTe/UDQx31DaXDsz6WMV0hBUUSk4efJihsJSRFHaiGVx3WoB3pGqR5GmchSXOH9EyKg8IKeLud
+B5XbK/EiA2BG9zsO2jddt/VYiz7wQ1jb/Yqcb/PrLP/jAkeJUZTlAz/+AAAAAElFTkSuQmCC
+------=_Part_26_1121172875.1538567864761
+Content-Type: text/css; charset=us-ascii; name=customizing.css
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=customizing.css
+
+.tabs .tab a{
+    color:#0288d1;
+}
+
+.tabs .tab a:hover {
+    color:#01579b;
+}
+
+.tabs .tab a.active {
+    color:#01579b;
+}
+
+.tabs .indicator {
+    background-color:#01579b;
+}
+
+.btn-floating.top-right {
+    position: absolute;
+    right: 24px;
+    top: 20px;
+}
+------=_Part_26_1121172875.1538567864761--

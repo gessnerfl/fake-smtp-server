@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.repository;
 
 import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.model.EmailContent;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -21,12 +23,13 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 
+@Transactional
 @ActiveProfiles("integrationtest")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class EmailRepositoryIntegrationTest {
 
-    public static final Sort SORT_DESC_BY_RECEIVED_ON = new Sort(Sort.Direction.DESC, "receivedOn");
+    private static final Sort SORT_DESC_BY_RECEIVED_ON = new Sort(Sort.Direction.DESC, "receivedOn");
     @Autowired
     private EmailRepository sut;
 
@@ -77,14 +80,18 @@ public class EmailRepositoryIntegrationTest {
         final String randomToken = RandomStringUtils.randomAlphanumeric(6);
         LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
         Date receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+
+        EmailContent content = new EmailContent();
+        content.setContentType(ContentType.PLAIN);
+        content.setData("Test Content "+randomToken);
+
         Email mail = new Email();
         mail.setSubject("Test Subject "+randomToken);
         mail.setRawData("Test Content "+randomToken);
-        mail.setContent("Test Content "+randomToken);
         mail.setReceivedOn(receivedOn);
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
-        mail.setContentType(ContentType.PLAIN);
+        mail.addContent(content);
         return sut.save(mail);
     }
 

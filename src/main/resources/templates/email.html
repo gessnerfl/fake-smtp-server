@@ -8,10 +8,10 @@
     <div class="row">
         <div class="col s12">
             <div class="card">
-                <div class="card-content">
+                <div class="card-content grey lighten-5">
                     <span class="card-title"><i class="material-icons" style="vertical-align: bottom;">email</i>&nbsp;Email&nbsp;<span th:text="${mail.id}">mail.id</span></span>
                     <a class="btn-floating top-right waves-effect waves-light grey lighten-4" th:href="@{/email}"><i class="material-icons blue-text text-darken-4">close</i></a>
-                    <table>
+                    <table class="striped">
                         <tr>
                             <th>From:</th>
                             <td th:text="${mail.fromAddress}">From</td>
@@ -31,22 +31,35 @@
                     </table>
                 </div>
                 <div class="card-tabs">
-                    <ul class="tabs tabs-fixed-width">
-                        <li class="tab col s6" th:classappend="${mail.contentType.name() == 'HTML'} ? 'active' : ''" th:if="${mail.contentType.name() == 'HTML'}"><a href="#mail-content-html">HTML</a></li>
-                        <li class="tab col s6" th:classappend="${mail.contentType.name() == 'HTML'} ? '' : 'active'" th:if="${mail.contentType.name() != 'HTML'}"><a href="#mail-content-plain">Plain</a></li>
-                        <li class="tab col s6"><a href="#mail-content-raw" aria-controls="mail-content-raw">Raw</a></li>
+                    <ul class="tabs tabs-fixed-width mail-type">
+                        <li class="tab col s3" th:each="c,is : ${mail.contents}" th:classappend="${is.first} ? 'active' : ''">
+                            <a th:href="'#mail-content-'+${c.id}" th:text="${c.contentType}">type</a>
+                        </li>
+                        <li class="tab col s3">
+                            <a href="#mail-content-raw" aria-controls="mail-content-raw">Raw</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-content">
-                    <div id="mail-content-html" th:utext="${mail.content}" th:if="${mail.contentType.name() == 'HTML'}"></div>
-                    <div id="mail-content-plain" th:text="${mail.content}" th:if="${mail.contentType.name() != 'HTML'}"></div>
+                    <div th:each="c,is : ${mail.contents}" th:id="'mail-content-'+${c.id}" th:utext="${c.data}"></div>
                     <div id="mail-content-raw" class="grey lighten-4">
                         <pre class="card-content" th:text="${mail.rawData}"></pre>
                     </div>
+                </div>
+                <div class="card-action" th:if="${not #lists.isEmpty(mail.attachments)}">
+                    <a th:href="@{|/email/${mail.id}/attachment/${a.id}|}" th:each="a : ${mail.attachments}">
+                        <i class="material-icons tiny blue-text">attach_file</i>
+                        <span class="blue-text no-uppercase" th:text="${a.filename}"></span>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        $('.tabs').tabs();
+      });
+</script>
 </body>
 </html>

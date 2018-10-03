@@ -19,3 +19,11 @@
     right: 24px;
     top: 20px;
 }
+
+.no-uppercase {
+    text-transform: none;
+}
+
+.tabs.mail-type .tab a:focus, .tabs .tab a:focus.active{
+    background-color: #e3f2fd;
+}

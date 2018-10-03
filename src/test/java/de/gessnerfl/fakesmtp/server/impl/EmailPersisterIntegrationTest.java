@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 
+@Transactional
 @ActiveProfiles("integrationtest")
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -55,7 +57,9 @@ public class EmailPersisterIntegrationTest {
         assertEquals(RECEIVER, mail.getToAddress());
         assertEquals("This is the mail title", mail.getSubject());
         assertEquals(rawData, mail.getRawData());
-        assertEquals("This is the message content", mail.getContent());
+        assertFalse(mail.getHtmlContent().isPresent());
+        assertTrue(mail.getPlainContent().isPresent());
+        assertEquals("This is the message content", mail.getPlainContent().get().getData());
         assertNotNull(mail.getReceivedOn());
     }
 
@@ -77,7 +81,9 @@ public class EmailPersisterIntegrationTest {
         assertEquals(RECEIVER, mail.getToAddress());
         assertEquals(EmailFactory.UNDEFINED, mail.getSubject());
         assertEquals(rawData, mail.getRawData());
-        assertEquals("This is the message content", mail.getContent());
+        assertFalse(mail.getHtmlContent().isPresent());
+        assertTrue(mail.getPlainContent().isPresent());
+        assertEquals("This is the message content", mail.getPlainContent().get().getData());
         assertNotNull(mail.getReceivedOn());
     }
 
@@ -98,7 +104,9 @@ public class EmailPersisterIntegrationTest {
         assertEquals(RECEIVER, mail.getToAddress());
         assertEquals(EmailFactory.UNDEFINED, mail.getSubject());
         assertEquals(rawData, mail.getRawData());
-        assertEquals(rawData, mail.getContent());
+        assertFalse(mail.getHtmlContent().isPresent());
+        assertTrue(mail.getPlainContent().isPresent());
+        assertEquals(rawData, mail.getPlainContent().get().getData());
         assertNotNull(mail.getReceivedOn());
     }
 }
