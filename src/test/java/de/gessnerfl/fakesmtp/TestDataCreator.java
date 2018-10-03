@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public class TestDataCreator {
 
-    public static final int NUMBER_OF_TEST_EMAILS = 5;
+    private static final int NUMBER_OF_TEST_EMAILS = 5;
 
     public static void main(String[] args) {
         for(int i = 0; i < NUMBER_OF_TEST_EMAILS; i++){

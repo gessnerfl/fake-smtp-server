@@ -11,7 +11,7 @@
                 <div class="card-content grey lighten-5">
                     <span class="card-title"><i class="material-icons" style="vertical-align: bottom;">email</i>&nbsp;Email&nbsp;<span th:text="${mail.id}">mail.id</span></span>
                     <a class="btn-floating top-right waves-effect waves-light grey lighten-4" th:href="@{/email}"><i class="material-icons blue-text text-darken-4">close</i></a>
-                    <table>
+                    <table class="striped">
                         <tr>
                             <th>From:</th>
                             <td th:text="${mail.fromAddress}">From</td>
@@ -31,9 +31,13 @@
                     </table>
                 </div>
                 <div class="card-tabs">
-                    <ul class="tabs tabs-fixed-width">
-                        <li class="tab col s3" th:each="c,is : ${mail.contents}" th:classappend="${is.first} ? 'active' : ''"><a th:href="'#mail-content-'+${c.id}" th:text="${c.contentType}">Plain</a></li>
-                        <li class="tab col s3"><a href="#mail-content-raw" aria-controls="mail-content-raw">Raw</a></li>
+                    <ul class="tabs tabs-fixed-width mail-type">
+                        <li class="tab col s3" th:each="c,is : ${mail.contents}" th:classappend="${is.first} ? 'active' : ''">
+                            <a th:href="'#mail-content-'+${c.id}" th:text="${c.contentType}">type</a>
+                        </li>
+                        <li class="tab col s3">
+                            <a href="#mail-content-raw" aria-controls="mail-content-raw">Raw</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-content">
@@ -52,5 +56,10 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        $('.tabs').tabs();
+      });
+</script>
 </body>
 </html>
