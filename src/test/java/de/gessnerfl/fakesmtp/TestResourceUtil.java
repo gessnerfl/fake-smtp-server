@@ -20,7 +20,7 @@ public class TestResourceUtil {
     }
 
     public static InputStream getTestFile(String filename) {
-        InputStream stream = TestResourceUtil.class.getResourceAsStream(TEST_DATA_FOLDER + filename);
+        var stream = TestResourceUtil.class.getResourceAsStream(TEST_DATA_FOLDER + filename);
         if (stream == null) {
             stream = TestResourceUtil.class.getClassLoader().getResourceAsStream(TEST_DATA_FOLDER + filename);
         }

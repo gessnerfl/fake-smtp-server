@@ -1,25 +1,25 @@
 buildscript {
-	ext { springBootVersion = '2.0.5.RELEASE' }
+	ext { springBootVersion = '2.1.0.RELEASE' }
     repositories {
 		jcenter()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2")
+        //classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2")
 	}
 }
 
 plugins {
 	id "com.cinnober.gradle.semver-git" version "2.3.1"
-	id 'org.springframework.boot' version '2.0.5.RELEASE'
+	id 'org.springframework.boot' version '2.1.0.RELEASE'
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'jacoco'
-apply plugin: 'org.sonarqube'
+//apply plugin: 'jacoco'
+//apply plugin: 'org.sonarqube'
 
 group = 'de.gessnerfl'
 description = """Fake SMTP Server :: Simple SMTP Server which stores emails in memory and lists email in a web ui"""
@@ -27,11 +27,14 @@ description = """Fake SMTP Server :: Simple SMTP Server which stores emails in m
 ext.scmUrl = 'git@github.com:gessnerfl/fake-smtp-server.git'
 ext.projectUrl = 'https://github.com/gessnerfl/fake-smtp-server'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories { jcenter() }
-
+/*
+jacoco {
+	toolVersion = "0.8.2"
+}*/
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -42,7 +45,8 @@ dependencies {
 	compile('commons-io:commons-io:2.6')
 	compile('org.subethamail:subethasmtp:3.1.7')
 	compile('org.flywaydb:flyway-core')
-
+	compile('com.sun.xml.bind:jaxb-impl:2.4.0-b180830.0438')
+	
     compile('org.webjars.bower:jquery:3.3.1')
     compile('org.webjars:materializecss:1.0.0')
 	compile('org.webjars:material-design-icons:3.0.1')
@@ -67,10 +71,11 @@ artifacts {
     archives sourcesJar
     archives javadocJar
 }
-
+/*
 sonarqube {
 	properties {
 		property "sonar.projectName", "Fake SMTP Server"
 		property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
 	}
 }
+*/

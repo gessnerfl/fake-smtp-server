@@ -56,9 +56,9 @@ public class EmailControllerMVCIntegrationTest {
 
     @Test
     public void shouldReturnListOfEmailsPagedWhenEmailsAreAvailable() throws Exception {
-        Email email1 = createRandomEmail(5);
-        Email email2 = createRandomEmail(2);
-        Email email3 = createRandomEmail(1);
+        var email1 = createRandomEmail(5);
+        var email2 = createRandomEmail(2);
+        var email3 = createRandomEmail(1);
 
         this.mockMvc.perform(get("/email?page=0&size=2"))
                 .andExpect(status().isOk())
@@ -85,7 +85,7 @@ public class EmailControllerMVCIntegrationTest {
 
     @Test
     public void shouldReturnMailById() throws Exception {
-        Email email = createRandomEmail(1);
+        var email = createRandomEmail(1);
 
         this.mockMvc.perform(get("/email/"+email.getId()))
                 .andExpect(status().isOk())
@@ -103,8 +103,8 @@ public class EmailControllerMVCIntegrationTest {
 
     @Test
     public void shouldReturnAttachmentForEmail() throws Exception {
-        Email email = createRandomEmail(1);
-        EmailAttachment attachment = email.getAttachments().get(0);
+        var email = createRandomEmail(1);
+        var attachment = email.getAttachments().get(0);
 
         this.mockMvc.perform(get("/email/"+email.getId()+"/attachment/" + attachment.getId()))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename=" + attachment.getFilename()))
@@ -116,7 +116,7 @@ public class EmailControllerMVCIntegrationTest {
 
     @Test
     public void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
-        Email email = createRandomEmail(1);
+        var email = createRandomEmail(1);
 
         this.mockMvc.perform(get("/email/"+email.getId()+"/attachment/123"))
                 .andExpect(status().isNotFound());
@@ -124,21 +124,19 @@ public class EmailControllerMVCIntegrationTest {
 
     @Test
     public void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
-        Email email = createRandomEmail(1);
+        var email = createRandomEmail(1);
 
         this.mockMvc.perform(get("/email/123/attachment/"+email.getAttachments().get(0).getId()))
                 .andExpect(status().isNotFound());
     }
 
     private Matcher<Email> equalsMail(Email email) {
-        return new BaseMatcher<Email>() {
+        return new BaseMatcher<>() {
             @Override
             public boolean matches(Object item) {
                 if(item instanceof Email){
                     Email other = (Email)item;
-                    if(email.getId() == other.getId()){
-                        return true;
-                    }
+                    return email.getId().equals(other.getId());
                 }
                 return false;
             }
@@ -151,19 +149,19 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     private Email createRandomEmail(int minusMinutes) {
-        final String randomToken = RandomStringUtils.randomAlphanumeric(6);
-        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        Date receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+        var randomToken = RandomStringUtils.randomAlphanumeric(6);
+        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
+        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
 
-        EmailContent content = new EmailContent();
+        var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
         content.setData("Test Content "+randomToken);
 
-        EmailAttachment attachment = new EmailAttachment();
+        var attachment = new EmailAttachment();
         attachment.setFilename("test.txt");
         attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
 
-        Email mail = new Email();
+        var mail = new Email();
         mail.setSubject("Test Subject "+randomToken);
         mail.setRawData("Test Content "+randomToken);
         mail.setReceivedOn(receivedOn);

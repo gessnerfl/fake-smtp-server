@@ -33,12 +33,12 @@ public class SmtpServerConfiguratorTest {
 
     @Test
     public void shouldConfigureBasicParameters(){
-        final Integer port = 1234;
-        final InetAddress bindingAddress = mock(InetAddress.class);
+        var port = 1234;
+        var bindingAddress = mock(InetAddress.class);
         when(fakeSmtpConfigurationProperties.getPort()).thenReturn(port);
         when(fakeSmtpConfigurationProperties.getBindAddress()).thenReturn(bindingAddress);
 
-        final SMTPServer smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(SMTPServer.class);
 
         sut.configure(smtpServer);
 
@@ -49,35 +49,35 @@ public class SmtpServerConfiguratorTest {
 
     @Test
     public void shouldConfigureAuthenticationWhenAuthenticationIsConfiguredProperly(){
-        final String username = "username";
-        final String password = "password";
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var username = "username";
+        var password = "password";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
         when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        final SMTPServer smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(SMTPServer.class);
 
         sut.configure(smtpServer);
 
-        ArgumentCaptor<AuthenticationHandlerFactory> argumentCaptor = ArgumentCaptor.forClass(AuthenticationHandlerFactory.class);
+        var argumentCaptor = ArgumentCaptor.forClass(AuthenticationHandlerFactory.class);
         verify(smtpServer).setAuthenticationHandlerFactory(argumentCaptor.capture());
 
-        AuthenticationHandlerFactory authenticationHandlerFactory = argumentCaptor.getValue();
+        var authenticationHandlerFactory = argumentCaptor.getValue();
         assertNotNull(authenticationHandlerFactory);
         assertThat(authenticationHandlerFactory, instanceOf(EasyAuthenticationHandlerFactory.class));
 
-        EasyAuthenticationHandlerFactory easyAuthenticationHandlerFactory = (EasyAuthenticationHandlerFactory)authenticationHandlerFactory;
+        var easyAuthenticationHandlerFactory = (EasyAuthenticationHandlerFactory)authenticationHandlerFactory;
         assertSame(basicUsernamePasswordValidator, easyAuthenticationHandlerFactory.getValidator());
     }
 
     @Test
     public void shouldSkipConfigurationOfAuthenticationWhenUsernameIsNull(){
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        final SMTPServer smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(SMTPServer.class);
 
         sut.configure(smtpServer);
 
@@ -87,11 +87,11 @@ public class SmtpServerConfiguratorTest {
 
     @Test
     public void shouldSkipConfigurationOfAuthenticationWhenUsernameIsEmptyString(){
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        final SMTPServer smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(SMTPServer.class);
 
         sut.configure(smtpServer);
 
@@ -101,13 +101,13 @@ public class SmtpServerConfiguratorTest {
 
     @Test
     public void shouldSkipConfigurationOfAuthenticationWhenPasswordIsNull(){
-        final String username = "username";
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var username = "username";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
         when(authentication.getPassword()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        final SMTPServer smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(SMTPServer.class);
 
         sut.configure(smtpServer);
 
@@ -117,13 +117,13 @@ public class SmtpServerConfiguratorTest {
 
     @Test
     public void shouldSkipConfigurationOfAuthenticationWhenPasswordIsEmptyString(){
-        final String username = "username";
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var username = "username";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
         when(authentication.getPassword()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        final SMTPServer smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(SMTPServer.class);
 
         sut.configure(smtpServer);
 

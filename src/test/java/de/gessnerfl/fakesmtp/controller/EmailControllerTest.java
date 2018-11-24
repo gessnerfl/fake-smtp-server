@@ -11,13 +11,11 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 
 import javax.servlet.ServletContext;
@@ -49,7 +47,7 @@ public class EmailControllerTest {
         final Page<Email> page = createFirstPageEmail();
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        String result = sut.getAll(0, 5, model);
+        var result = sut.getAll(0, 5, model);
 
         assertEquals(EmailController.EMAIL_LIST_VIEW, result);
 
@@ -60,12 +58,12 @@ public class EmailControllerTest {
 
     @Test
     public void shouldReturnRedirectToFirstPageWhenRequestedPageIsOutOfRange() {
-        final Page<Email> page = mock(Page.class);
+        var page = mock(Page.class);
         when(page.getTotalPages()).thenReturn(2);
         when(page.getNumber()).thenReturn(3);
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        String result = sut.getAll(3, 5, model);
+        var result = sut.getAll(3, 5, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
 
@@ -75,11 +73,11 @@ public class EmailControllerTest {
 
     @Test
     public void shouldNotRedirectToFirstPageWhenNoDataIsAvailable() {
-        final Page<Email> page = mock(Page.class);
+        var page = mock(Page.class);
         when(page.getNumber()).thenReturn(0);
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        String result = sut.getAll(0, 5, model);
+        var result = sut.getAll(0, 5, model);
 
         assertEquals(EmailController.EMAIL_LIST_VIEW, result);
 
@@ -89,7 +87,7 @@ public class EmailControllerTest {
 
     @Test
     public void shouldRedirectToFirstPageWhenPageNumberIsBelowNull() {
-        String result = sut.getAll(-1, 5, model);
+        var result = sut.getAll(-1, 5, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
         verifyZeroInteractions(emailRepository);
@@ -105,7 +103,7 @@ public class EmailControllerTest {
 
     @Test
     public void shouldRedirectToFirstPageWhenPageSizeIsBelowNull() {
-        String result = sut.getAll(0, -1, model);
+        var result = sut.getAll(0, -1, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
         verifyZeroInteractions(emailRepository);
@@ -113,11 +111,11 @@ public class EmailControllerTest {
 
     @Test
     public void shouldReturnSingleEmailWhenIdIsValid() {
-        final long id = 12L;
-        final Email mail = mock(Email.class);
+        var id = 12L;
+        var mail = mock(Email.class);
         when(emailRepository.findById(id)).thenReturn(Optional.of(mail));
 
-        String result = sut.getEmailById(id, model);
+        var result = sut.getEmailById(id, model);
 
         assertEquals(EmailController.SINGLE_EMAIL_VIEW, result);
 
@@ -127,10 +125,10 @@ public class EmailControllerTest {
 
     @Test
     public void shouldReturnRedirectToListPageWhenIdIsNotValid() {
-        final long id = 12L;
+        var id = 12L;
         when(emailRepository.findById(id)).thenReturn(Optional.empty());
 
-        String result = sut.getEmailById(id, model);
+        var result = sut.getEmailById(id, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
 
@@ -138,7 +136,7 @@ public class EmailControllerTest {
     }
 
     private Page<Email> createFirstPageEmail() {
-        Page<Email> page = mock(Page.class);
+        var page = mock(Page.class);
         when(page.getNumber()).thenReturn(0);
         return page;
     }
@@ -150,13 +148,13 @@ public class EmailControllerTest {
 
     @Test
     public void shouldReturnResponseEntityForAttachment(){
-        final byte[] fileContent = "this is the file content".getBytes(StandardCharsets.UTF_8);
-        final String filename = "myfile.txt";
-        final long emailId = 123L;
-        final long attachmentId = 456L;
-        final Email email = mock(Email.class);
-        final EmailAttachment attachment = mock(EmailAttachment.class);
-        final MediaType mediaType = MediaType.TEXT_PLAIN;
+        var fileContent = "this is the file content".getBytes(StandardCharsets.UTF_8);
+        var filename = "myfile.txt";
+        var emailId = 123L;
+        var attachmentId = 456L;
+        var email = mock(Email.class);
+        var attachment = mock(EmailAttachment.class);
+        var mediaType = MediaType.TEXT_PLAIN;
 
         when(email.getId()).thenReturn(emailId);
         when(attachment.getEmail()).thenReturn(email);
@@ -165,7 +163,7 @@ public class EmailControllerTest {
         when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.of(attachment));
         when(mediaTypeUtil.getMediaTypeForFileName(servletContext, filename)).thenReturn(mediaType);
 
-        ResponseEntity<ByteArrayResource> result = sut.getEmailAttachmentById(emailId, attachmentId);
+        var result = sut.getEmailAttachmentById(emailId, attachmentId);
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("attachment;filename=myfile.txt", result.getHeaders().get(HttpHeaders.CONTENT_DISPOSITION).get(0));
@@ -176,10 +174,10 @@ public class EmailControllerTest {
 
     @Test(expected = AttachmentNotFoundException.class)
     public void shouldThrowExceptionWhenNoAttachmentExistsForTheGivenId(){
-        final long emailId = 123L;
-        final long attachmentId = 456L;
-        final Email email = mock(Email.class);
-        final EmailAttachment attachment = mock(EmailAttachment.class);
+        var emailId = 123L;
+        var attachmentId = 456L;
+        var email = mock(Email.class);
+        var attachment = mock(EmailAttachment.class);
 
         when(email.getId()).thenReturn(789L);
         when(attachment.getEmail()).thenReturn(email);
@@ -190,8 +188,8 @@ public class EmailControllerTest {
 
     @Test(expected = AttachmentNotFoundException.class)
     public void shouldThrowExceptionWhenAttachmentExistsForTheGivenIdButTheEmailIdDoesNotMatch(){
-        final long emailId = 123L;
-        final long attachmentId = 456L;
+        var emailId = 123L;
+        var attachmentId = 456L;
 
         when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.empty());
 

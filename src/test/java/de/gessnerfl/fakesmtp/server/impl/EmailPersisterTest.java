@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
@@ -38,12 +37,12 @@ public class EmailPersisterTest {
 
     @Test
     public void shouldCreateEmailEntityAndStoreItInDatabaseWhenEmailIsDelivered() throws IOException {
-        final String from = "from";
-        final String to = "to";
-        String contentString = "content";
-        final byte[] content = contentString.getBytes(StandardCharsets.UTF_8);
-        final InputStream contentStream = new ByteArrayInputStream(content);
-        final Email mail = mock(Email.class);
+        var from = "from";
+        var to = "to";
+        var contentString = "content";
+        var content = contentString.getBytes(StandardCharsets.UTF_8);
+        var contentStream = new ByteArrayInputStream(content);
+        var mail = mock(Email.class);
 
         when(emailFactory.convert(any(RawData.class))).thenReturn(mail);
 
@@ -60,10 +59,10 @@ public class EmailPersisterTest {
 
     @Test(expected = IOException.class)
     public void shouldThrowExceptionWhenEmailEntityCannotBeCreatedWhenEmailIsDelivered() throws IOException {
-        final String from = "from";
-        final String to = "to";
-        final byte[] content = "content".getBytes(StandardCharsets.UTF_8);
-        final InputStream contentStream = new ByteArrayInputStream(content);
+        var from = "from";
+        var to = "to";
+        var content = "content".getBytes(StandardCharsets.UTF_8);
+        var contentStream = new ByteArrayInputStream(content);
 
         when(emailFactory.convert(any(RawData.class))).thenThrow(new IOException("foo"));
 

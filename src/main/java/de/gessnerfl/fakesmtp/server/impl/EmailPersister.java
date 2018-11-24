@@ -36,8 +36,8 @@ public class EmailPersister implements SimpleMessageListener {
     public void deliver(String sender, String recipient, InputStream data) throws IOException {
         logger.info("Received email from {} for {}", sender, recipient);
 
-        RawData rawData = new RawData(sender, recipient, IOUtils.toByteArray(data));
-        Email email = emailFactory.convert(rawData);
+        var rawData = new RawData(sender, recipient, IOUtils.toByteArray(data));
+        var email = emailFactory.convert(rawData);
         emailRepository.save(email);
     }
 }

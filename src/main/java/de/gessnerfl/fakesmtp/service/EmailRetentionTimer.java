@@ -26,10 +26,10 @@ public class EmailRetentionTimer {
 
     @Scheduled(fixedDelay = 300000, initialDelay = 500)
     public void deleteOutdatedMails(){
-        FakeSmtpConfigurationProperties.Persistence persistence = fakeSmtpConfigurationProperties.getPersistence();
+        var persistence = fakeSmtpConfigurationProperties.getPersistence();
         if(isDataRetentionConfigured(persistence)){
-            int maxNumber = persistence.getMaxNumberEmails();
-            int count = emailRepository.deleteEmailsExceedingDateRetentionLimit(maxNumber);
+            var maxNumber = persistence.getMaxNumberEmails();
+            var count = emailRepository.deleteEmailsExceedingDateRetentionLimit(maxNumber);
             logger.info("Deleted {} emails which exceeded the maximum number {} of emails to be stored", count, maxNumber);
         }
     }

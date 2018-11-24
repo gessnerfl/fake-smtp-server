@@ -22,7 +22,7 @@ public class EmailServerTest {
 
     @Test
     public void shouldSetSmtpServerOnPostConstruct(){
-        SmtpServer smtpServer = mock(SmtpServer.class);
+        var smtpServer = mock(SmtpServer.class);
         when(smtpServerFactory.create()).thenReturn(smtpServer);
 
         sut.startServer();
@@ -34,7 +34,7 @@ public class EmailServerTest {
 
     @Test
     public void shouldStopServerOnPreDestroy(){
-        SmtpServer smtpServer = mock(SmtpServer.class);
+        var smtpServer = mock(SmtpServer.class);
         sut.smtpServer = smtpServer;
 
         sut.shutdown();

@@ -2,7 +2,6 @@ package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.TestResourceUtil;
 import de.gessnerfl.fakesmtp.model.ContentType;
-import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
@@ -34,15 +33,15 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateEmailForEmlFileWithSubjectAndContentTypePlain() throws Exception {
-        Date now = new Date();
-        String testFilename = "mail-with-subject.eml";
-        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var testFilename = "mail-with-subject.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
@@ -58,15 +57,15 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateEmailForEmlFileWithSubjectAndContentTypeHtml() throws Exception {
-        Date now = new Date();
-        String testFilename = "mail-with-subject-and-content-type-html.eml";
-        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var testFilename = "mail-with-subject-and-content-type-html.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
@@ -82,15 +81,15 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateEmailForEmlFileWithSubjectAndWithoutContentType() throws Exception {
-        Date now = new Date();
-        String testFilename = "mail-with-subject-without-content-type.eml";
-        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var testFilename = "mail-with-subject-without-content-type.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
@@ -106,15 +105,15 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateEmailForEmlFileWithoutSubjectAndContentTypePlain() throws Exception {
-        Date now = new Date();
-        String testFilename = "mail-without-subject.eml";
-        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var testFilename = "mail-without-subject.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
@@ -130,14 +129,14 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateMailForPlainText() throws Exception {
-        Date now = new Date();
-        String dataAsString = "this is just some dummy content";
-        byte[] data = dataAsString.getBytes(StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var dataAsString = "this is just some dummy content";
+        var data = dataAsString.getBytes(StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
@@ -153,15 +152,15 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateMailForMultipartWithContentTypeHtmlAndPlain() throws Exception {
-        Date now = new Date();
-        String testFilename = "multipart-mail.eml";
-        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var testFilename = "multipart-mail.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
@@ -178,15 +177,15 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateMailForMultipartWithoutContentTypeHtml() throws Exception {
-        Date now = new Date();
-        String testFilename = "multipart-mail-plain-only.eml";
-        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var testFilename = "multipart-mail-plain-only.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
@@ -202,15 +201,15 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateMailForMultipartWithUnknownContentType() throws Exception {
-        Date now = new Date();
-        String testFilename = "multipart-mail-unknown-content-type.eml";
-        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var testFilename = "multipart-mail-unknown-content-type.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
@@ -227,15 +226,15 @@ public class EmailFactoryTest {
 
     @Test
     public void shouldCreateMailForMultipartWithPlainAndHtmlContentAndAttachments() throws Exception {
-        Date now = new Date();
-        String testFilename = "multipart-mail-html-and-plain-with-attachments.eml";
-        byte[] data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
-        RawData rawData = new RawData(SENDER, RECEIVER, data);
+        var now = new Date();
+        var testFilename = "multipart-mail-html-and-plain-with-attachments.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
 
         when(timestampProvider.now()).thenReturn(now);
 
-        Email result = sut.convert(rawData);
+        var result = sut.convert(rawData);
 
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());

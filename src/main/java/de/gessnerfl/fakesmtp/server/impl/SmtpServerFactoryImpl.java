@@ -23,8 +23,8 @@ public class SmtpServerFactoryImpl implements SmtpServerFactory {
 
     @Override
     public SmtpServer create() {
-        SimpleMessageListenerAdapter simpleMessageListenerAdapter = new SimpleMessageListenerAdapter(emailPersister);
-        SMTPServer smtpServer = new SMTPServer(simpleMessageListenerAdapter);
+        var simpleMessageListenerAdapter = new SimpleMessageListenerAdapter(emailPersister);
+        var smtpServer = new SMTPServer(simpleMessageListenerAdapter);
         configurator.configure(smtpServer);
         return new SmtpServerImpl(smtpServer);
     }
