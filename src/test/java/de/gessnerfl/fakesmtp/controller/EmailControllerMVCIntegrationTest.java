@@ -6,9 +6,6 @@ import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,7 +86,7 @@ public class EmailControllerMVCIntegrationTest {
 
         this.mockMvc.perform(get("/email/"+email.getId()))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("mail", equalsMail(email)))
+                .andExpect(model().attribute("mail", equalTo(email)))
                 .andExpect(view().name("email"));
     }
 
@@ -128,24 +125,6 @@ public class EmailControllerMVCIntegrationTest {
 
         this.mockMvc.perform(get("/email/123/attachment/"+email.getAttachments().get(0).getId()))
                 .andExpect(status().isNotFound());
-    }
-
-    private Matcher<Email> equalsMail(Email email) {
-        return new BaseMatcher<>() {
-            @Override
-            public boolean matches(Object item) {
-                if(item instanceof Email){
-                    Email other = (Email)item;
-                    return email.getId().equals(other.getId());
-                }
-                return false;
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("equalsMail should return email with id ").appendValue(email.getId());
-            }
-        };
     }
 
     private Email createRandomEmail(int minusMinutes) {
