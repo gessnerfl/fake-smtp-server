@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8u181-jdk-alpine
 
 VOLUME /tmp
 

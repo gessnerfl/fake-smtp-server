@@ -16,4 +16,5 @@ docker build -f Dockerfile -t $REPO:$TRAVIS_TAG .
 echo "Tag docker images as latest"
 docker tag $REPO:$TRAVIS_TAG $REPO:latest
 echo "Push to dockerhub"
-docker push $REPO
+docker push $REPO:$TRAVIS_TAG
+docker push $REPO:latest
