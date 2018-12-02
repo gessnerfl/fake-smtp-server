@@ -1,17 +1,14 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.Email;
-import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
@@ -57,7 +54,7 @@ public class EmailController {
         if(page < 0 || size <= 0){
             return REDIRECT_EMAIL_LIST_VIEW;
         }
-        Page<Email> result = emailRepository.findAll(PageRequest.of(page, size, DEFAULT_SORT));
+        var result = emailRepository.findAll(PageRequest.of(page, size, DEFAULT_SORT));
         if (result.getNumber() != 0 && result.getNumber() >= result.getTotalPages()) {
             return REDIRECT_EMAIL_LIST_VIEW;
         }
@@ -78,11 +75,11 @@ public class EmailController {
     @RequestMapping({"/email/{mailId}/attachment/{attachmentId}"})
     @ResponseBody
     public ResponseEntity<ByteArrayResource> getEmailAttachmentById(@PathVariable Long mailId, @PathVariable Long attachmentId) {
-        EmailAttachment attachment = emailAttachmentRepository.findById(attachmentId)
+        var attachment = emailAttachmentRepository.findById(attachmentId)
                 .filter(a -> a.getEmail().getId().equals(mailId))
                 .orElseThrow(() -> new AttachmentNotFoundException("Attachment with id " + attachmentId + " not found for mail " + mailId));
 
-        MediaType mediaType = mediaTypeUtil.getMediaTypeForFileName(this.servletContext, attachment.getFilename());
+        var mediaType = mediaTypeUtil.getMediaTypeForFileName(this.servletContext, attachment.getFilename());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + attachment.getFilename())

@@ -126,7 +126,7 @@ public class Email {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Email email = (Email) o;
+        var email = (Email) o;
 
         return id.equals(email.id);
     }

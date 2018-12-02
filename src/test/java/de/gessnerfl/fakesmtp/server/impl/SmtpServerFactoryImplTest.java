@@ -1,6 +1,5 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
-import de.gessnerfl.fakesmtp.server.SmtpServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -26,10 +25,10 @@ public class SmtpServerFactoryImplTest {
 
     @Test
     public void shouldCreateAndConfigureNewInsance(){
-        SmtpServer smtpServer = sut.create();
+        var smtpServer = sut.create();
 
         assertThat(smtpServer, instanceOf(SmtpServerImpl.class));
-        SmtpServerImpl impl = (SmtpServerImpl)smtpServer;
+        var impl = (SmtpServerImpl)smtpServer;
         assertNotNull(impl.smtpServer);
 
         verify(configurator).configure(impl.smtpServer);

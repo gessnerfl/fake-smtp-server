@@ -9,7 +9,7 @@ import javax.servlet.ServletContext;
 public class MediaTypeUtil {
 
     public MediaType getMediaTypeForFileName(ServletContext servletContext, String fileName) {
-        String mineType = servletContext.getMimeType(fileName);
+        var mineType = servletContext.getMimeType(fileName);
         try {
             return MediaType.parseMediaType(mineType);
         } catch (Exception e) {

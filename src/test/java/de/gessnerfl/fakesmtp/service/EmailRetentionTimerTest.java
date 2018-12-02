@@ -26,8 +26,8 @@ public class EmailRetentionTimerTest {
 
     @Test
     public void shouldTriggerDeletionWhenDataRetentionIsConfigured(){
-        final int maxNumber = 5;
-        final FakeSmtpConfigurationProperties.Persistence persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
+        var maxNumber = 5;
+        var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
         when(persistence.getMaxNumberEmails()).thenReturn(maxNumber);
         when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
 
@@ -38,7 +38,7 @@ public class EmailRetentionTimerTest {
 
     @Test
     public void shouldNotTriggerDeletionWhenConfiguredMaxNumberIsNull(){
-        final FakeSmtpConfigurationProperties.Persistence persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
+        var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
         when(persistence.getMaxNumberEmails()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
 
@@ -49,7 +49,7 @@ public class EmailRetentionTimerTest {
 
     @Test
     public void shouldNotTriggerDeletionWhenConfiguredMaxNumberIsLessOrEqualToZero(){
-        final FakeSmtpConfigurationProperties.Persistence persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
+        var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
         when(persistence.getMaxNumberEmails()).thenReturn(0);
         when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
 

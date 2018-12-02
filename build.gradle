@@ -1,5 +1,5 @@
 buildscript {
-	ext { springBootVersion = '2.0.5.RELEASE' }
+	ext { springBootVersion = '2.1.1.RELEASE' }
     repositories {
 		jcenter()
 	}
@@ -11,7 +11,7 @@ buildscript {
 
 plugins {
 	id "com.cinnober.gradle.semver-git" version "2.3.1"
-	id 'org.springframework.boot' version '2.0.5.RELEASE'
+	id 'org.springframework.boot' version '2.1.1.RELEASE'
 }
 
 apply plugin: 'java'
@@ -27,11 +27,13 @@ description = """Fake SMTP Server :: Simple SMTP Server which stores emails in m
 ext.scmUrl = 'git@github.com:gessnerfl/fake-smtp-server.git'
 ext.projectUrl = 'https://github.com/gessnerfl/fake-smtp-server'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories { jcenter() }
-
+jacoco {
+	toolVersion = "0.8.2"
+}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -42,7 +44,8 @@ dependencies {
 	compile('commons-io:commons-io:2.6')
 	compile('org.subethamail:subethasmtp:3.1.7')
 	compile('org.flywaydb:flyway-core')
-
+	compile('com.sun.xml.bind:jaxb-impl:2.4.0-b180830.0438')
+	
     compile('org.webjars.bower:jquery:3.3.1')
     compile('org.webjars:materializecss:1.0.0')
 	compile('org.webjars:material-design-icons:3.0.1')
@@ -50,6 +53,7 @@ dependencies {
     runtime'com.h2database:h2'
 	runtime('org.springframework.boot:spring-boot-devtools')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.ow2.asm:asm:7.0')
 	testCompile('org.apache.commons:commons-lang3:3.8.1')
 }
 

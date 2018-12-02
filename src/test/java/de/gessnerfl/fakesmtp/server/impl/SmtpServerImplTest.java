@@ -10,9 +10,9 @@ public class SmtpServerImplTest {
     
     @Test
     public void shouldCreateNewInstanceAndDelegateCallsToRealImplementation(){
-        SMTPServer delegate = mock(SMTPServer.class);
+        var delegate = mock(SMTPServer.class);
 
-        SmtpServerImpl sut = new SmtpServerImpl(delegate);
+        var sut = new SmtpServerImpl(delegate);
 
         sut.start();
         verify(delegate).start();

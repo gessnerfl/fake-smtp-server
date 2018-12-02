@@ -24,9 +24,9 @@ public class BasicUsernamePasswordValidatorTest {
 
     @Test
     public void shouldSuccessfullyValidateCorrectUsernameAndPassword() throws Exception {
-        final String username = "username";
-        final String password = "password";
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var username = "username";
+        var password = "password";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
         when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
@@ -39,10 +39,10 @@ public class BasicUsernamePasswordValidatorTest {
 
     @Test(expected = LoginFailedException.class)
     public void shouldThrowLoginFailedExceptionWhenUsernameIsNotValid() throws Exception {
-        final String username = "username";
-        final String invalidUsername = "inValidUsername";
-        final String password = "password";
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var username = "username";
+        var invalidUsername = "inValidUsername";
+        var password = "password";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
@@ -51,10 +51,10 @@ public class BasicUsernamePasswordValidatorTest {
 
     @Test(expected = LoginFailedException.class)
     public void shouldThrowLoginFailedExceptionWhenPasswordIsNotValid() throws Exception {
-        final String username = "username";
-        final String password = "password";
-        final String invalidPassword = "invalidPassword";
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var username = "username";
+        var password = "password";
+        var invalidPassword = "invalidPassword";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
         when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
@@ -64,8 +64,8 @@ public class BasicUsernamePasswordValidatorTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldThrowNullPointerExceptionWhenAuthenticationIsMissing() throws Exception {
-        final String username = "username";
-        final String password = "password";
+        var username = "username";
+        var password = "password";
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(null);
 
         sut.login(username, password);
@@ -73,9 +73,9 @@ public class BasicUsernamePasswordValidatorTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldThrowNullPointerExceptionWhenUsernameIsMissingInAuthentication() throws Exception {
-        final String username = "username";
-        final String password = "password";
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var username = "username";
+        var password = "password";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
@@ -84,9 +84,9 @@ public class BasicUsernamePasswordValidatorTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldThrowNullPointerExceptionWhenPasswordIsMissingInAuthentication() throws Exception {
-        final String username = "username";
-        final String password = "password";
-        final FakeSmtpConfigurationProperties.Authentication authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        var username = "username";
+        var password = "password";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
         when(authentication.getPassword()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
