@@ -24,6 +24,8 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -125,6 +127,17 @@ public class EmailControllerMVCIntegrationTest {
 
         this.mockMvc.perform(get("/email/123/attachment/"+email.getAttachments().get(0).getId()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldDeleteEmail() throws Exception {
+        var email = createRandomEmail(1);
+
+        this.mockMvc.perform(delete("/email/"+email.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/email")).andExpect(status().isFound());
+
+        assertThat(emailRepository.findAll(), empty());
     }
 
     private Email createRandomEmail(int minusMinutes) {
