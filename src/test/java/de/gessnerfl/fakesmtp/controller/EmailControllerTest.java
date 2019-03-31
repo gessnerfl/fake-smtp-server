@@ -195,4 +195,14 @@ public class EmailControllerTest {
 
         sut.getEmailAttachmentById(emailId, attachmentId);
     }
+
+    @Test
+    public void shouldDeleteEmailByItsIdAndFlushChangesSoThatDeleteIsApplied(){
+        var emailId = 123L;
+
+        sut.deleteEmailById(emailId);
+
+        verify(emailRepository).deleteById(emailId);
+        verify(emailRepository).flush();
+    }
 }

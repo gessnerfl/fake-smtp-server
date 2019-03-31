@@ -33,7 +33,13 @@
                         <td th:text="${mail.toAddress}">To</td>
                         <td th:with="df='yyyy-MM-dd HH:mm:ss'" th:text="${#calendars.format(mail.receivedOn,df)}">Received On</td>
                         <td th:text="${mail.subject}"></td>
-                        <td><a alt="Details" th:href="@{|/email/${mail.id}|}"><i class="material-icons">email</i></a></td>
+                        <td>
+                            <a class="waves-effect waves-light btn blue darken-3" alt="Details" th:href="@{|/email/${mail.id}|}"><i class="material-icons">email</i></a>
+                            <form action="#" th:action="@{'/email/{id}'(id=${mail.id})}" th:method="delete" class="inline">
+                                <input type="hidden" name="_method" value="delete" />
+                                <button class="waves-effect waves-light btn blue darken-3" type="submit"><i class="material-icons">delete</i></button>
+                            </form>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
