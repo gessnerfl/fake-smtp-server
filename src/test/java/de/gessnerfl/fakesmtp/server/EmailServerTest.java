@@ -5,17 +5,18 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EmailServerTest {
 
     @Mock
     private SmtpServerFactory smtpServerFactory;
+    @Mock
+    private Logger logger;
 
     @InjectMocks
     private EmailServer sut;
@@ -40,12 +41,13 @@ public class EmailServerTest {
         sut.shutdown();
 
         verify(smtpServer).stop();
+        verify(logger, times(2)).info(anyString());
     }
 
     @Test
     public void shouldSilentlyShutdownWhenNoServerIsSet(){
         sut.shutdown();
 
-        //No exception expected
+        verify(logger).debug(anyString());
     }
 }

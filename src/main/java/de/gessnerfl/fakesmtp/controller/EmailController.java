@@ -42,7 +42,7 @@ public class EmailController {
         this.servletContext = servletContext;
     }
 
-    @RequestMapping({"/", "/email"})
+    @GetMapping({"/", "/email"})
     public String getAll(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "" + DEFAULT_PAGE_SIZE) int size, Model model) {
         return getAllEmailsPaged(page, size, model);
     }
@@ -59,7 +59,7 @@ public class EmailController {
         return EMAIL_LIST_VIEW;
     }
 
-    @RequestMapping({"/email/{id}"})
+    @GetMapping("/email/{id}")
     public String getEmailById(@PathVariable Long id, Model model) {
         return emailRepository.findById(id).map(email -> appendToModelAndReturnView(model, email)).orElse(REDIRECT_EMAIL_LIST_VIEW);
     }
@@ -69,7 +69,7 @@ public class EmailController {
         return SINGLE_EMAIL_VIEW;
     }
 
-    @RequestMapping({"/email/{mailId}/attachment/{attachmentId}"})
+    @GetMapping("/email/{mailId}/attachment/{attachmentId}")
     @ResponseBody
     public ResponseEntity<ByteArrayResource> getEmailAttachmentById(@PathVariable Long mailId, @PathVariable Long attachmentId) {
         var attachment = emailAttachmentRepository.findById(attachmentId)
@@ -85,7 +85,7 @@ public class EmailController {
                 .body(new ByteArrayResource(attachment.getData()));
     }
 
-    @RequestMapping(path = {"/email/{id}"}, method = RequestMethod.DELETE)
+    @DeleteMapping("/email/{id}")
     public String deleteEmailById(@PathVariable Long id) {
         emailRepository.deleteById(id);
         emailRepository.flush();

@@ -1,6 +1,5 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
-import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
