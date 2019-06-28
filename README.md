@@ -35,23 +35,32 @@ The following paragraphs describe the application specific resp. pre-defined con
 
 ## Fake SMTP Server
 The following snippet shows the configuration of a fake smtp server with its default values.
-
-    fakesmtp.port=5025                        #The SMTP Server Port used by the Fake SMTP Server
-    fakesmtp.bindAddress                      #The binding address of the Fake SMTP Server; By default it is bound to 
-                                              #all interfaces as no value is defined
-    fakesmtp.persistence.maxNumberEmails=100  #The maximum number of emails which should be stored in the database; 
-                                              #default 100
+    
+    #The SMTP Server Port used by the Fake SMTP Server
+    fakesmtp.port=5025
+    
+    #The binding address of the Fake SMTP Server; Bound to all interfaces by default / no value
+    fakesmtp.bindAddress
+    
+    #The maximum number of emails which should be stored in the database; Defualts to 100
+    fakesmtp.persistence.maxNumberEmails=100  
     
 
 ### Authentication
 Optionally authentication can be turned on. Configuring authentication does not mean the authentication is enforced. It
 just allows you to test PLAIN and LOGIN SMTP Authentication against the server instance.
 
-    fakesmtp.authentication.username          #Username of the client to be authenticated
-    fakesmtp.authentication.password          #Password of the client to be authenticated
+    #Username of the client to be authenticated
+    fakesmtp.authentication.username
+    
+    #Password of the client to be authenticated
+    fakesmtp.authentication.password          
 
 ## Web UI
 The following snippet shows the pre-defined web application configuration
 
-    server.port=5080     #Port of the web interface
-    management.port=5081 #Port of the http management api
+    #Port of the web interface
+    server.port=5080     
+    
+    #Port of the http management api
+    management.port=5081 
