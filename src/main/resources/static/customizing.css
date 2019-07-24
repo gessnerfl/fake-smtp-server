@@ -31,3 +31,7 @@
 form.inline {
     display: inline
 }
+
+.mail-content-plain {
+    white-space: pre-line;
+}
