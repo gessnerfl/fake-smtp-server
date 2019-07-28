@@ -41,7 +41,7 @@
                     </ul>
                 </div>
                 <div class="card-content">
-                    <div th:each="c,is : ${mail.contents}" th:id="'mail-content-'+${c.id}" th:utext="${c.data}"></div>
+                    <div th:each="c,is : ${mail.contents}" th:id="'mail-content-'+${c.id}" th:utext="${c.data}" class="mail-content-plain"></div>
                     <div id="mail-content-raw" class="grey lighten-4">
                         <pre class="card-content" th:text="${mail.rawData}"></pre>
                     </div>
