@@ -21,9 +21,6 @@ sourceCompatibility = 11
 targetCompatibility = 11
 
 repositories { jcenter() }
-jacoco {
-	toolVersion = "0.8.4"
-}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -52,5 +49,11 @@ sonarqube {
 	properties {
 		property "sonar.projectName", "Fake SMTP Server"
 		property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
+	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
 	}
 }
