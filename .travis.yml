@@ -21,7 +21,7 @@ before_install:
 - chmod +x buildViaTravisCI.sh
 
 script:
- - ./buildViaTravisCI.sh
+ - ./gradlew build sonarqube
 
 notifications:
   email: false
