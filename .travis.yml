@@ -18,7 +18,6 @@ services:
 before_install:
 - mkdir -p ~/.gradle && echo "org.gradle.daemon=true" >> ~/.gradle/gradle.properties
 - chmod +x gradlew
-- chmod +x buildViaTravisCI.sh
 
 script:
  - ./gradlew build sonarqube
