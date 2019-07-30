@@ -38,7 +38,6 @@ dependencies {
 	compile('org.webjars:material-design-icons:3.0.1')
 
     runtime'com.h2database:h2'
-	runtime('org.springframework.boot:spring-boot-devtools')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.ow2.asm:asm:7.1')
 	testCompile('org.apache.commons:commons-lang3:3.9')
