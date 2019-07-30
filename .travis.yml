@@ -17,10 +17,9 @@ services:
 
 before_install:
 - chmod +x gradlew
-- chmod +x buildViaTravisCI.sh
 
 script:
- - ./buildViaTravisCI.sh
+ - ./gradlew build sonarqube
 
 notifications:
   email: false
