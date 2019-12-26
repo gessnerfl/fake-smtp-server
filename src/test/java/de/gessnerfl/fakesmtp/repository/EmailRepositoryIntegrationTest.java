@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 @SpringBootTest
 public class EmailRepositoryIntegrationTest {
 
-    private static final Sort SORT_DESC_BY_RECEIVED_ON = new Sort(Sort.Direction.DESC, "receivedOn");
+    private static final Sort SORT_DESC_BY_RECEIVED_ON = Sort.by(Sort.Direction.DESC, "receivedOn");
     @Autowired
     private EmailRepository sut;
 
