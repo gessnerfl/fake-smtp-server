@@ -21,7 +21,7 @@ import javax.servlet.ServletContext;
 @Controller
 @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
 public class EmailController {
-    private static final Sort DEFAULT_SORT = new Sort(Sort.Direction.DESC, "receivedOn");
+    private static final Sort DEFAULT_SORT =  Sort.by(Sort.Direction.DESC, "receivedOn");
     private static final int DEFAULT_PAGE_SIZE = 10;
     static final String EMAIL_LIST_VIEW = "email-list";
     static final String EMAIL_LIST_MODEL_NAME = "mails";
