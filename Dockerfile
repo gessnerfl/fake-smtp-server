@@ -1,4 +1,4 @@
-FROM amazoncorretto:11.0.5
+FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.5_10
 
 VOLUME /tmp
 
