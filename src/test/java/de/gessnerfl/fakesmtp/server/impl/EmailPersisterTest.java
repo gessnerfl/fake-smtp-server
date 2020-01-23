@@ -23,6 +23,8 @@ public class EmailPersisterTest {
     @Mock
     private EmailFactory emailFactory;
     @Mock
+    private EmailFilter emailFilter;
+    @Mock
     private EmailRepository emailRepository;
     @Mock
     private Logger logger;

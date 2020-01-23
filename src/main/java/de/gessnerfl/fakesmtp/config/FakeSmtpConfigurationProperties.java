@@ -16,6 +16,8 @@ public class FakeSmtpConfigurationProperties {
     private Integer port = DEFAULT_PORT;
     private InetAddress bindAddress;
     private Authentication authentication;
+    private String filteredEmailRegexList;
+
     @NotNull
     private Persistence persistence = new Persistence();
 
@@ -49,6 +51,14 @@ public class FakeSmtpConfigurationProperties {
 
     public void setPersistence(Persistence persistence) {
         this.persistence = persistence;
+    }
+
+    public String getFilteredEmailRegexList() {
+        return filteredEmailRegexList;
+    }
+
+    public void setFilteredEmailRegexList(String filteredEmailRegexList) {
+        this.filteredEmailRegexList = filteredEmailRegexList;
     }
 
     public static class Authentication {

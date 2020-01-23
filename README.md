@@ -45,7 +45,9 @@ The following snippet shows the configuration of a fake smtp server with its def
     #The maximum number of emails which should be stored in the database; Defualts to 100
     fakesmtp.persistence.maxNumberEmails=100  
     
-
+    #A comma separated list of regex expressions to filter out unwanted emails by email address
+    fakesmtp.filteredEmailRegexList=john@doe\\.com,.*@google\\.com ; empty by default
+    
 ### Authentication
 Optionally authentication can be turned on. Configuring authentication does not mean the authentication is enforced. It
 just allows you to test PLAIN and LOGIN SMTP Authentication against the server instance.
