@@ -16,12 +16,14 @@ import java.io.InputStream;
 @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = IOException.class)
 public class EmailPersister implements SimpleMessageListener {
     private final EmailFactory emailFactory;
+    private final EmailFilter emailFilter;
     private final EmailRepository emailRepository;
     private final Logger logger;
 
     @Autowired
-    public EmailPersister(EmailFactory emailFactory, EmailRepository emailRepository, Logger logger) {
+    public EmailPersister(EmailFactory emailFactory, EmailFilter emailFilter, EmailRepository emailRepository, Logger logger) {
         this.emailFactory = emailFactory;
+        this.emailFilter = emailFilter;
         this.emailRepository = emailRepository;
         this.logger = logger;
     }
@@ -36,7 +38,10 @@ public class EmailPersister implements SimpleMessageListener {
         logger.info("Received email from {} for {}", sender, recipient);
 
         var rawData = new RawData(sender, recipient, IOUtils.toByteArray(data));
-        var email = emailFactory.convert(rawData);
-        emailRepository.save(email);
+
+        if(!emailFilter.ignore(sender,recipient)) {
+            var email = emailFactory.convert(rawData);
+            emailRepository.save(email);
+        }
     }
 }
