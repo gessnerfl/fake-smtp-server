@@ -23,25 +23,25 @@ targetCompatibility = 11
 repositories { jcenter() }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-mail')
-	compile('commons-io:commons-io:2.6')
-	compile('org.subethamail:subethasmtp:3.1.7')
-	compile('org.flywaydb:flyway-core')
-	compile('com.sun.xml.bind:jaxb-impl:2.3.2')
-	
-    compile('org.webjars.bower:jquery:3.4.1')
-    compile('org.webjars:materializecss:1.0.0')
-	compile('org.webjars:material-design-icons:3.0.1')
+	implementation('org.springframework.boot:spring-boot-starter-actuator')
+	implementation('org.springframework.boot:spring-boot-starter-web')
+	implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
+	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+	implementation('org.springframework.boot:spring-boot-starter-mail')
+	implementation('commons-io:commons-io:2.6')
+	implementation('org.subethamail:subethasmtp:3.1.7')
+	implementation('org.flywaydb:flyway-core')
+	implementation('com.sun.xml.bind:jaxb-impl:2.3.2')
 
-    runtime'com.h2database:h2'
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('org.ow2.asm:asm:7.2')
-	testCompile('org.apache.commons:commons-lang3:3.9')
-	testCompile('org.hamcrest:hamcrest-core:2.2')
+	implementation('org.webjars.bower:jquery:3.4.1')
+	implementation('org.webjars:materializecss:1.0.0')
+	implementation('org.webjars:material-design-icons:3.0.1')
+
+	runtimeOnly('com.h2database:h2')
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('org.ow2.asm:asm:7.2')
+	testImplementation('org.apache.commons:commons-lang3:3.9')
+	testImplementation('org.hamcrest:hamcrest-core:2.2')
 }
 
 sonarqube {
