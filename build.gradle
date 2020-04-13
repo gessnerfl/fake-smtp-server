@@ -1,6 +1,6 @@
 plugins {
-	id "com.cinnober.gradle.semver-git" version "2.5.0"
-	id 'org.springframework.boot' version '2.2.2.RELEASE'
+	id "com.cinnober.gradle.semver-git" version "3.0.0"
+	id 'org.springframework.boot' version '2.2.6.RELEASE'
 	id "org.sonarqube" version "2.8"
 }
 
@@ -39,8 +39,8 @@ dependencies {
 
 	runtimeOnly('com.h2database:h2')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
-	testImplementation('org.ow2.asm:asm:7.2')
-	testImplementation('org.apache.commons:commons-lang3:3.9')
+	testImplementation('org.ow2.asm:asm:8.0.1')
+	testImplementation('org.apache.commons:commons-lang3:3.10')
 	testImplementation('org.hamcrest:hamcrest-core:2.2')
 }
 
