@@ -29,7 +29,7 @@ public class EmailFilter {
   private boolean ignoreParticipant(String participant) {
     if(StringUtils.hasText(participant)){
       try{
-        if(Arrays.stream(this.fakeSmtpConfigurationProperties.getFilteredEmailRegexList().split(",")).anyMatch(emailRegex -> participant.matches(emailRegex))){
+        if(Arrays.stream(this.fakeSmtpConfigurationProperties.getFilteredEmailRegexList().split(",")).anyMatch(participant::matches)){
           logger.info("Participant '{}' matches a filtered email regex entry. Email will be filtered.", participant);
           return true;
         }
