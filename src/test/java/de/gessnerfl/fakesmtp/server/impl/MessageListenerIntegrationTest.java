@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 @ActiveProfiles("integrationtest")
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class EmailPersisterIntegrationTest {
+public class MessageListenerIntegrationTest {
     private static final String SENDER = "sender";
     private static final String RECEIVER = "receiver";
 
@@ -29,7 +29,7 @@ public class EmailPersisterIntegrationTest {
     private EmailRepository emailRepository;
 
     @Autowired
-    private EmailPersister sut;
+    private MessageListener sut;
 
     @Before
     public void setup(){

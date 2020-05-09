@@ -18,7 +18,7 @@ public class SmtpServerFactoryImplTest {
     @Mock
     private SmtpServerConfigurator configurator;
     @Mock
-    private EmailPersister emailPersister;
+    private MessageListener messageListener;
 
     @InjectMocks
     private SmtpServerFactoryImpl sut;

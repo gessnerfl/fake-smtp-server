@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EmailPersisterTest {
+public class MessageListenerTest {
 
     @Mock
     private EmailFactory emailFactory;
@@ -27,10 +27,12 @@ public class EmailPersisterTest {
     @Mock
     private EmailRepository emailRepository;
     @Mock
+    private MessageForwarder messageForwarder;
+    @Mock
     private Logger logger;
 
     @InjectMocks
-    private EmailPersister sut;
+    private MessageListener sut;
 
     @Test
     public void shouldAcceptAllMails(){
@@ -57,6 +59,7 @@ public class EmailPersisterTest {
         assertEquals(to, rawData.getTo());
         assertEquals(contentString, rawData.getContentAsString());
         verify(emailRepository).save(mail);
+        verify(messageForwarder).forward(rawData);
     }
 
     @Test(expected = IOException.class)
@@ -71,5 +74,6 @@ public class EmailPersisterTest {
         sut.deliver(from, to, contentStream);
 
         verify(emailRepository, never()).save(any(Email.class));
+        verify(messageForwarder, never()).forward(any(RawData.class));
     }
 }

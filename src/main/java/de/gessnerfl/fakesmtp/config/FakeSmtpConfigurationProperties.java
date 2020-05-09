@@ -17,6 +17,7 @@ public class FakeSmtpConfigurationProperties {
     private InetAddress bindAddress;
     private Authentication authentication;
     private String filteredEmailRegexList;
+    private boolean forwardEmails = false;
 
     @NotNull
     private Persistence persistence = new Persistence();
@@ -59,6 +60,14 @@ public class FakeSmtpConfigurationProperties {
 
     public void setFilteredEmailRegexList(String filteredEmailRegexList) {
         this.filteredEmailRegexList = filteredEmailRegexList;
+    }
+
+    public boolean isForwardEmails() {
+        return forwardEmails;
+    }
+
+    public void setForwardEmails(boolean forwardEmails) {
+        this.forwardEmails = forwardEmails;
     }
 
     public static class Authentication {

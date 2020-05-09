@@ -48,6 +48,11 @@ The following snippet shows the configuration of a fake smtp server with its def
     #A comma separated list of regex expressions to filter out unwanted emails by email address
     fakesmtp.filteredEmailRegexList=john@doe\\.com,.*@google\\.com ; empty by default
     
+    #When set to true emails will be forwarded to a configured target email system. Therefore
+    #the spring boot mail system needs to be configured. See also 
+    https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-email
+    fakesmtp.forwardEmails=false
+    
 ### Authentication
 Optionally authentication can be turned on. Configuring authentication does not mean the authentication is enforced. It
 just allows you to test PLAIN and LOGIN SMTP Authentication against the server instance.

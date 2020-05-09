@@ -12,18 +12,18 @@ import org.subethamail.smtp.server.SMTPServer;
 @Service
 public class SmtpServerFactoryImpl implements SmtpServerFactory {
 
-    private final EmailPersister emailPersister;
+    private final MessageListener messageListener;
     private final SmtpServerConfigurator configurator;
 
     @Autowired
-    public SmtpServerFactoryImpl(EmailPersister emailPersister, SmtpServerConfigurator configurator) {
-        this.emailPersister = emailPersister;
+    public SmtpServerFactoryImpl(MessageListener messageListener, SmtpServerConfigurator configurator) {
+        this.messageListener = messageListener;
         this.configurator = configurator;
     }
 
     @Override
     public SmtpServer create() {
-        var simpleMessageListenerAdapter = new SimpleMessageListenerAdapter(emailPersister);
+        var simpleMessageListenerAdapter = new SimpleMessageListenerAdapter(messageListener);
         var smtpServer = new SMTPServer(simpleMessageListenerAdapter);
         configurator.configure(smtpServer);
         return new SmtpServerImpl(smtpServer);
