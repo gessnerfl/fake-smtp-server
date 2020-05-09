@@ -90,7 +90,7 @@ public class EmailControllerTest {
         var result = sut.getAll(-1, 5, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
-        verifyZeroInteractions(emailRepository);
+        verifyNoInteractions(emailRepository);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class EmailControllerTest {
         String result = sut.getAll(0, 0, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
-        verifyZeroInteractions(emailRepository);
+        verifyNoInteractions(emailRepository);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class EmailControllerTest {
         var result = sut.getAll(0, -1, model);
 
         assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
-        verifyZeroInteractions(emailRepository);
+        verifyNoInteractions(emailRepository);
     }
 
     @Test

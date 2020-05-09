@@ -14,17 +14,19 @@ import java.io.InputStream;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = IOException.class)
-public class EmailPersister implements SimpleMessageListener {
+public class MessageListener implements SimpleMessageListener {
     private final EmailFactory emailFactory;
     private final EmailFilter emailFilter;
     private final EmailRepository emailRepository;
+    private final MessageForwarder messageForwarder;
     private final Logger logger;
 
     @Autowired
-    public EmailPersister(EmailFactory emailFactory, EmailFilter emailFilter, EmailRepository emailRepository, Logger logger) {
+    public MessageListener(EmailFactory emailFactory, EmailFilter emailFilter, EmailRepository emailRepository, MessageForwarder messageForwarder, Logger logger) {
         this.emailFactory = emailFactory;
         this.emailFilter = emailFilter;
         this.emailRepository = emailRepository;
+        this.messageForwarder = messageForwarder;
         this.logger = logger;
     }
 
@@ -42,6 +44,7 @@ public class EmailPersister implements SimpleMessageListener {
         if(!emailFilter.ignore(sender,recipient)) {
             var email = emailFactory.convert(rawData);
             emailRepository.save(email);
+            messageForwarder.forward(rawData);
         }
     }
 }

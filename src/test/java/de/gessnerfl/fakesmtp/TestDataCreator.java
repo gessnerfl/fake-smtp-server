@@ -22,7 +22,7 @@ public class TestDataCreator {
 
     private static void createEmail(int i) {
         var message = new SimpleMailMessage();
-        message.setTo("receiver@exmaple.com");
+        message.setTo("receiver@example.com");
         message.setFrom("sender@example.com");
         message.setSubject("Test-Plain-Mail " + i);
         message.setText("This is the test mail number "+i);
@@ -35,7 +35,7 @@ public class TestDataCreator {
 
             var message = sender.createMimeMessage();
             var helper = new MimeMessageHelper(message);
-            helper.setTo("receiver@exmaple.com");
+            helper.setTo("receiver@example.com");
             helper.setFrom("sender@example.com");
             helper.setSubject("Test-Html-Mail " + i);
             helper.setText("<html><head></head><body>This is the test mail number " + i + "</body>", true);
@@ -52,7 +52,7 @@ public class TestDataCreator {
 
             var message = sender.createMimeMessage();
             var helper = new MimeMessageHelper(message, true);
-            helper.setTo("receiver@exmaple.com");
+            helper.setTo("receiver@example.com");
             helper.setFrom("sender@example.com");
             helper.setSubject("Test-Alternative-Mail " + i);
             helper.setText("This is the test mail number" + i, "<html><head></head><body>This is the test mail number " + i + "</body>");

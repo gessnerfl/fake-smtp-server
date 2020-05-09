@@ -19,7 +19,7 @@ before_install:
 - chmod +x gradlew
 
 script:
- - ./gradlew build sonarqube
+ - ./gradlew build jacocoTestReport sonarqube
 
 notifications:
   email: false

@@ -10,11 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.mail.*;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 @Service
 public class EmailFactory {
@@ -29,8 +27,7 @@ public class EmailFactory {
 
     public Email convert(RawData rawData) throws IOException {
         try {
-            var s = Session.getDefaultInstance(new Properties());
-            var mimeMessage = new MimeMessage(s, rawData.getContentAsStream());
+            var mimeMessage = rawData.toMimeMessage();
             var subject = Objects.toString(mimeMessage.getSubject(), UNDEFINED);
             var contentType = ContentType.fromString(mimeMessage.getContentType());
             var messageContent = mimeMessage.getContent();
