@@ -1,5 +1,7 @@
 package de.gessnerfl.fakesmtp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -96,14 +98,17 @@ public class Email {
         contents.add(content);
     }
 
+    @JsonIgnore
     public List<EmailContent> getContents() {
         return contents.stream().sorted(comparing(EmailContent::getContentType)).collect(toList());
     }
 
+    @JsonIgnore
     public Optional<EmailContent> getPlainContent(){
         return getContentOfType(ContentType.PLAIN);
     }
 
+    @JsonIgnore
     public Optional<EmailContent> getHtmlContent(){
         return getContentOfType(ContentType.HTML);
     }

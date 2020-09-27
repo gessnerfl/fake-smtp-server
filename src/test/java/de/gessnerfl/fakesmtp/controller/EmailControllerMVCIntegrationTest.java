@@ -141,27 +141,7 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     private Email createRandomEmail(int minusMinutes) {
-        var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
-
-        var content = new EmailContent();
-        content.setContentType(ContentType.PLAIN);
-        content.setData("Test Content "+randomToken);
-
-        var attachment = new EmailAttachment();
-        attachment.setFilename("test.txt");
-        attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
-
-        var mail = new Email();
-        mail.setSubject("Test Subject "+randomToken);
-        mail.setRawData("Test Content "+randomToken);
-        mail.setReceivedOn(receivedOn);
-        mail.setFromAddress("sender@example.com");
-        mail.setToAddress("receiver@example.com");
-        mail.addContent(content);
-        mail.addAttachment(attachment);
-        return emailRepository.save(mail);
+        return emailRepository.save(EmailControllerUtil.prepareRandomEmail(minusMinutes));
     }
 
 }
