@@ -47,7 +47,7 @@
                     </div>
                 </div>
                 <div class="card-action" th:if="${not #lists.isEmpty(mail.attachments)}">
-                    <a th:href="@{|/email/${mail.id}/attachment/${a.id}|}" th:each="a : ${mail.attachments}">
+                    <a th:href="@{|/api/email/${mail.id}/attachment/${a.id}|}" th:each="a : ${mail.attachments}">
                         <i class="material-icons tiny blue-text">attach_file</i>
                         <span class="blue-text no-uppercase" th:text="${a.filename}"></span>
                     </a>
