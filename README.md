@@ -74,31 +74,6 @@ The following snippet shows the pre-defined web application configuration
 
 ## REST API
 
-There is a possibility to access emails through REST API. Below is the list of available services with examples.
-
-* Get emails
-    * Path: _/api/email_ 
-    * Optional parameters:
-        * page - the page to be returned
-        * size - the number of emails to be returned
-        * sort - the sorting direction, accepts _ASC_ or _DESC_ value
-    * Example of usage:
-        ```
-        curl -H "Accept: application/json" "localhost:5080/api/email?page=1&size=10"
-        ```
-* Get email
-    * Path _/api/email/{id}_
-    * Required parameters:
-        * id - id of the email
-    * Example of usage: 
-        ```
-        curl -H "Accept: application/json" "localhost:5080/api/email/1"
-        ```
-* Delete email
-    * Path _/api/email/{id}_
-    * Required parameters:
-        * id - id of the email that should be deleted
-    * Example of usage:
-        ```
-        curl -X DELETE -H "Accept: application/json" "localhost:5080/api/email/1"
-        ```
+Documentation of exposed services is available at:
+    
+    localhost:5080/swagger-ui.html
