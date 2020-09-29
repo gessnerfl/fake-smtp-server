@@ -1,5 +1,7 @@
 package de.gessnerfl.fakesmtp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -31,6 +33,7 @@ public class EmailAttachment {
         this.id = id;
     }
 
+    @JsonIgnore
     public Email getEmail() {
         return email;
     }

@@ -101,35 +101,6 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnAttachmentForEmail() throws Exception {
-        var email = createRandomEmail(1);
-        var attachment = email.getAttachments().get(0);
-
-        this.mockMvc.perform(get("/email/"+email.getId()+"/attachment/" + attachment.getId()))
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename=" + attachment.getFilename()))
-                .andExpect(header().string(HttpHeaders.CONTENT_LENGTH,"" + attachment.getData().length))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE))
-                .andExpect(content().bytes(attachment.getData()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    public void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
-        var email = createRandomEmail(1);
-
-        this.mockMvc.perform(get("/email/"+email.getId()+"/attachment/123"))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
-        var email = createRandomEmail(1);
-
-        this.mockMvc.perform(get("/email/123/attachment/"+email.getAttachments().get(0).getId()))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     public void shouldDeleteEmail() throws Exception {
         var email = createRandomEmail(1);
 
@@ -141,27 +112,7 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     private Email createRandomEmail(int minusMinutes) {
-        var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
-
-        var content = new EmailContent();
-        content.setContentType(ContentType.PLAIN);
-        content.setData("Test Content "+randomToken);
-
-        var attachment = new EmailAttachment();
-        attachment.setFilename("test.txt");
-        attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
-
-        var mail = new Email();
-        mail.setSubject("Test Subject "+randomToken);
-        mail.setRawData("Test Content "+randomToken);
-        mail.setReceivedOn(receivedOn);
-        mail.setFromAddress("sender@example.com");
-        mail.setToAddress("receiver@example.com");
-        mail.addContent(content);
-        mail.addAttachment(attachment);
-        return emailRepository.save(mail);
+        return emailRepository.save(EmailControllerUtil.prepareRandomEmail(minusMinutes));
     }
 
 }

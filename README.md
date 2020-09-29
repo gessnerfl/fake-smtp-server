@@ -71,3 +71,9 @@ The following snippet shows the pre-defined web application configuration
     
     #Port of the http management api
     management.port=5081 
+
+## REST API
+
+Documentation of exposed services is available at:
+    
+    localhost:5080/swagger-ui.html

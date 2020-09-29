@@ -30,16 +30,10 @@ public class EmailController {
     static final String REDIRECT_EMAIL_LIST_VIEW = "redirect:/email";
 
     private final EmailRepository emailRepository;
-    private final EmailAttachmentRepository emailAttachmentRepository;
-    private final MediaTypeUtil mediaTypeUtil;
-    private final ServletContext servletContext;
 
     @Autowired
-    public EmailController(EmailRepository emailRepository, EmailAttachmentRepository emailAttachmentRepository, MediaTypeUtil mediaTypeUtil, ServletContext servletContext) {
+    public EmailController(EmailRepository emailRepository) {
         this.emailRepository = emailRepository;
-        this.emailAttachmentRepository = emailAttachmentRepository;
-        this.mediaTypeUtil = mediaTypeUtil;
-        this.servletContext = servletContext;
     }
 
     @GetMapping({"/", "/email"})
@@ -67,22 +61,6 @@ public class EmailController {
     private String appendToModelAndReturnView(Model model, Email email) {
         model.addAttribute(SINGLE_EMAIL_MODEL_NAME, email);
         return SINGLE_EMAIL_VIEW;
-    }
-
-    @GetMapping("/email/{mailId}/attachment/{attachmentId}")
-    @ResponseBody
-    public ResponseEntity<ByteArrayResource> getEmailAttachmentById(@PathVariable Long mailId, @PathVariable Long attachmentId) {
-        var attachment = emailAttachmentRepository.findById(attachmentId)
-                .filter(a -> a.getEmail().getId().equals(mailId))
-                .orElseThrow(() -> new AttachmentNotFoundException("Attachment with id " + attachmentId + " not found for mail " + mailId));
-
-        var mediaType = mediaTypeUtil.getMediaTypeForFileName(this.servletContext, attachment.getFilename());
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + attachment.getFilename())
-                .contentType(mediaType)
-                .contentLength(attachment.getData().length) //
-                .body(new ByteArrayResource(attachment.getData()));
     }
 
     @DeleteMapping("/email/{id}")
