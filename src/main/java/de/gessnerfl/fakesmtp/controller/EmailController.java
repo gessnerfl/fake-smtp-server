@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletContext;
-
 @Controller
 @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
 public class EmailController {
