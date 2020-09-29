@@ -1,7 +1,7 @@
 plugins {
 	id "com.cinnober.gradle.semver-git" version "3.0.0"
-	id 'org.springframework.boot' version '2.2.7.RELEASE'
-	id "org.sonarqube" version "2.8"
+	id 'org.springframework.boot' version '2.3.4.RELEASE'
+	id "org.sonarqube" version "3.0"
 }
 
 apply plugin: 'java'
@@ -28,20 +28,20 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
 	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
 	implementation('org.springframework.boot:spring-boot-starter-mail')
-	implementation('commons-io:commons-io:2.6')
+	implementation('commons-io:commons-io:2.8.0')
 	implementation('org.subethamail:subethasmtp:3.1.7')
 	implementation('org.flywaydb:flyway-core')
-	implementation('com.sun.xml.bind:jaxb-impl:2.3.2')
+	implementation('com.sun.xml.bind:jaxb-impl:2.3.3')
 	implementation('org.springdoc:springdoc-openapi-ui:1.4.8')
 
-	implementation('org.webjars.bower:jquery:3.4.1')
+	implementation('org.webjars.bower:jquery:3.5.1')
 	implementation('org.webjars:materializecss:1.0.0')
 	implementation('org.webjars:material-design-icons:3.0.1')
 
 	runtimeOnly('com.h2database:h2')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
-	testImplementation('org.ow2.asm:asm:8.0.1')
-	testImplementation('org.apache.commons:commons-lang3:3.10')
+	testImplementation('org.ow2.asm:asm:9.0')
+	testImplementation('org.apache.commons:commons-lang3:3.11')
 	testImplementation('org.hamcrest:hamcrest-core:2.2')
 }
 

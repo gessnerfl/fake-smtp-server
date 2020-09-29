@@ -11,7 +11,7 @@ import java.net.InetAddress;
 
 import static org.junit.Assert.*;
 
-@ActiveProfiles("integrationtest,config_integrationtest")
+@ActiveProfiles({"integrationtest","config_integrationtest"})
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class FakeSmtpConfigurationPropertiesIntegrationTest {

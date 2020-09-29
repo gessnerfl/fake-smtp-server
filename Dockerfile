@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.6_10
+FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.8_10
 
 VOLUME /tmp
 
