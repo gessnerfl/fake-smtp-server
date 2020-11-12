@@ -1,13 +1,8 @@
 package de.gessnerfl.fakesmtp.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
-import de.gessnerfl.fakesmtp.model.EmailAttachment;
-import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,10 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;

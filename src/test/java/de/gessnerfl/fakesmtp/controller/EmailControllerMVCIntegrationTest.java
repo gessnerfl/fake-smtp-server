@@ -1,27 +1,16 @@
 package de.gessnerfl.fakesmtp.controller;
 
-import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
-import de.gessnerfl.fakesmtp.model.EmailAttachment;
-import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -50,6 +39,7 @@ public class EmailControllerMVCIntegrationTest {
         this.mockMvc.perform(get("/email?page"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mails", emptyIterableOf(Email.class)))
+                .andExpect(model().attribute("appVersion", any(String.class)))
                 .andExpect(view().name("email-list"));
     }
 
@@ -63,12 +53,14 @@ public class EmailControllerMVCIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mails", iterableWithSize(2)))
                 .andExpect(model().attribute("mails", contains(equalTo(email3), equalTo(email2))))
+                .andExpect(model().attribute("appVersion", any(String.class)))
                 .andExpect(view().name("email-list"));
 
         this.mockMvc.perform(get("/email?page=1&size=2"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mails", iterableWithSize(1)))
                 .andExpect(model().attribute("mails", contains(equalTo(email1))))
+                .andExpect(model().attribute("appVersion", any(String.class)))
                 .andExpect(view().name("email-list"));
     }
 
@@ -89,6 +81,7 @@ public class EmailControllerMVCIntegrationTest {
         this.mockMvc.perform(get("/email/"+email.getId()))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mail", equalTo(email)))
+                .andExpect(model().attribute("appVersion", any(String.class)))
                 .andExpect(view().name("email"));
     }
 

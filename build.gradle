@@ -1,6 +1,6 @@
 plugins {
 	id "com.cinnober.gradle.semver-git" version "3.0.0"
-	id 'org.springframework.boot' version '2.3.4.RELEASE'
+	id 'org.springframework.boot' version '2.4.0'
 	id "org.sonarqube" version "3.0"
 }
 
@@ -39,10 +39,15 @@ dependencies {
 	implementation('org.webjars:material-design-icons:3.0.1')
 
 	runtimeOnly('com.h2database:h2')
+	testImplementation('org.junit.vintage:junit-vintage-engine')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	testImplementation('org.ow2.asm:asm:9.0')
 	testImplementation('org.apache.commons:commons-lang3:3.11')
 	testImplementation('org.hamcrest:hamcrest-core:2.2')
+}
+
+springBoot {
+	buildInfo()
 }
 
 sonarqube {
