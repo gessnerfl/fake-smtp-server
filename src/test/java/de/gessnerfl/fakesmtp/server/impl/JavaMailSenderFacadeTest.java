@@ -9,10 +9,10 @@ import javax.mail.internet.MimeMessage;
 
 import static org.mockito.Mockito.*;
 
-public class JavaMailSenderFacadeTest {
+class JavaMailSenderFacadeTest {
 
     @Test
-    public void shouldSendMimeMessageWhenMailSystemIsAvailable() {
+    void shouldSendMimeMessageWhenMailSystemIsAvailable() {
         var javaMailSender = mock(JavaMailSender.class);
         var logger = mock(Logger.class);
         var mimeMessage = mock(MimeMessage.class);
@@ -29,7 +29,7 @@ public class JavaMailSenderFacadeTest {
     }
 
     @Test
-    public void shouldLogErrorAndSkipSendingOfMimeMessageWhenMailSystemIsNotAvailable() {
+    void shouldLogErrorAndSkipSendingOfMimeMessageWhenMailSystemIsNotAvailable() {
         var logger = mock(Logger.class);
         var mimeMessage = mock(MimeMessage.class);
 
@@ -43,7 +43,7 @@ public class JavaMailSenderFacadeTest {
     }
 
     @Test
-    public void shouldSendSimpleMessageWhenMailSystemIsAvailable() {
+    void shouldSendSimpleMessageWhenMailSystemIsAvailable() {
         var javaMailSender = mock(JavaMailSender.class);
         var logger = mock(Logger.class);
         var message = mock(SimpleMailMessage.class);
@@ -60,7 +60,7 @@ public class JavaMailSenderFacadeTest {
     }
 
     @Test
-    public void shouldLogErrorAndSkipSendingOfSimpleMessageWhenMailSystemIsNotAvailable() {
+    void shouldLogErrorAndSkipSendingOfSimpleMessageWhenMailSystemIsNotAvailable() {
         var logger = mock(Logger.class);
         var message = mock(SimpleMailMessage.class);
 

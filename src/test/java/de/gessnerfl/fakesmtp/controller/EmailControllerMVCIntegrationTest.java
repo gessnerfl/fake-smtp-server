@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EmailControllerMVCIntegrationTest {
+class EmailControllerMVCIntegrationTest {
 
     @Autowired
     private EmailRepository emailRepository;
@@ -30,12 +30,12 @@ public class EmailControllerMVCIntegrationTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void init(){
+    void init(){
         emailRepository.deleteAll();
     }
 
     @Test
-    public void shouldReturnEmptyListWhenNoEmailsAreAvailable() throws Exception {
+    void shouldReturnEmptyListWhenNoEmailsAreAvailable() throws Exception {
         this.mockMvc.perform(get("/email?page"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("mails", emptyIterableOf(Email.class)))
@@ -44,7 +44,7 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnListOfEmailsPagedWhenEmailsAreAvailable() throws Exception {
+    void shouldReturnListOfEmailsPagedWhenEmailsAreAvailable() throws Exception {
         var email1 = createRandomEmail(5);
         var email2 = createRandomEmail(2);
         var email3 = createRandomEmail(1);
@@ -65,7 +65,7 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnFirstPageWhenGivenPageIsOutOfRange() throws Exception {
+    void shouldReturnFirstPageWhenGivenPageIsOutOfRange() throws Exception {
         createRandomEmail(1);
 
         this.mockMvc.perform(get("/email?page=1&size=2"))
@@ -75,7 +75,7 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnMailById() throws Exception {
+    void shouldReturnMailById() throws Exception {
         var email = createRandomEmail(1);
 
         this.mockMvc.perform(get("/email/"+email.getId()))
@@ -86,7 +86,7 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnErrorWhenMailIdIsNotValid() throws Exception {
+    void shouldReturnErrorWhenMailIdIsNotValid() throws Exception {
         this.mockMvc.perform(get("/email/123"))
                 .andExpect(redirectedUrl("/email"))
                 .andExpect(model().attributeDoesNotExist("mails", "mail"))
@@ -94,7 +94,7 @@ public class EmailControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldDeleteEmail() throws Exception {
+    void shouldDeleteEmail() throws Exception {
         var email = createRandomEmail(1);
 
         this.mockMvc.perform(delete("/email/"+email.getId()))

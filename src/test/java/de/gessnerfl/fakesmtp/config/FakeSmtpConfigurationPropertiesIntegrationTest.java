@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles({"integrationtest","config_integrationtest"})
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class FakeSmtpConfigurationPropertiesIntegrationTest {
+class FakeSmtpConfigurationPropertiesIntegrationTest {
 
     @Autowired
     private FakeSmtpConfigurationProperties sut;
 
     @Test
-    public void shouldLoadConfigurationParameters() throws Exception {
+    void shouldLoadConfigurationParameters() throws Exception {
         assertEquals(1234, sut.getPort().intValue());
         assertEquals(InetAddress.getByName("127.0.0.1"), sut.getBindAddress());
         assertNull(sut.getAuthentication());

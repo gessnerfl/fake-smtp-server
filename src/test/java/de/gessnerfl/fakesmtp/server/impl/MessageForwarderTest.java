@@ -17,7 +17,7 @@ import javax.mail.internet.MimeMessage;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MessageForwarderTest {
+class MessageForwarderTest {
 
     @Mock
     private FakeSmtpConfigurationProperties configurationProperties;
@@ -30,7 +30,7 @@ public class MessageForwarderTest {
     private MessageForwarder sut;
 
     @Test
-    public void shouldSkipForwardingWhenForwardingIsNotEnabled() throws Exception {
+    void shouldSkipForwardingWhenForwardingIsNotEnabled() throws Exception {
         var rawData = mock(RawData.class);
         when(configurationProperties.isForwardEmails()).thenReturn(false);
 
@@ -41,7 +41,7 @@ public class MessageForwarderTest {
     }
 
     @Test
-    public void shouldForwardMimeMessageWhenForwardingIsEnabledAndEmailCanBeConvertedToMimeMessage() throws Exception {
+    void shouldForwardMimeMessageWhenForwardingIsEnabledAndEmailCanBeConvertedToMimeMessage() throws Exception {
         var mimeMessage = mock(MimeMessage.class);
         var rawData = mock(RawData.class);
         when(rawData.toMimeMessage()).thenReturn(mimeMessage);
@@ -55,7 +55,7 @@ public class MessageForwarderTest {
     }
 
     @Test
-    public void shouldForwardEmailAsSimpleMessageWhenForwardingIsEnabledAndEmailCannotBeConvertedToMimeMessage() throws Exception {
+    void shouldForwardEmailAsSimpleMessageWhenForwardingIsEnabledAndEmailCannotBeConvertedToMimeMessage() throws Exception {
         var expectedException = new MessagingException("test");
         var from = "from";
         var to = "to";

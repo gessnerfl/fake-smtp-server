@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MessageListenerTest {
+class MessageListenerTest {
 
     @Mock
     private EmailFactory emailFactory;
@@ -35,12 +35,12 @@ public class MessageListenerTest {
     private MessageListener sut;
 
     @Test
-    public void shouldAcceptAllMails(){
+    void shouldAcceptAllMails(){
         assertTrue(sut.accept("foo", "bar"));
     }
 
     @Test
-    public void shouldCreateEmailEntityAndStoreItInDatabaseWhenEmailIsDelivered() throws IOException {
+    void shouldCreateEmailEntityAndStoreItInDatabaseWhenEmailIsDelivered() throws IOException {
         var from = "from";
         var to = "to";
         var contentString = "content";
@@ -63,14 +63,15 @@ public class MessageListenerTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenEmailEntityCannotBeCreatedWhenEmailIsDelivered() {
-        assertThrows(IOException.class, () -> {
-            var from = "from";
-            var to = "to";
-            var content = "content".getBytes(StandardCharsets.UTF_8);
-            var contentStream = new ByteArrayInputStream(content);
+    void shouldThrowExceptionWhenEmailEntityCannotBeCreatedWhenEmailIsDelivered() throws IOException {
+        var from = "from";
+        var to = "to";
+        var content = "content".getBytes(StandardCharsets.UTF_8);
+        var contentStream = new ByteArrayInputStream(content);
 
-            when(emailFactory.convert(any(RawData.class))).thenThrow(new IOException("foo"));
+        when(emailFactory.convert(any(RawData.class))).thenThrow(new IOException("foo"));
+
+        assertThrows(IOException.class, () -> {
 
             sut.deliver(from, to, contentStream);
 

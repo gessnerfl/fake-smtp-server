@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SmtpServerConfiguratorTest {
+class SmtpServerConfiguratorTest {
 
     @Mock
     private FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
@@ -33,7 +33,7 @@ public class SmtpServerConfiguratorTest {
     private SmtpServerConfigurator sut;
 
     @Test
-    public void shouldConfigureBasicParameters(){
+    void shouldConfigureBasicParameters(){
         var port = 1234;
         var bindingAddress = mock(InetAddress.class);
         when(fakeSmtpConfigurationProperties.getPort()).thenReturn(port);
@@ -49,7 +49,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldConfigureAuthenticationWhenAuthenticationIsConfiguredProperly(){
+    void shouldConfigureAuthenticationWhenAuthenticationIsConfiguredProperly(){
         var username = "username";
         var password = "password";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
@@ -73,7 +73,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldSkipConfigurationOfAuthenticationWhenUsernameIsNull(){
+    void shouldSkipConfigurationOfAuthenticationWhenUsernameIsNull(){
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
@@ -87,7 +87,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldSkipConfigurationOfAuthenticationWhenUsernameIsEmptyString(){
+    void shouldSkipConfigurationOfAuthenticationWhenUsernameIsEmptyString(){
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
@@ -101,7 +101,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldSkipConfigurationOfAuthenticationWhenPasswordIsNull(){
+    void shouldSkipConfigurationOfAuthenticationWhenPasswordIsNull(){
         var username = "username";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
@@ -117,7 +117,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldSkipConfigurationOfAuthenticationWhenPasswordIsEmptyString(){
+    void shouldSkipConfigurationOfAuthenticationWhenPasswordIsEmptyString(){
         var username = "username";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);

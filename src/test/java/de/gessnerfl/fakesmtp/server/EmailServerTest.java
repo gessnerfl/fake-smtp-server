@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EmailServerTest {
+class EmailServerTest {
 
     @Mock
     private SmtpServerFactory smtpServerFactory;
@@ -22,7 +22,7 @@ public class EmailServerTest {
     private EmailServer sut;
 
     @Test
-    public void shouldSetSmtpServerOnPostConstruct(){
+    void shouldSetSmtpServerOnPostConstruct(){
         var smtpServer = mock(SmtpServer.class);
         when(smtpServerFactory.create()).thenReturn(smtpServer);
 
@@ -34,7 +34,7 @@ public class EmailServerTest {
     }
 
     @Test
-    public void shouldStopServerOnPreDestroy(){
+    void shouldStopServerOnPreDestroy(){
         var smtpServer = mock(SmtpServer.class);
         sut.smtpServer = smtpServer;
 
@@ -45,7 +45,7 @@ public class EmailServerTest {
     }
 
     @Test
-    public void shouldSilentlyShutdownWhenNoServerIsSet(){
+    void shouldSilentlyShutdownWhenNoServerIsSet(){
         sut.shutdown();
 
         verify(logger).debug(anyString());

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("integrationtest")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class MessageListenerIntegrationTest {
+class MessageListenerIntegrationTest {
     private static final String SENDER = "sender";
     private static final String RECEIVER = "receiver";
 
@@ -33,12 +33,12 @@ public class MessageListenerIntegrationTest {
     private MessageListener sut;
 
     @BeforeEach
-    public void setup(){
+    void setup(){
         emailRepository.deleteAll();
     }
 
     @Test
-    public void shouldCreateEmailForEmlFileWithSubject() throws Exception {
+    void shouldCreateEmailForEmlFileWithSubject() throws Exception {
         var testFilename = "mail-with-subject.eml";
         var data = TestResourceUtil.getTestFile(testFilename);
         var rawData = TestResourceUtil.getTestFileContent(testFilename);
@@ -62,7 +62,7 @@ public class MessageListenerIntegrationTest {
     }
 
     @Test
-    public void shouldCreateEmailForEmlFileWithoutSubject() throws Exception {
+    void shouldCreateEmailForEmlFileWithoutSubject() throws Exception {
         var testFilename = "mail-without-subject.eml";
         var data = TestResourceUtil.getTestFile(testFilename);
         var rawData = TestResourceUtil.getTestFileContent(testFilename);
@@ -86,7 +86,7 @@ public class MessageListenerIntegrationTest {
     }
 
     @Test
-    public void shouldCreateMailForPlainText() throws Exception {
+    void shouldCreateMailForPlainText() throws Exception {
         var rawData = "this is just some dummy content";
         var data = new ByteArrayInputStream(rawData.getBytes(StandardCharsets.UTF_8));
 

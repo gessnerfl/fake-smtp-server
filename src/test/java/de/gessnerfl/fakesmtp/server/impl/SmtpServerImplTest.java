@@ -6,10 +6,10 @@ import org.subethamail.smtp.server.SMTPServer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class SmtpServerImplTest {
+class SmtpServerImplTest {
     
     @Test
-    public void shouldCreateNewInstanceAndDelegateCallsToRealImplementation(){
+    void shouldCreateNewInstanceAndDelegateCallsToRealImplementation(){
         var delegate = mock(SMTPServer.class);
 
         var sut = new SmtpServerImpl(delegate);

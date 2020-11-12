@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EmailFilterTest {
+class EmailFilterTest {
   private static final String TEST_EMAIL_ADDRESS_1 = "john@doe.com";
   private static final String TEST_EMAIL_ADDRESS_2 = "jane@doe.com";
 
@@ -26,7 +26,7 @@ public class EmailFilterTest {
   private EmailFilter sut;
 
   @Test
-  public void emptyFilter(){
+  void emptyFilter(){
     when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn(null);
     assertFalse(sut.ignore(TEST_EMAIL_ADDRESS_1, TEST_EMAIL_ADDRESS_2));
 
@@ -35,31 +35,31 @@ public class EmailFilterTest {
   }
 
   @Test
-  public void noneMatchingFilter(){
+  void noneMatchingFilter(){
     when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn(".*@google.com");
     assertFalse(sut.ignore(TEST_EMAIL_ADDRESS_1,TEST_EMAIL_ADDRESS_2));
   }
 
   @Test
-  public void matchingFilter(){
+  void matchingFilter(){
     when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn(".*@doe.com");
     assertTrue(sut.ignore(TEST_EMAIL_ADDRESS_1,TEST_EMAIL_ADDRESS_2));
   }
 
   @Test
-  public void matchingFilterMultipleRegexAnyMatch(){
+  void matchingFilterMultipleRegexAnyMatch(){
     when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn(".*@other\\.com,jane@.*");
     assertTrue(sut.ignore(TEST_EMAIL_ADDRESS_1,TEST_EMAIL_ADDRESS_2));
   }
 
   @Test
-  public void matchingFilterMultipleRegexAllMatch(){
+  void matchingFilterMultipleRegexAllMatch(){
     when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn(".*@doe\\.com,jane@.*");
     assertTrue(sut.ignore(TEST_EMAIL_ADDRESS_1,TEST_EMAIL_ADDRESS_2));
   }
 
   @Test
-  public void invalidRegex(){
+  void invalidRegex(){
     when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn("****");
     assertFalse(sut.ignore(TEST_EMAIL_ADDRESS_1,TEST_EMAIL_ADDRESS_2));
   }

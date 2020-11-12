@@ -27,19 +27,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("integrationtest")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class EmailRepositoryIntegrationTest {
+class EmailRepositoryIntegrationTest {
 
     private static final Sort SORT_DESC_BY_RECEIVED_ON = Sort.by(Sort.Direction.DESC, "receivedOn");
     @Autowired
     private EmailRepository sut;
 
     @BeforeEach
-    public void init(){
+    void init(){
         sut.deleteAll();
     }
 
     @Test
-    public void shouldDeleteEmailsWhichExceedTheRetentionLimitOfMaximumNumberOfEmails(){
+    void shouldDeleteEmailsWhichExceedTheRetentionLimitOfMaximumNumberOfEmails(){
         var mail1 = createRandomEmail(5);
         var mail2 = createRandomEmail(4);
         var mail3 = createRandomEmail(3);
@@ -59,7 +59,7 @@ public class EmailRepositoryIntegrationTest {
     }
 
     @Test
-    public void shouldNotDeleteAnyEmailWhenTheNumberOfEmailsDoesNotExceedTheRetentionLimitOfMaximumNumberOfEmails(){
+    void shouldNotDeleteAnyEmailWhenTheNumberOfEmailsDoesNotExceedTheRetentionLimitOfMaximumNumberOfEmails(){
         var mail1 = createRandomEmail(5);
         var mail2 = createRandomEmail(4);
         var mail3 = createRandomEmail(3);

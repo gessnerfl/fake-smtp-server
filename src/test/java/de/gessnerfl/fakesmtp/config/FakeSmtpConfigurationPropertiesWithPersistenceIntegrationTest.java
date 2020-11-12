@@ -13,13 +13,13 @@ import java.net.InetAddress;
 @ActiveProfiles({"integrationtest","config_with_persistence_integrationtest"})
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class FakeSmtpConfigurationPropertiesWithPersistenceIntegrationTest {
+class FakeSmtpConfigurationPropertiesWithPersistenceIntegrationTest {
 
     @Autowired
     private FakeSmtpConfigurationProperties sut;
 
     @Test
-    public void shouldLoadConfigurationParameters() throws Exception {
+    void shouldLoadConfigurationParameters() throws Exception {
         Assertions.assertEquals(1234, sut.getPort().intValue());
         Assertions.assertEquals(InetAddress.getByName("127.0.0.1"), sut.getBindAddress());
         Assertions.assertNull(sut.getAuthentication());

@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class BasicUsernamePasswordValidatorTest {
+class BasicUsernamePasswordValidatorTest {
 
     @Mock
     private FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
@@ -24,7 +24,7 @@ public class BasicUsernamePasswordValidatorTest {
 
 
     @Test
-    public void shouldSuccessfullyValidateCorrectUsernameAndPassword() throws Exception {
+    void shouldSuccessfullyValidateCorrectUsernameAndPassword() throws Exception {
         var username = "username";
         var password = "password";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
@@ -39,7 +39,7 @@ public class BasicUsernamePasswordValidatorTest {
     }
 
     @Test
-    public void shouldThrowLoginFailedExceptionWhenUsernameIsNotValid() {
+    void shouldThrowLoginFailedExceptionWhenUsernameIsNotValid() {
         Assertions.assertThrows(LoginFailedException.class, () -> {
             var username = "username";
             var invalidUsername = "inValidUsername";
@@ -53,7 +53,7 @@ public class BasicUsernamePasswordValidatorTest {
     }
 
     @Test
-    public void shouldThrowLoginFailedExceptionWhenPasswordIsNotValid() {
+    void shouldThrowLoginFailedExceptionWhenPasswordIsNotValid() {
         Assertions.assertThrows(LoginFailedException.class, () -> {
             var username = "username";
             var password = "password";
@@ -68,7 +68,7 @@ public class BasicUsernamePasswordValidatorTest {
     }
 
     @Test
-    public void shouldThrowNullPointerExceptionWhenAuthenticationIsMissing() {
+    void shouldThrowNullPointerExceptionWhenAuthenticationIsMissing() {
         Assertions.assertThrows(NullPointerException.class, () -> {
             var username = "username";
             var password = "password";
@@ -79,7 +79,7 @@ public class BasicUsernamePasswordValidatorTest {
     }
 
     @Test
-    public void shouldThrowNullPointerExceptionWhenUsernameIsMissingInAuthentication() {
+    void shouldThrowNullPointerExceptionWhenUsernameIsMissingInAuthentication() {
         Assertions.assertThrows(NullPointerException.class, () -> {
             var username = "username";
             var password = "password";
@@ -92,7 +92,7 @@ public class BasicUsernamePasswordValidatorTest {
     }
 
     @Test
-    public void shouldThrowNullPointerExceptionWhenPasswordIsMissingInAuthentication() {
+    void shouldThrowNullPointerExceptionWhenPasswordIsMissingInAuthentication() {
         Assertions.assertThrows(NullPointerException.class, () -> {
             var username = "username";
             var password = "password";

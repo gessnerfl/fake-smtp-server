@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import javax.mail.internet.MimeMessage;
 
-public class RawDataTest {
+class RawDataTest {
 
     @Test
-    public void shouldReturnMimeMessage() throws Exception {
+    void shouldReturnMimeMessage() throws Exception {
         RawData sut = new RawData("from", "to", TestResourceUtil.getTestFileContentBytes(("mail-with-subject.eml")));
 
         MimeMessage message = sut.toMimeMessage();

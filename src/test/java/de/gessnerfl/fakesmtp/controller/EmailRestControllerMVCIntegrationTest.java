@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EmailRestControllerMVCIntegrationTest {
+class EmailRestControllerMVCIntegrationTest {
 
     @Autowired
     private EmailRepository emailRepository;
@@ -39,12 +39,12 @@ public class EmailRestControllerMVCIntegrationTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void init(){
+    void init(){
         emailRepository.deleteAll();
     }
 
     @Test
-    public void shouldReturnEmptyListWhenNoEmailsAreAvailable() throws Exception {
+    void shouldReturnEmptyListWhenNoEmailsAreAvailable() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/api/email")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
@@ -53,7 +53,7 @@ public class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnFirstPageOfEmails() throws Exception {
+    void shouldReturnFirstPageOfEmails() throws Exception {
         var email1 = createRandomEmail(5);
         var email2 = createRandomEmail(2);
         var email3 = createRandomEmail(1);
@@ -66,7 +66,7 @@ public class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnSecondPageOfEmails() throws Exception {
+    void shouldReturnSecondPageOfEmails() throws Exception {
         var email1 = createRandomEmail(5);
         var email2 = createRandomEmail(2);
         var email3 = createRandomEmail(1);
@@ -79,7 +79,7 @@ public class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnNoEmailsWhenGivenPageIsOutOfRange() throws Exception {
+    void shouldReturnNoEmailsWhenGivenPageIsOutOfRange() throws Exception {
         var email1 = createRandomEmail(5);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/email?page=2&size=1")).andReturn();
@@ -90,7 +90,7 @@ public class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnMailById() throws Exception {
+    void shouldReturnMailById() throws Exception {
         var email = createRandomEmail(1);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/email/"+email.getId())).andReturn();
@@ -101,13 +101,13 @@ public class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnNotFoundCodeWhenMailIdIsNotValid() throws Exception {
+    void shouldReturnNotFoundCodeWhenMailIdIsNotValid() throws Exception {
         this.mockMvc.perform(get("/api/email/123"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void shouldReturnAttachmentForEmail() throws Exception {
+    void shouldReturnAttachmentForEmail() throws Exception {
         var email = createRandomEmail(1);
         var attachment = email.getAttachments().get(0);
 
@@ -120,7 +120,7 @@ public class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
+    void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
         this.mockMvc.perform(get("/api/email/"+email.getId()+"/attachment/123"))
@@ -128,7 +128,7 @@ public class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
+    void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
         this.mockMvc.perform(get("/api/email/123/attachment/"+email.getAttachments().get(0).getId()))
@@ -136,7 +136,7 @@ public class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
-    public void shouldDeleteEmail() throws Exception {
+    void shouldDeleteEmail() throws Exception {
         var email = createRandomEmail(1);
 
         this.mockMvc.perform(delete("/api/email/"+email.getId()))

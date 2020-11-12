@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EmailRestControllerTest {
+class EmailRestControllerTest {
     @Mock
     private EmailRepository emailRepository;
     @Mock
@@ -40,7 +40,7 @@ public class EmailRestControllerTest {
     private EmailRestController sut;
 
     @Test
-    public void shouldReturnListOfEmails() {
+    void shouldReturnListOfEmails() {
         final Page<Email> page = createFirstPageEmail();
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
@@ -52,7 +52,7 @@ public class EmailRestControllerTest {
     }
 
     @Test
-    public void shouldReturnSingleEmailWhenIdIsValid() {
+    void shouldReturnSingleEmailWhenIdIsValid() {
         var id = 12L;
         var mail = mock(Email.class);
         when(emailRepository.findById(id)).thenReturn(Optional.of(mail));
@@ -74,7 +74,7 @@ public class EmailRestControllerTest {
     }
 
     @Test
-    public void shouldReturnResponseEntityForAttachment() {
+    void shouldReturnResponseEntityForAttachment() {
         var fileContent = "this is the file content".getBytes(StandardCharsets.UTF_8);
         var filename = "myfile.txt";
         var emailId = 123L;
@@ -100,7 +100,7 @@ public class EmailRestControllerTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenNoAttachmentExistsForTheGivenId() {
+    void shouldThrowExceptionWhenNoAttachmentExistsForTheGivenId() {
         assertThrows(AttachmentNotFoundException.class, () -> {
             var emailId = 123L;
             var attachmentId = 456L;
@@ -116,7 +116,7 @@ public class EmailRestControllerTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenAttachmentExistsForTheGivenIdButTheEmailIdDoesNotMatch() {
+    void shouldThrowExceptionWhenAttachmentExistsForTheGivenIdButTheEmailIdDoesNotMatch() {
         assertThrows(AttachmentNotFoundException.class, () -> {
             var emailId = 123L;
             var attachmentId = 456L;
@@ -128,7 +128,7 @@ public class EmailRestControllerTest {
     }
 
     @Test
-    public void shouldDeleteEmailByItsIdAndFlushChangesSoThatDeleteIsApplied() {
+    void shouldDeleteEmailByItsIdAndFlushChangesSoThatDeleteIsApplied() {
         var emailId = 123L;
 
         sut.deleteEmailById(emailId);

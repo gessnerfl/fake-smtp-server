@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class SmtpServerFactoryImplTest {
+class SmtpServerFactoryImplTest {
     private final int PORT = 25;
 
     @Mock
@@ -24,7 +24,7 @@ public class SmtpServerFactoryImplTest {
     private SmtpServerFactoryImpl sut;
 
     @Test
-    public void shouldCreateAndConfigureNewInsance(){
+    void shouldCreateAndConfigureNewInsance(){
         var smtpServer = sut.create();
 
         MatcherAssert.assertThat(smtpServer, instanceOf(SmtpServerImpl.class));

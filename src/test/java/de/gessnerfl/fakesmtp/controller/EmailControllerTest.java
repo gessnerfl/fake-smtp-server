@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EmailControllerTest {
+class EmailControllerTest {
     @Mock
     private Model model;
     @Mock
@@ -30,7 +30,7 @@ public class EmailControllerTest {
     private EmailController sut;
 
     @Test
-    public void shouldReturnEmailsPaged() {
+    void shouldReturnEmailsPaged() {
         final String appVersion = "appVersion";
         final Page<Email> page = createFirstPageEmail();
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
@@ -48,7 +48,7 @@ public class EmailControllerTest {
     }
 
     @Test
-    public void shouldReturnRedirectToFirstPageWhenRequestedPageIsOutOfRange() {
+    void shouldReturnRedirectToFirstPageWhenRequestedPageIsOutOfRange() {
         var page = mock(Page.class);
         when(page.getTotalPages()).thenReturn(2);
         when(page.getNumber()).thenReturn(3);
@@ -63,7 +63,7 @@ public class EmailControllerTest {
     }
 
     @Test
-    public void shouldNotRedirectToFirstPageWhenNoDataIsAvailable() {
+    void shouldNotRedirectToFirstPageWhenNoDataIsAvailable() {
         final String appVersion = "appVersion";
         var page = mock(Page.class);
         when(page.getNumber()).thenReturn(0);
@@ -82,7 +82,7 @@ public class EmailControllerTest {
     }
 
     @Test
-    public void shouldRedirectToFirstPageWhenPageNumberIsBelowNull() {
+    void shouldRedirectToFirstPageWhenPageNumberIsBelowNull() {
         var result = sut.getAll(-1, 5, model);
 
         Assertions.assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
@@ -90,7 +90,7 @@ public class EmailControllerTest {
     }
 
     @Test
-    public void shouldRedirectToFirstPageWhenPageSizeIsNull() {
+    void shouldRedirectToFirstPageWhenPageSizeIsNull() {
         String result = sut.getAll(0, 0, model);
 
         Assertions.assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
@@ -98,7 +98,7 @@ public class EmailControllerTest {
     }
 
     @Test
-    public void shouldRedirectToFirstPageWhenPageSizeIsBelowNull() {
+    void shouldRedirectToFirstPageWhenPageSizeIsBelowNull() {
         var result = sut.getAll(0, -1, model);
 
         Assertions.assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
@@ -106,7 +106,7 @@ public class EmailControllerTest {
     }
 
     @Test
-    public void shouldReturnSingleEmailWhenIdIsValid() {
+    void shouldReturnSingleEmailWhenIdIsValid() {
         final String appVersion = "appVersion";
         var id = 12L;
         var mail = mock(Email.class);
@@ -125,7 +125,7 @@ public class EmailControllerTest {
     }
 
     @Test
-    public void shouldReturnRedirectToListPageWhenIdIsNotValid() {
+    void shouldReturnRedirectToListPageWhenIdIsNotValid() {
         var id = 12L;
         when(emailRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -150,7 +150,7 @@ public class EmailControllerTest {
     }
 
     @Test
-    public void shouldDeleteEmailByItsIdAndFlushChangesSoThatDeleteIsApplied(){
+    void shouldDeleteEmailByItsIdAndFlushChangesSoThatDeleteIsApplied(){
         var emailId = 123L;
 
         sut.deleteEmailById(emailId);
