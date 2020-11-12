@@ -2,22 +2,22 @@ package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MessageListenerTest {
 
     @Mock
@@ -62,18 +62,20 @@ public class MessageListenerTest {
         verify(messageForwarder).forward(rawData);
     }
 
-    @Test(expected = IOException.class)
-    public void shouldThrowExceptionWhenEmailEntityCannotBeCreatedWhenEmailIsDelivered() throws IOException {
-        var from = "from";
-        var to = "to";
-        var content = "content".getBytes(StandardCharsets.UTF_8);
-        var contentStream = new ByteArrayInputStream(content);
+    @Test
+    public void shouldThrowExceptionWhenEmailEntityCannotBeCreatedWhenEmailIsDelivered() {
+        assertThrows(IOException.class, () -> {
+            var from = "from";
+            var to = "to";
+            var content = "content".getBytes(StandardCharsets.UTF_8);
+            var contentStream = new ByteArrayInputStream(content);
 
-        when(emailFactory.convert(any(RawData.class))).thenThrow(new IOException("foo"));
+            when(emailFactory.convert(any(RawData.class))).thenThrow(new IOException("foo"));
 
-        sut.deliver(from, to, contentStream);
+            sut.deliver(from, to, contentStream);
 
-        verify(emailRepository, never()).save(any(Email.class));
-        verify(messageForwarder, never()).forward(any(RawData.class));
+            verify(emailRepository, never()).save(any(Email.class));
+            verify(messageForwarder, never()).forward(any(RawData.class));
+        });
     }
 }

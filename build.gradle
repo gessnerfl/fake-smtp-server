@@ -39,7 +39,6 @@ dependencies {
 	implementation('org.webjars:material-design-icons:3.0.1')
 
 	runtimeOnly('com.h2database:h2')
-	testImplementation('org.junit.vintage:junit-vintage-engine')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	testImplementation('org.ow2.asm:asm:9.0')
 	testImplementation('org.apache.commons:commons-lang3:3.11')

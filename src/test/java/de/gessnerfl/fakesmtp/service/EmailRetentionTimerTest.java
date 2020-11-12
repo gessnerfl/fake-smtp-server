@@ -2,16 +2,16 @@ package de.gessnerfl.fakesmtp.service;
 
 import de.gessnerfl.fakesmtp.config.FakeSmtpConfigurationProperties;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EmailRetentionTimerTest {
 
     @Mock

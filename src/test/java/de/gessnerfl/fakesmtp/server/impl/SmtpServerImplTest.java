@@ -1,6 +1,6 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.subethamail.smtp.server.SMTPServer;
 
 import static org.mockito.Mockito.mock;

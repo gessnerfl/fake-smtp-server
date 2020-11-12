@@ -2,12 +2,13 @@ package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +16,9 @@ import org.springframework.ui.Model;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EmailControllerTest {
     @Mock
     private Model model;
@@ -38,7 +38,7 @@ public class EmailControllerTest {
 
         var result = sut.getAll(0, 5, model);
 
-        assertEquals(EmailController.EMAIL_LIST_VIEW, result);
+        Assertions.assertEquals(EmailController.EMAIL_LIST_VIEW, result);
 
         verify(emailRepository).findAll(argThat(matchPageable(0, 5)));
         verify(model).addAttribute(EmailController.EMAIL_LIST_MODEL_NAME, page);
@@ -56,7 +56,7 @@ public class EmailControllerTest {
 
         var result = sut.getAll(3, 5, model);
 
-        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
+        Assertions.assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
 
         verify(emailRepository).findAll(argThat(matchPageable(3, 5)));
         verifyNoMoreInteractions(emailRepository, buildProperties, model);
@@ -72,7 +72,7 @@ public class EmailControllerTest {
 
         var result = sut.getAll(0, 5, model);
 
-        assertEquals(EmailController.EMAIL_LIST_VIEW, result);
+        Assertions.assertEquals(EmailController.EMAIL_LIST_VIEW, result);
 
         verify(emailRepository).findAll(argThat(matchPageable(0, 5)));
         verify(model).addAttribute(EmailController.EMAIL_LIST_MODEL_NAME, page);
@@ -85,7 +85,7 @@ public class EmailControllerTest {
     public void shouldRedirectToFirstPageWhenPageNumberIsBelowNull() {
         var result = sut.getAll(-1, 5, model);
 
-        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
+        Assertions.assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
         verifyNoInteractions(emailRepository, buildProperties, model);
     }
 
@@ -93,7 +93,7 @@ public class EmailControllerTest {
     public void shouldRedirectToFirstPageWhenPageSizeIsNull() {
         String result = sut.getAll(0, 0, model);
 
-        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
+        Assertions.assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
         verifyNoInteractions(emailRepository, buildProperties, model);
     }
 
@@ -101,7 +101,7 @@ public class EmailControllerTest {
     public void shouldRedirectToFirstPageWhenPageSizeIsBelowNull() {
         var result = sut.getAll(0, -1, model);
 
-        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
+        Assertions.assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
         verifyNoInteractions(emailRepository, buildProperties, model);
     }
 
@@ -115,7 +115,7 @@ public class EmailControllerTest {
 
         var result = sut.getEmailById(id, model);
 
-        assertEquals(EmailController.SINGLE_EMAIL_VIEW, result);
+        Assertions.assertEquals(EmailController.SINGLE_EMAIL_VIEW, result);
 
         verify(emailRepository).findById(id);
         verify(model).addAttribute(EmailController.SINGLE_EMAIL_MODEL_NAME, mail);
@@ -131,7 +131,7 @@ public class EmailControllerTest {
 
         var result = sut.getEmailById(id, model);
 
-        assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
+        Assertions.assertEquals(EmailController.REDIRECT_EMAIL_LIST_VIEW, result);
 
         verify(emailRepository).findById(id);
         verifyNoMoreInteractions(emailRepository);

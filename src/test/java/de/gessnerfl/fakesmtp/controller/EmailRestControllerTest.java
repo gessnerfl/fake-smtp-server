@@ -5,12 +5,12 @@ import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,11 +22,10 @@ import javax.servlet.ServletContext;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EmailRestControllerTest {
     @Mock
     private EmailRepository emailRepository;
@@ -100,28 +99,32 @@ public class EmailRestControllerTest {
         assertArrayEquals(fileContent, result.getBody().getByteArray());
     }
 
-    @Test(expected = AttachmentNotFoundException.class)
+    @Test
     public void shouldThrowExceptionWhenNoAttachmentExistsForTheGivenId() {
-        var emailId = 123L;
-        var attachmentId = 456L;
-        var email = mock(Email.class);
-        var attachment = mock(EmailAttachment.class);
+        assertThrows(AttachmentNotFoundException.class, () -> {
+            var emailId = 123L;
+            var attachmentId = 456L;
+            var email = mock(Email.class);
+            var attachment = mock(EmailAttachment.class);
 
-        when(email.getId()).thenReturn(789L);
-        when(attachment.getEmail()).thenReturn(email);
-        when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.of(attachment));
+            when(email.getId()).thenReturn(789L);
+            when(attachment.getEmail()).thenReturn(email);
+            when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.of(attachment));
 
-        sut.getEmailAttachmentById(emailId, attachmentId);
+            sut.getEmailAttachmentById(emailId, attachmentId);
+        });
     }
 
-    @Test(expected = AttachmentNotFoundException.class)
+    @Test
     public void shouldThrowExceptionWhenAttachmentExistsForTheGivenIdButTheEmailIdDoesNotMatch() {
-        var emailId = 123L;
-        var attachmentId = 456L;
+        assertThrows(AttachmentNotFoundException.class, () -> {
+            var emailId = 123L;
+            var attachmentId = 456L;
 
-        when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.empty());
+            when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.empty());
 
-        sut.getEmailAttachmentById(emailId, attachmentId);
+            sut.getEmailAttachmentById(emailId, attachmentId);
+        });
     }
 
     @Test

@@ -1,12 +1,12 @@
 package de.gessnerfl.fakesmtp.util;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import javax.servlet.ServletContext;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,7 +15,7 @@ public class MediaTypeUtilTest {
 
     private MediaTypeUtil sut;
 
-    @Before
+    @BeforeEach
     public void init(){
         servletContext = mock(ServletContext.class);
 
