@@ -5,12 +5,12 @@ import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,12 +22,11 @@ import javax.servlet.ServletContext;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class EmailRestControllerTest {
+@ExtendWith(MockitoExtension.class)
+class EmailRestControllerTest {
     @Mock
     private EmailRepository emailRepository;
     @Mock
@@ -41,7 +40,7 @@ public class EmailRestControllerTest {
     private EmailRestController sut;
 
     @Test
-    public void shouldReturnListOfEmails() {
+    void shouldReturnListOfEmails() {
         final Page<Email> page = createFirstPageEmail();
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
@@ -53,7 +52,7 @@ public class EmailRestControllerTest {
     }
 
     @Test
-    public void shouldReturnSingleEmailWhenIdIsValid() {
+    void shouldReturnSingleEmailWhenIdIsValid() {
         var id = 12L;
         var mail = mock(Email.class);
         when(emailRepository.findById(id)).thenReturn(Optional.of(mail));
@@ -75,7 +74,7 @@ public class EmailRestControllerTest {
     }
 
     @Test
-    public void shouldReturnResponseEntityForAttachment() {
+    void shouldReturnResponseEntityForAttachment() {
         var fileContent = "this is the file content".getBytes(StandardCharsets.UTF_8);
         var filename = "myfile.txt";
         var emailId = 123L;
@@ -100,8 +99,8 @@ public class EmailRestControllerTest {
         assertArrayEquals(fileContent, result.getBody().getByteArray());
     }
 
-    @Test(expected = AttachmentNotFoundException.class)
-    public void shouldThrowExceptionWhenNoAttachmentExistsForTheGivenId() {
+    @Test
+    void shouldThrowExceptionWhenNoAttachmentExistsForTheGivenId() {
         var emailId = 123L;
         var attachmentId = 456L;
         var email = mock(Email.class);
@@ -111,21 +110,25 @@ public class EmailRestControllerTest {
         when(attachment.getEmail()).thenReturn(email);
         when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.of(attachment));
 
-        sut.getEmailAttachmentById(emailId, attachmentId);
+        assertThrows(AttachmentNotFoundException.class, () -> {
+            sut.getEmailAttachmentById(emailId, attachmentId);
+        });
     }
 
-    @Test(expected = AttachmentNotFoundException.class)
-    public void shouldThrowExceptionWhenAttachmentExistsForTheGivenIdButTheEmailIdDoesNotMatch() {
+    @Test
+    void shouldThrowExceptionWhenAttachmentExistsForTheGivenIdButTheEmailIdDoesNotMatch() {
         var emailId = 123L;
         var attachmentId = 456L;
 
         when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.empty());
 
-        sut.getEmailAttachmentById(emailId, attachmentId);
+        assertThrows(AttachmentNotFoundException.class, () -> {
+            sut.getEmailAttachmentById(emailId, attachmentId);
+        });
     }
 
     @Test
-    public void shouldDeleteEmailByItsIdAndFlushChangesSoThatDeleteIsApplied() {
+    void shouldDeleteEmailByItsIdAndFlushChangesSoThatDeleteIsApplied() {
         var emailId = 123L;
 
         sut.deleteEmailById(emailId);

@@ -3,6 +3,7 @@ package de.gessnerfl.fakesmtp.controller;
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class EmailController {
     private static final Sort DEFAULT_SORT =  Sort.by(Sort.Direction.DESC, "receivedOn");
     private static final int DEFAULT_PAGE_SIZE = 10;
+    static final String APP_VERSION_MODEL_NAME = "appVersion";
     static final String EMAIL_LIST_VIEW = "email-list";
     static final String EMAIL_LIST_MODEL_NAME = "mails";
     static final String SINGLE_EMAIL_VIEW = "email";
@@ -23,10 +25,12 @@ public class EmailController {
     static final String REDIRECT_EMAIL_LIST_VIEW = "redirect:/email";
 
     private final EmailRepository emailRepository;
+    private final BuildProperties buildProperties;
 
     @Autowired
-    public EmailController(EmailRepository emailRepository) {
+    public EmailController(EmailRepository emailRepository, BuildProperties buildProperties) {
         this.emailRepository = emailRepository;
+        this.buildProperties = buildProperties;
     }
 
     @GetMapping({"/", "/email"})
@@ -43,6 +47,7 @@ public class EmailController {
             return REDIRECT_EMAIL_LIST_VIEW;
         }
         model.addAttribute(EMAIL_LIST_MODEL_NAME, result);
+        addApplicationVersion(model);
         return EMAIL_LIST_VIEW;
     }
 
@@ -53,6 +58,7 @@ public class EmailController {
 
     private String appendToModelAndReturnView(Model model, Email email) {
         model.addAttribute(SINGLE_EMAIL_MODEL_NAME, email);
+        addApplicationVersion(model);
         return SINGLE_EMAIL_VIEW;
     }
 
@@ -61,6 +67,10 @@ public class EmailController {
         emailRepository.deleteById(id);
         emailRepository.flush();
         return REDIRECT_EMAIL_LIST_VIEW;
+    }
+
+    private void addApplicationVersion(Model model){
+        model.addAttribute(APP_VERSION_MODEL_NAME, buildProperties.getVersion());
     }
 
 }

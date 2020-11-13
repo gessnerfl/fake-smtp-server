@@ -2,17 +2,17 @@ package de.gessnerfl.fakesmtp.service;
 
 import de.gessnerfl.fakesmtp.config.FakeSmtpConfigurationProperties;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class EmailRetentionTimerTest {
+@ExtendWith(MockitoExtension.class)
+class EmailRetentionTimerTest {
 
     @Mock
     private FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
@@ -25,7 +25,7 @@ public class EmailRetentionTimerTest {
     private EmailRetentionTimer sut;
 
     @Test
-    public void shouldTriggerDeletionWhenDataRetentionIsConfigured(){
+    void shouldTriggerDeletionWhenDataRetentionIsConfigured(){
         var maxNumber = 5;
         var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
         when(persistence.getMaxNumberEmails()).thenReturn(maxNumber);
@@ -37,7 +37,7 @@ public class EmailRetentionTimerTest {
     }
 
     @Test
-    public void shouldNotTriggerDeletionWhenConfiguredMaxNumberIsNull(){
+    void shouldNotTriggerDeletionWhenConfiguredMaxNumberIsNull(){
         var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
         when(persistence.getMaxNumberEmails()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
@@ -48,7 +48,7 @@ public class EmailRetentionTimerTest {
     }
 
     @Test
-    public void shouldNotTriggerDeletionWhenConfiguredMaxNumberIsLessOrEqualToZero(){
+    void shouldNotTriggerDeletionWhenConfiguredMaxNumberIsLessOrEqualToZero(){
         var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
         when(persistence.getMaxNumberEmails()).thenReturn(0);
         when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
@@ -59,7 +59,7 @@ public class EmailRetentionTimerTest {
     }
 
     @Test
-    public void shouldNotTriggerDeletionWhenNoPersistenceIsConfigured(){
+    void shouldNotTriggerDeletionWhenNoPersistenceIsConfigured(){
         when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(null);
 
         sut.deleteOutdatedMails();

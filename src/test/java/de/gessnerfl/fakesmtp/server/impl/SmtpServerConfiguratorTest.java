@@ -1,12 +1,12 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.config.FakeSmtpConfigurationProperties;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.subethamail.smtp.AuthenticationHandlerFactory;
 import org.subethamail.smtp.auth.EasyAuthenticationHandlerFactory;
@@ -14,12 +14,13 @@ import org.subethamail.smtp.server.SMTPServer;
 
 import java.net.InetAddress;
 
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SmtpServerConfiguratorTest {
+@ExtendWith(MockitoExtension.class)
+class SmtpServerConfiguratorTest {
 
     @Mock
     private FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
@@ -32,7 +33,7 @@ public class SmtpServerConfiguratorTest {
     private SmtpServerConfigurator sut;
 
     @Test
-    public void shouldConfigureBasicParameters(){
+    void shouldConfigureBasicParameters(){
         var port = 1234;
         var bindingAddress = mock(InetAddress.class);
         when(fakeSmtpConfigurationProperties.getPort()).thenReturn(port);
@@ -48,7 +49,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldConfigureAuthenticationWhenAuthenticationIsConfiguredProperly(){
+    void shouldConfigureAuthenticationWhenAuthenticationIsConfiguredProperly(){
         var username = "username";
         var password = "password";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
@@ -72,7 +73,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldSkipConfigurationOfAuthenticationWhenUsernameIsNull(){
+    void shouldSkipConfigurationOfAuthenticationWhenUsernameIsNull(){
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
@@ -86,7 +87,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldSkipConfigurationOfAuthenticationWhenUsernameIsEmptyString(){
+    void shouldSkipConfigurationOfAuthenticationWhenUsernameIsEmptyString(){
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
@@ -100,7 +101,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldSkipConfigurationOfAuthenticationWhenPasswordIsNull(){
+    void shouldSkipConfigurationOfAuthenticationWhenPasswordIsNull(){
         var username = "username";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
@@ -116,7 +117,7 @@ public class SmtpServerConfiguratorTest {
     }
 
     @Test
-    public void shouldSkipConfigurationOfAuthenticationWhenPasswordIsEmptyString(){
+    void shouldSkipConfigurationOfAuthenticationWhenPasswordIsEmptyString(){
         var username = "username";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);

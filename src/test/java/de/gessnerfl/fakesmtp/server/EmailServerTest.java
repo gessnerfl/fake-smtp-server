@@ -1,17 +1,17 @@
 package de.gessnerfl.fakesmtp.server;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class EmailServerTest {
+@ExtendWith(MockitoExtension.class)
+class EmailServerTest {
 
     @Mock
     private SmtpServerFactory smtpServerFactory;
@@ -22,7 +22,7 @@ public class EmailServerTest {
     private EmailServer sut;
 
     @Test
-    public void shouldSetSmtpServerOnPostConstruct(){
+    void shouldSetSmtpServerOnPostConstruct(){
         var smtpServer = mock(SmtpServer.class);
         when(smtpServerFactory.create()).thenReturn(smtpServer);
 
@@ -34,7 +34,7 @@ public class EmailServerTest {
     }
 
     @Test
-    public void shouldStopServerOnPreDestroy(){
+    void shouldStopServerOnPreDestroy(){
         var smtpServer = mock(SmtpServer.class);
         sut.smtpServer = smtpServer;
 
@@ -45,7 +45,7 @@ public class EmailServerTest {
     }
 
     @Test
-    public void shouldSilentlyShutdownWhenNoServerIsSet(){
+    void shouldSilentlyShutdownWhenNoServerIsSet(){
         sut.shutdown();
 
         verify(logger).debug(anyString());

@@ -2,23 +2,23 @@ package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class MessageListenerTest {
+@ExtendWith(MockitoExtension.class)
+class MessageListenerTest {
 
     @Mock
     private EmailFactory emailFactory;
@@ -35,12 +35,12 @@ public class MessageListenerTest {
     private MessageListener sut;
 
     @Test
-    public void shouldAcceptAllMails(){
+    void shouldAcceptAllMails(){
         assertTrue(sut.accept("foo", "bar"));
     }
 
     @Test
-    public void shouldCreateEmailEntityAndStoreItInDatabaseWhenEmailIsDelivered() throws IOException {
+    void shouldCreateEmailEntityAndStoreItInDatabaseWhenEmailIsDelivered() throws IOException {
         var from = "from";
         var to = "to";
         var contentString = "content";
@@ -62,8 +62,8 @@ public class MessageListenerTest {
         verify(messageForwarder).forward(rawData);
     }
 
-    @Test(expected = IOException.class)
-    public void shouldThrowExceptionWhenEmailEntityCannotBeCreatedWhenEmailIsDelivered() throws IOException {
+    @Test
+    void shouldThrowExceptionWhenEmailEntityCannotBeCreatedWhenEmailIsDelivered() throws IOException {
         var from = "from";
         var to = "to";
         var content = "content".getBytes(StandardCharsets.UTF_8);
@@ -71,9 +71,12 @@ public class MessageListenerTest {
 
         when(emailFactory.convert(any(RawData.class))).thenThrow(new IOException("foo"));
 
-        sut.deliver(from, to, contentStream);
+        assertThrows(IOException.class, () -> {
 
-        verify(emailRepository, never()).save(any(Email.class));
-        verify(messageForwarder, never()).forward(any(RawData.class));
+            sut.deliver(from, to, contentStream);
+
+            verify(emailRepository, never()).save(any(Email.class));
+            verify(messageForwarder, never()).forward(any(RawData.class));
+        });
     }
 }

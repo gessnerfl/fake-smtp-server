@@ -5,9 +5,12 @@
 
 <body>
     <div class="navbar-fixed" th:fragment="navbar" >
-        <nav class="light-blue darken-4" style="padding-left:10px">
+        <nav class="light-blue darken-4" style="padding-left:10px; padding-right:10px;">
             <div class="nav-wrapper">
                 <a class="brand-logo" href="/"><i class="material-icons" style="font-size: 2rem">email</i>Fake SMTP Server</a>
+                <ul class="right">
+                    <li th:text="${'Version: ' + appVersion}"></li>
+                </ul>
             </div>
         </nav>
     </div>

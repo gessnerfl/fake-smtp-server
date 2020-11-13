@@ -2,25 +2,27 @@ package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.TestResourceUtil;
 import de.gessnerfl.fakesmtp.model.ContentType;
+import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class EmailFactoryTest {
+@ExtendWith(MockitoExtension.class)
+class EmailFactoryTest {
 
     private static final String SENDER = "sender";
     private static final String RECEIVER = "receiver";
@@ -32,7 +34,7 @@ public class EmailFactoryTest {
     private EmailFactory sut;
 
     @Test
-    public void shouldCreateEmailForEmlFileWithSubjectAndContentTypePlain() throws Exception {
+    void shouldCreateEmailForEmlFileWithSubjectAndContentTypePlain() throws Exception {
         var now = new Date();
         var testFilename = "mail-with-subject.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
@@ -43,6 +45,10 @@ public class EmailFactoryTest {
 
         var result = sut.convert(rawData);
 
+        assertPlainTextEmail(now, dataAsString, result);
+    }
+
+    private void assertPlainTextEmail(Date now, String dataAsString, Email result) {
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
@@ -56,7 +62,7 @@ public class EmailFactoryTest {
     }
 
     @Test
-    public void shouldCreateEmailForEmlFileWithSubjectAndContentTypeHtml() throws Exception {
+    void shouldCreateEmailForEmlFileWithSubjectAndContentTypeHtml() throws Exception {
         var now = new Date();
         var testFilename = "mail-with-subject-and-content-type-html.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
@@ -80,7 +86,7 @@ public class EmailFactoryTest {
     }
 
     @Test
-    public void shouldCreateEmailForEmlFileWithSubjectAndWithoutContentType() throws Exception {
+    void shouldCreateEmailForEmlFileWithSubjectAndWithoutContentType() throws Exception {
         var now = new Date();
         var testFilename = "mail-with-subject-without-content-type.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
@@ -91,20 +97,11 @@ public class EmailFactoryTest {
 
         var result = sut.convert(rawData);
 
-        assertEquals(SENDER, result.getFromAddress());
-        assertEquals(RECEIVER, result.getToAddress());
-        assertEquals("This is the mail title", result.getSubject());
-        assertEquals(dataAsString, result.getRawData());
-        assertThat(result.getContents(), hasSize(1));
-        assertFalse(result.getHtmlContent().isPresent());
-        assertTrue(result.getPlainContent().isPresent());
-        assertEquals("This is the message content", result.getPlainContent().get().getData());
-        assertEquals(now, result.getReceivedOn());
-        assertThat(result.getAttachments(), empty());
+        assertPlainTextEmail(now, dataAsString, result);
     }
 
     @Test
-    public void shouldCreateEmailForEmlFileWithoutSubjectAndContentTypePlain() throws Exception {
+    void shouldCreateEmailForEmlFileWithoutSubjectAndContentTypePlain() throws Exception {
         var now = new Date();
         var testFilename = "mail-without-subject.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
@@ -128,7 +125,7 @@ public class EmailFactoryTest {
     }
 
     @Test
-    public void shouldCreateMailForPlainText() throws Exception {
+    void shouldCreateMailForPlainText() throws Exception {
         var now = new Date();
         var dataAsString = "this is just some dummy content";
         var data = dataAsString.getBytes(StandardCharsets.UTF_8);
@@ -151,7 +148,7 @@ public class EmailFactoryTest {
     }
 
     @Test
-    public void shouldCreateMailForMultipartWithContentTypeHtmlAndPlain() throws Exception {
+    void shouldCreateMailForMultipartWithContentTypeHtmlAndPlain() throws Exception {
         var now = new Date();
         var testFilename = "multipart-mail.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
@@ -176,7 +173,7 @@ public class EmailFactoryTest {
     }
 
     @Test
-    public void shouldCreateMailForMultipartWithoutContentTypeHtml() throws Exception {
+    void shouldCreateMailForMultipartWithoutContentTypeHtml() throws Exception {
         var now = new Date();
         var testFilename = "multipart-mail-plain-only.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
@@ -187,20 +184,11 @@ public class EmailFactoryTest {
 
         var result = sut.convert(rawData);
 
-        assertEquals(SENDER, result.getFromAddress());
-        assertEquals(RECEIVER, result.getToAddress());
-        assertEquals("This is the mail title", result.getSubject());
-        assertEquals(dataAsString, result.getRawData());
-        assertThat(result.getContents(), hasSize(1));
-        assertFalse(result.getHtmlContent().isPresent());
-        assertTrue(result.getPlainContent().isPresent());
-        assertEquals("This is the message content", result.getPlainContent().get().getData());
-        assertEquals(now, result.getReceivedOn());
-        assertThat(result.getAttachments(), empty());
+        assertPlainTextEmail(now, dataAsString, result);
     }
 
     @Test
-    public void shouldCreateMailForMultipartWithUnknownContentType() throws Exception {
+    void shouldCreateMailForMultipartWithUnknownContentType() throws Exception {
         var now = new Date();
         var testFilename = "multipart-mail-unknown-content-type.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
@@ -225,7 +213,7 @@ public class EmailFactoryTest {
     }
 
     @Test
-    public void shouldCreateMailForMultipartWithPlainAndHtmlContentAndAttachments() throws Exception {
+    void shouldCreateMailForMultipartWithPlainAndHtmlContentAndAttachments() throws Exception {
         var now = new Date();
         var testFilename = "multipart-mail-html-and-plain-with-attachments.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);

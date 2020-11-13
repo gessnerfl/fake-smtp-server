@@ -1,23 +1,23 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.config.FakeSmtpConfigurationProperties;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.springframework.mail.SimpleMailMessage;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class MessageForwarderTest {
+@ExtendWith(MockitoExtension.class)
+class MessageForwarderTest {
 
     @Mock
     private FakeSmtpConfigurationProperties configurationProperties;
@@ -30,7 +30,7 @@ public class MessageForwarderTest {
     private MessageForwarder sut;
 
     @Test
-    public void shouldSkipForwardingWhenForwardingIsNotEnabled() throws Exception {
+    void shouldSkipForwardingWhenForwardingIsNotEnabled() throws Exception {
         var rawData = mock(RawData.class);
         when(configurationProperties.isForwardEmails()).thenReturn(false);
 
@@ -41,7 +41,7 @@ public class MessageForwarderTest {
     }
 
     @Test
-    public void shouldForwardMimeMessageWhenForwardingIsEnabledAndEmailCanBeConvertedToMimeMessage() throws Exception {
+    void shouldForwardMimeMessageWhenForwardingIsEnabledAndEmailCanBeConvertedToMimeMessage() throws Exception {
         var mimeMessage = mock(MimeMessage.class);
         var rawData = mock(RawData.class);
         when(rawData.toMimeMessage()).thenReturn(mimeMessage);
@@ -55,7 +55,7 @@ public class MessageForwarderTest {
     }
 
     @Test
-    public void shouldForwardEmailAsSimpleMessageWhenForwardingIsEnabledAndEmailCannotBeConvertedToMimeMessage() throws Exception {
+    void shouldForwardEmailAsSimpleMessageWhenForwardingIsEnabledAndEmailCannotBeConvertedToMimeMessage() throws Exception {
         var expectedException = new MessagingException("test");
         var from = "from";
         var to = "to";
@@ -80,9 +80,9 @@ public class MessageForwarderTest {
         verifyNoMoreInteractions(rawData, javaMailSenderFacade);
 
         var message = mailMessageArgumentCaptor.getValue();
-        assertEquals(from, message.getFrom());
-        assertEquals(to, message.getTo()[0]);
-        assertEquals(content, message.getText());
+        Assertions.assertEquals(from, message.getFrom());
+        Assertions.assertEquals(to, message.getTo()[0]);
+        Assertions.assertEquals(content, message.getText());
     }
 
 }
