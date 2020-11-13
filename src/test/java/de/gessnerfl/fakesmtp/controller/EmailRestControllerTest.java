@@ -101,28 +101,28 @@ class EmailRestControllerTest {
 
     @Test
     void shouldThrowExceptionWhenNoAttachmentExistsForTheGivenId() {
+        var emailId = 123L;
+        var attachmentId = 456L;
+        var email = mock(Email.class);
+        var attachment = mock(EmailAttachment.class);
+
+        when(email.getId()).thenReturn(789L);
+        when(attachment.getEmail()).thenReturn(email);
+        when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.of(attachment));
+
         assertThrows(AttachmentNotFoundException.class, () -> {
-            var emailId = 123L;
-            var attachmentId = 456L;
-            var email = mock(Email.class);
-            var attachment = mock(EmailAttachment.class);
-
-            when(email.getId()).thenReturn(789L);
-            when(attachment.getEmail()).thenReturn(email);
-            when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.of(attachment));
-
             sut.getEmailAttachmentById(emailId, attachmentId);
         });
     }
 
     @Test
     void shouldThrowExceptionWhenAttachmentExistsForTheGivenIdButTheEmailIdDoesNotMatch() {
+        var emailId = 123L;
+        var attachmentId = 456L;
+
+        when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.empty());
+
         assertThrows(AttachmentNotFoundException.class, () -> {
-            var emailId = 123L;
-            var attachmentId = 456L;
-
-            when(emailAttachmentRepository.findById(attachmentId)).thenReturn(Optional.empty());
-
             sut.getEmailAttachmentById(emailId, attachmentId);
         });
     }

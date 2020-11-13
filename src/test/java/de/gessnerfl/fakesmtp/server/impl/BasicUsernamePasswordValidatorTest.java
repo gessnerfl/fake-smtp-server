@@ -69,38 +69,38 @@ class BasicUsernamePasswordValidatorTest {
 
     @Test
     void shouldThrowNullPointerExceptionWhenAuthenticationIsMissing() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            var username = "username";
-            var password = "password";
-            when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(null);
+        var username = "username";
+        var password = "password";
+        when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(null);
 
+        Assertions.assertThrows(NullPointerException.class, () -> {
             sut.login(username, password);
         });
     }
 
     @Test
     void shouldThrowNullPointerExceptionWhenUsernameIsMissingInAuthentication() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            var username = "username";
-            var password = "password";
-            var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
-            when(authentication.getUsername()).thenReturn(null);
-            when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
+        var username = "username";
+        var password = "password";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        when(authentication.getUsername()).thenReturn(null);
+        when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
+        Assertions.assertThrows(NullPointerException.class, () -> {
             sut.login(username, password);
         });
     }
 
     @Test
     void shouldThrowNullPointerExceptionWhenPasswordIsMissingInAuthentication() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            var username = "username";
-            var password = "password";
-            var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
-            when(authentication.getUsername()).thenReturn(username);
-            when(authentication.getPassword()).thenReturn(null);
-            when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
+        var username = "username";
+        var password = "password";
+        var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
+        when(authentication.getUsername()).thenReturn(username);
+        when(authentication.getPassword()).thenReturn(null);
+        when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
+        Assertions.assertThrows(NullPointerException.class, () -> {
             sut.login(username, password);
         });
     }

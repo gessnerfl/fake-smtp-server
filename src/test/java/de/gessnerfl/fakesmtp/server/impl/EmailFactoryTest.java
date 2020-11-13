@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.TestResourceUtil;
 import de.gessnerfl.fakesmtp.model.ContentType;
+import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
@@ -44,6 +45,10 @@ class EmailFactoryTest {
 
         var result = sut.convert(rawData);
 
+        assertPlainTextEmail(now, dataAsString, result);
+    }
+
+    private void assertPlainTextEmail(Date now, String dataAsString, Email result) {
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
@@ -92,16 +97,7 @@ class EmailFactoryTest {
 
         var result = sut.convert(rawData);
 
-        assertEquals(SENDER, result.getFromAddress());
-        assertEquals(RECEIVER, result.getToAddress());
-        assertEquals("This is the mail title", result.getSubject());
-        assertEquals(dataAsString, result.getRawData());
-        assertThat(result.getContents(), hasSize(1));
-        assertFalse(result.getHtmlContent().isPresent());
-        assertTrue(result.getPlainContent().isPresent());
-        assertEquals("This is the message content", result.getPlainContent().get().getData());
-        assertEquals(now, result.getReceivedOn());
-        assertThat(result.getAttachments(), empty());
+        assertPlainTextEmail(now, dataAsString, result);
     }
 
     @Test
@@ -188,16 +184,7 @@ class EmailFactoryTest {
 
         var result = sut.convert(rawData);
 
-        assertEquals(SENDER, result.getFromAddress());
-        assertEquals(RECEIVER, result.getToAddress());
-        assertEquals("This is the mail title", result.getSubject());
-        assertEquals(dataAsString, result.getRawData());
-        assertThat(result.getContents(), hasSize(1));
-        assertFalse(result.getHtmlContent().isPresent());
-        assertTrue(result.getPlainContent().isPresent());
-        assertEquals("This is the message content", result.getPlainContent().get().getData());
-        assertEquals(now, result.getReceivedOn());
-        assertThat(result.getAttachments(), empty());
+        assertPlainTextEmail(now, dataAsString, result);
     }
 
     @Test
