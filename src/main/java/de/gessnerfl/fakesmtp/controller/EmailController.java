@@ -69,6 +69,13 @@ public class EmailController {
         return REDIRECT_EMAIL_LIST_VIEW;
     }
 
+    @DeleteMapping("/email")
+    public String deleteAllEmails() {
+        emailRepository.deleteAll();
+        emailRepository.flush();
+        return REDIRECT_EMAIL_LIST_VIEW;
+    }
+
     private void addApplicationVersion(Model model){
         model.addAttribute(APP_VERSION_MODEL_NAME, buildProperties.getVersion());
     }

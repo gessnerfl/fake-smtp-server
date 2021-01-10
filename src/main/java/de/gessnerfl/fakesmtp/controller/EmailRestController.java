@@ -78,4 +78,10 @@ public class EmailRestController {
         emailRepository.flush();
     }
 
+    @DeleteMapping("/email")
+    public void deleteAllEmails() {
+        emailRepository.deleteAll();
+        emailRepository.flush();
+    }
+
 }
