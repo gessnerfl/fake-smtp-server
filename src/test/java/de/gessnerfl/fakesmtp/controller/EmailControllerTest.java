@@ -160,4 +160,14 @@ class EmailControllerTest {
         verifyNoMoreInteractions(emailRepository);
         verifyNoInteractions(buildProperties);
     }
+
+    @Test
+    void shouldDeleteAllEmails(){
+        sut.deleteAllEmails();
+
+        verify(emailRepository).deleteAll();
+        verify(emailRepository).flush();
+        verifyNoMoreInteractions(emailRepository);
+        verifyNoInteractions(buildProperties);
+    }
 }

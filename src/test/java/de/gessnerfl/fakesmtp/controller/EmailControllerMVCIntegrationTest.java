@@ -104,6 +104,19 @@ class EmailControllerMVCIntegrationTest {
         assertThat(emailRepository.findAll(), empty());
     }
 
+    @Test
+    void shouldDeleteAllEmails() throws Exception {
+        var email = createRandomEmail(5);
+
+        assertThat(emailRepository.findAll(), hasSize(5));
+
+        this.mockMvc.perform(delete("/email"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/email")).andExpect(status().isFound());
+
+        assertThat(emailRepository.findAll(), empty());
+    }
+
     private Email createRandomEmail(int minusMinutes) {
         return emailRepository.save(EmailControllerUtil.prepareRandomEmail(minusMinutes));
     }

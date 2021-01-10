@@ -15,6 +15,7 @@
                 </div>
             </div>
             <div th:if="${mails.totalElements > 0}">
+                <button data-target="delete-all-modal" class="btn red modal-trigger"><i class="material-icons left">delete</i>Delete All</button>
                 <table class="striped responsive-table">
                     <thead>
                     <tr>
@@ -48,5 +49,24 @@
         </div>
     </div>
 </div>
+
+<div id="delete-all-modal" class="modal">
+    <div class="modal-content">
+        <h4>Delete All Emails</h4>
+        <p>Do you really want to delete all emails?</p>
+    </div>
+    <div class="modal-footer">
+        <form action="#" th:action="@{'/email'}" th:method="delete" class="inline">
+            <input type="hidden" name="_method" value="delete" />
+            <button class="waves-effect waves-light btn red" type="submit">Yes</button>
+        </form>
+        <a href="#!" class="modal-close btn grey lighten-2 waves-effect waves-light">No</a>
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+        $('.modal').modal();
+      });
+</script>
 </body>
 </html>

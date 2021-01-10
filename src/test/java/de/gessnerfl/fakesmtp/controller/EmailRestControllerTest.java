@@ -136,4 +136,13 @@ class EmailRestControllerTest {
         verify(emailRepository).deleteById(emailId);
         verify(emailRepository).flush();
     }
+
+    @Test
+    void shouldDeleteAllEmails(){
+        sut.deleteAllEmails();
+
+        verify(emailRepository).deleteAll();
+        verify(emailRepository).flush();
+        verifyNoMoreInteractions(emailRepository);
+    }
 }

@@ -145,6 +145,18 @@ class EmailRestControllerMVCIntegrationTest {
         assertThat(emailRepository.findAll(), empty());
     }
 
+    @Test
+    void shouldDeleteAllEmails() throws Exception {
+        var email = createRandomEmail(5);
+
+        assertThat(emailRepository.findAll(), hasSize(5));
+
+        this.mockMvc.perform(delete("/api/email"))
+                .andExpect(status().is2xxSuccessful());
+
+        assertThat(emailRepository.findAll(), empty());
+    }
+
     private static <T> T mapFromJson(String json, Class<T> clazz) throws IOException {
 
         ObjectMapper objectMapper = new ObjectMapper();
