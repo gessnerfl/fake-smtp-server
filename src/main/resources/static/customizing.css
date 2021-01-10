@@ -34,4 +34,5 @@ form.inline {
 
 .mail-content-plain {
     white-space: pre-line;
+    all: revert;
 }
