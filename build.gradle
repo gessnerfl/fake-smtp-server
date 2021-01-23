@@ -45,12 +45,19 @@ dependencies {
 	testImplementation('org.hamcrest:hamcrest-core:2.2')
 }
 
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
 springBoot {
 	buildInfo()
 }
 
 sonarqube {
 	properties {
+		property 'sonar.host.url', 'https://sonarcloud.io'
+		property 'sonar.organization', 'gessnerfl-github'
 		property "sonar.projectName", "Fake SMTP Server"
 		property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
 	}

@@ -1,5 +1,5 @@
 # Fake SMTP Server
-[![Build Status](https://travis-ci.org/gessnerfl/fake-smtp-server.svg?branch=master)](https://travis-ci.org/gessnerfl/fake-smtp-server)
+[![Build Status](https://github.com/gessnerfl/fake-smtp-server/workflows/ci/badge.svg)](https://github.com/gessnerfl/fake-smtp-server/workflows/ci/badge.svg)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=de.gessnerfl.fake-smtp-server&metric=alert_status)](https://sonarcloud.io/dashboard/index/de.gessnerfl.fake-smtp-server)
 
 *Simple SMTP Server which stores all received emails in an in-memory database and renders the emails in a web interface*
