@@ -12,6 +12,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -106,7 +110,7 @@ class EmailControllerMVCIntegrationTest {
 
     @Test
     void shouldDeleteAllEmails() throws Exception {
-        var email = createRandomEmail(5);
+        var email = createRandomEmails(5, 1);
 
         assertThat(emailRepository.findAll(), hasSize(5));
 
@@ -115,6 +119,10 @@ class EmailControllerMVCIntegrationTest {
                 .andExpect(redirectedUrl("/email")).andExpect(status().isFound());
 
         assertThat(emailRepository.findAll(), empty());
+    }
+
+    private List<Email> createRandomEmails(int numberOfEmails, int minusMinutes) {
+        return IntStream.range(0, numberOfEmails).mapToObj(i -> createRandomEmail(minusMinutes)).collect(Collectors.toList());
     }
 
     private Email createRandomEmail(int minusMinutes) {

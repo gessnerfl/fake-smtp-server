@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -147,7 +149,7 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldDeleteAllEmails() throws Exception {
-        var email = createRandomEmail(5);
+        var email = createRandomEmails(5, 1);
 
         assertThat(emailRepository.findAll(), hasSize(5));
 
@@ -161,6 +163,10 @@ class EmailRestControllerMVCIntegrationTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(json, clazz);
+    }
+
+    private List<Email> createRandomEmails(int numberOfEmails, int minusMinutes) {
+        return IntStream.range(0, numberOfEmails).mapToObj(i -> createRandomEmail(minusMinutes)).collect(Collectors.toList());
     }
 
     private Email createRandomEmail(int minusMinutes) {
