@@ -18,6 +18,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Get version number
+        id: get_version
+        run: echo ::set-output name=APP_VERSION::${GITHUB_REF#refs/tags/}
       - name: Build with Gradle
         run: ./gradlew build jacocoTestReport sonarqube --info
         env:
@@ -45,8 +48,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/lib/fake-smtp-server-${{ github.ref }}.jar
-          asset_name: fake-smtp-server-${{ github.ref }}.jar
+          asset_path: ./build/lib/fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}.jar
+          asset_name: fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}.jar
           asset_content_type: application/java-archive
       - name: Upload sources jar
         uses: actions/upload-release-asset@v1
@@ -54,8 +57,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/lib/fake-smtp-server-${{ github.ref }}-sources.jar
-          asset_name: fake-smtp-server-${{ github.ref }}-sources.jar
+          asset_path: ./build/lib/fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-sources.jar
+          asset_name: fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-sources.jar
           asset_content_type: application/java-archive
       - name: Upload javadoc jar
         uses: actions/upload-release-asset@v1
@@ -63,8 +66,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/lib/fake-smtp-server-${{ github.ref }}-javadoc.jar
-          asset_name: fake-smtp-server-${{ github.ref }}-javadoc.jar
+          asset_path: ./build/lib/fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-javadoc.jar
+          asset_name: fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-javadoc.jar
           asset_content_type: application/java-archive
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -81,9 +84,9 @@ jobs:
         with:
           push: true
           tags: |
-            gessnerfl/fake-smtp-server:${{ github.ref }}
+            gessnerfl/fake-smtp-server:${{ steps.get_version.outputs.APP_VERSION }}
             gessnerfl/fake-smtp-server:latest
           build-args: |
-            APP_VERSION=${{ github.ref }}
+            APP_VERSION=${{ steps.get_version.outputs.APP_VERSION }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
