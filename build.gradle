@@ -1,5 +1,5 @@
 plugins {
-	id "com.cinnober.gradle.semver-git" version "3.0.0"
+	id 'pl.allegro.tech.build.axion-release' version '1.12.1'
 	id 'org.springframework.boot' version '2.4.1'
 	id "org.sonarqube" version "3.0"
 }
@@ -11,8 +11,15 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'jacoco'
 apply plugin: 'org.sonarqube'
 
+scmVersion {
+	tag {
+		prefix = ''
+	}
+}
+
 group = 'de.gessnerfl'
 description = """Fake SMTP Server :: Simple SMTP Server which stores emails in memory and lists email in a web ui"""
+project.version = scmVersion.version
 
 ext.scmUrl = 'git@github.com:gessnerfl/fake-smtp-server.git'
 ext.projectUrl = 'https://github.com/gessnerfl/fake-smtp-server'
