@@ -15,13 +15,24 @@
                 </div>
             </div>
             <div th:if="${mails.totalElements > 0}">
-                <button data-target="delete-all-modal" class="btn red modal-trigger"><i class="material-icons left">delete</i>Delete All</button>
+                <div class="row">
+                    <form th:action="@{/search}" method="get">
+                        <div class="input-field">
+                            <input type="text" class="col s10" name="q" id="q" th:value="${q}" placeholder="Search..."/>
+                            <button type="submit" class="waves-effect waves-light btn-large">
+                                <i class="material-icons left">search</i> Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <button data-target="delete-all-modal" class="btn red modal-trigger pull-right"><i class="material-icons left">delete</i>Delete All</button>
                 <table class="striped responsive-table">
                     <thead>
                     <tr>
                         <th>ID</th>
                         <th>From</th>
                         <th>To</th>
+                        <th>Bcc</th>
                         <th>Received On</th>
                         <th>Subject</th>
                         <th>Details</th>
@@ -32,6 +43,7 @@
                         <td th:text="${mail.id}">Id</td>
                         <td th:text="${mail.fromAddress}">From</td>
                         <td th:text="${mail.toAddress}">To</td>
+                        <td th:text="${mail.bccAddress}">Bcc</td>
                         <td th:with="df='yyyy-MM-dd HH:mm:ss'" th:text="${#calendars.format(mail.receivedOn,df)}">Received On</td>
                         <td th:text="${mail.subject}"></td>
                         <td>
