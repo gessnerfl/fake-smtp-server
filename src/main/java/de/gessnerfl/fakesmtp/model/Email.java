@@ -24,6 +24,10 @@ public class Email {
     @Basic(optional = false)
     private String toAddress;
 
+    @Column(name = "bcc_address", length = 255, nullable = false)
+    @Basic(optional = false)
+    private String bccAddress;
+
     @Lob
     @Column(name="subject", nullable = false)
     @Basic(optional = false)
@@ -67,6 +71,14 @@ public class Email {
 
     public void setToAddress(String toAddress) {
         this.toAddress = toAddress;
+    }
+
+    public String getBccAddress() {
+        return bccAddress;
+    }
+
+    public void setBccAddress(String bccAddress) {
+        this.bccAddress = bccAddress;
     }
 
     public String getSubject() {
