@@ -17,7 +17,7 @@ public class EmailSpecification {
         return (root, query, builder) -> builder
                 .or(root.getModel().getDeclaredSingularAttributes().stream().filter(a -> {
                     return fields.contains(a.getName());
-                }).map(a -> builder.like(root.get(a.getName()), finalText)).toArray(Predicate[]::new));
+                }).map(a -> builder.like(builder.lower(root.get(a.getName())), finalText.toLowerCase())).toArray(Predicate[]::new));
     }
     
 }
