@@ -25,7 +25,7 @@ and docker documentation (https://docs.docker.com/engine/reference/run/#env-envi
 
 # Running Fake SMTP Server locally
 
-You need Java 8 installed. In order to run this application locally, execute:
+You need Java 11 installed. In order to run this application locally, execute:
 
     ./gradlew bootRun
 
