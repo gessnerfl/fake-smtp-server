@@ -15,13 +15,21 @@ would forward the mails to the target recipient or return with mail undelivery f
 @example.com) the server just accepts all mails, stores them in the database so that they can be rendered in the UI. 
 This allows you to use any test mail address and check the sent email in the web application of the Fake SMTP Server.
 
-The server store a configurable maximum number of emails. If the maximum number of emails is exceeded old emails will
-be deleted to avoid that the system consumes too much memory.
+The server store a configurable maximum number of emails.
+If the maximum number of emails is exceeded old emails will be deleted to avoid that the system consumes too much memory.
 
 The server is also provided as docker image on docker hub [gessnerfl/fake-smtp-server](https://hub.docker.com/r/gessnerfl/fake-smtp-server/).
-To change configuration parameters the corresponding configuration values have to be specified as environment variables
-for the docker container. For details check the Spring Boot (http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config) 
+To change configuration parameters the corresponding configuration values have to be specified as environment variables for the docker container.
+For details check the Spring Boot (http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config)
 and docker documentation (https://docs.docker.com/engine/reference/run/#env-environment-variables).
+
+# Running Fake SMTP Server locally
+
+You need Java 11 installed. In order to run this application locally, execute:
+
+    ./gradlew bootRun
+
+Afterwards, the web interface is be availabe under http://localhost:5080.
 
 # Configuration
 
