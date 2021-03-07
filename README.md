@@ -25,7 +25,22 @@ and docker documentation (https://docs.docker.com/engine/reference/run/#env-envi
 
 # Running Fake SMTP Server locally
 
-You need Java 11 installed. In order to run this application locally, execute:
+**Note:** You need Java 11 installed to run Fake SMTP Server. 
+
+## Run from released JAR files
+
+1. Download the latest `fake-smtp-server-<version>.jar` from 
+[https://github.com/gessnerfl/fake-smtp-server/releases/latest](https://github.com/gessnerfl/fake-smtp-server/releases/latest)
+2. Copy the file into the desired target folder
+3. Execute the following command from the folder where the JAR file is located:
+   
+```
+java -jar fake-smtp-server-<version>.jar
+```
+
+## Run from sources
+
+In order to run this application locally from sources, execute:
 
     ./gradlew bootRun
 
