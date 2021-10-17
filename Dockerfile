@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.9.1_1
+FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.12_7
 
 ARG APP_VERSION
 

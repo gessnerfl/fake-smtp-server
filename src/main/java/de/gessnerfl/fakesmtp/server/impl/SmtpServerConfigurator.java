@@ -31,9 +31,9 @@ public class SmtpServerConfigurator {
     }
 
     private void configureAuthentication(SMTPServer smtpServer, FakeSmtpConfigurationProperties.Authentication authentication) {
-        if (StringUtils.isEmpty(authentication.getUsername())) {
+        if (!StringUtils.hasText(authentication.getUsername())) {
             logger.error("Username is missing; skip configuration of authentication");
-        } else if (StringUtils.isEmpty(authentication.getPassword())) {
+        } else if (!StringUtils.hasText(authentication.getPassword())) {
             logger.error("Password is missing; skip configuration of authentication");
         } else {
             logger.info("Setup simple username and password authentication for SMTP server");

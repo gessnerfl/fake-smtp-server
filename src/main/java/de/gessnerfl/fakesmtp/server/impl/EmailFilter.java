@@ -20,7 +20,7 @@ public class EmailFilter {
   }
 
   public boolean ignore(String sender, String recipient){
-    if(StringUtils.isEmpty(this.fakeSmtpConfigurationProperties.getFilteredEmailRegexList())){
+    if(!StringUtils.hasText(this.fakeSmtpConfigurationProperties.getFilteredEmailRegexList())){
       return false;
     }
     return ignoreParticipant(sender) || ignoreParticipant(recipient);
