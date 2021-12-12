@@ -1,6 +1,6 @@
 plugins {
-	id 'pl.allegro.tech.build.axion-release' version '1.13.3'
-	id 'org.springframework.boot' version '2.5.5'
+	id 'pl.allegro.tech.build.axion-release' version '1.13.6'
+	id 'org.springframework.boot' version '2.6.1'
 	id "org.sonarqube" version "3.3"
 }
 
@@ -39,7 +39,7 @@ dependencies {
 	implementation('org.subethamail:subethasmtp:3.1.7')
 	implementation('org.flywaydb:flyway-core')
 	implementation('com.sun.xml.bind:jaxb-impl:3.0.2')
-	implementation('org.springdoc:springdoc-openapi-ui:1.5.11')
+	implementation('org.springdoc:springdoc-openapi-ui:1.5.13')
 
 	implementation('org.webjars.bower:jquery:3.6.0')
 	implementation('org.webjars:materializecss:1.0.0')
