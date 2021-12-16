@@ -93,7 +93,7 @@ The following snippet shows the pre-defined web application configuration
     server.port=5080     
     
     #Port of the http management api
-    management.port=5081 
+    management.server.port=5081 
 
 ## REST API
 
