@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.13_8
+FROM amazoncorretto:11.0.14-alpine3.15
 
 ARG APP_VERSION
 
