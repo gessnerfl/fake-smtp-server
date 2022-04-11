@@ -20,6 +20,10 @@
                             <th>To:</th>
                             <td th:text="${mail.toAddress}">To</td>
                         </tr>
+                        <tr th:if= "${mail.bccAddress != ''}">
+                            <th>Bcc:</th>
+                            <td th:text="${mail.bccAddress}">To</td>
+                        </tr>
                         <tr>
                             <th>Received On:</th>
                             <td th:with="df='yyyy-MM-dd HH:mm:ss'" th:text="${#calendars.format(mail.receivedOn,df)}">Received On</td>
