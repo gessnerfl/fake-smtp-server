@@ -1,4 +1,5 @@
-FROM amazoncorretto:11.0.14-alpine3.15
+ARG BASE_IMAGE=amazoncorretto:11.0.14-alpine3.15
+FROM ${BASE_IMAGE}
 
 ARG APP_VERSION
 
