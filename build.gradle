@@ -19,7 +19,8 @@ scmVersion {
 
 group = 'de.gessnerfl'
 description = """Fake SMTP Server :: Simple SMTP Server which stores emails in memory and lists email in a web ui"""
-project.version = scmVersion.version
+project.version = findProperty 'projectVersion' ?: scmVersion.version
+project.archivesBaseName = 'fake-smtp-server'
 
 ext.scmUrl = 'git@github.com:gessnerfl/fake-smtp-server.git'
 ext.projectUrl = 'https://github.com/gessnerfl/fake-smtp-server'
