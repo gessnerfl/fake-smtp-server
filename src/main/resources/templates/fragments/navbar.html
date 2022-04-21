@@ -4,15 +4,11 @@
 </head>
 
 <body>
-    <div class="navbar-fixed" th:fragment="navbar" >
-        <nav class="light-blue darken-4" style="padding-left:10px; padding-right:10px;">
-            <div class="nav-wrapper">
-                <a class="brand-logo" href="/"><i class="material-icons" style="font-size: 2rem">email</i>Fake SMTP Server</a>
-                <ul class="right">
-                    <li th:text="${'Version: ' + appVersion}"></li>
-                </ul>
-            </div>
-        </nav>
-    </div>
+    <nav class="navbar fixed-top navbar-dark bg-primary bg-gradient" th:fragment="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="material-icons">email</i><span>Fake SMTP Server</span></a>
+            <span class="d-flex navbar-text" th:text="${'Version: ' + appVersion}"></span>
+        </div>
+    </nav>
 </body>
 </html>

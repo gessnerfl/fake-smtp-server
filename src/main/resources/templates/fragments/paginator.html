@@ -5,38 +5,38 @@
 
 <body>
 	<div th:fragment="paginator(url, page)" class="row">
-		<div class="col s5">
-			<div class="pagination">
-                <p>Page&nbsp;<span class="label label-primary" th:text="${page.number + 1}"></span>&nbsp;of&nbsp;<span class="label label-primary" th:text="${page.totalPages}"></span></p></div>
+		<div class="col-5">
+			<p>
+				<span class="small">Page&nbsp;</span>
+				<span class="badge bg-secondary" th:text="${page.number + 1}"></span>
+				<span class="small">&nbsp;of&nbsp;</span>
+				<span class="badge bg-secondary" th:text="${page.totalPages}"></span>
+			</p>
 		</div>
 
-		<div class="col s7">
+		<div class="col-7">
 			<!-- Pagination Bar -->
-			<div th:fragment='paginationbar'>
-				<div class="text-center">
-					<ul class='pagination justify-content-center'>
-						<li class="waves-effect" th:class="${page.first}?'disabled':''">
-							<a th:if='${page.first}'><i class="material-icons">first_page</i></a>
-							<a th:if='${not page.first}' th:href='@{${url}(page=0,size=${page.size})}' title="Go to first page"><i class="material-icons">first_page</i></a>
-						</li>
-						<li class="waves-effect" th:class="${page.hasPrevious()}? '' : 'disabled'">
-							<a th:if='${not page.hasPrevious()}'><i class="material-icons">navigate_before</i></a>
-							<a th:if='${page.hasPrevious()}' th:href='@{${url}(page=${page.number-2},size=${page.size})}' title='Go to previous page'><i class="material-icons">navigate_before</i></a>
-						</li>
-						<li class="waves-effect" th:class="${page.hasNext()}? '' : 'disabled'">
-							<a th:if='${not page.hasNext()}'><i class="material-icons">navigate_next</i></a>
-							<a th:if='${page.hasNext()}' th:href='@{${url}(page=${page.number+1},size=${page.size})}' title='Go to next page'><i class="material-icons">navigate_next</i></a>
-						</li>
-						<li class="waves-effect" th:class="${page.last}? 'disabled' : ''">
-							<a th:if='${page.last}'><i class="material-icons">last_page</i></a>
-							<a th:if='${not page.last}' th:href='@{${url}(page=${page.totalPages - 1},size=${page.size})}' title="Go to last page"><i class="material-icons">last_page</i></a>
-						</li>
-					</ul>
-				</div>
-			</div>
+			<nav th:fragment='paginationbar'>
+				<ul class='pagination float-end'>
+					<li th:class="${page.first}?'page-item disabled':'page-item'">
+						<a th:if='${page.first}' class="page-link"><i class="material-icons">first_page</i></a>
+						<a th:if='${not page.first}' class="page-link" title="Go to first page"><i class="material-icons">first_page</i></a>
+					</li>
+					<li th:class="${page.hasPrevious()}? 'page-item' : 'page-item disabled'">
+						<a th:if='${not page.hasPrevious()}' class="page-link"><i class="material-icons">navigate_before</i></a>
+						<a th:if='${page.hasPrevious()}' class="page-link" th:href='@{${url}(page=${page.number-2},size=${page.size})}' title='Go to previous page'><i class="material-icons">navigate_before</i></a>
+					</li>
+					<li th:class="${page.hasNext()}? 'page-item' : 'page-item disabled'">
+						<a th:if='${not page.hasNext()}' class="page-link"><i class="material-icons">navigate_next</i></a>
+						<a th:if='${page.hasNext()}' class="page-link" th:href='@{${url}(page=${page.number+1},size=${page.size})}' title='Go to next page'><i class="material-icons">navigate_next</i></a>
+					</li>
+					<li th:class="${page.last}? 'page-item disabled' : 'page-item'">
+						<a th:if='${page.last}' class="page-link"><i class="material-icons">last_page</i></a>
+						<a th:if='${not page.last}' class="page-link" th:href='@{${url}(page=${page.totalPages - 1},size=${page.size})}' title="Go to last page"><i class="material-icons">last_page</i></a>
+					</li>
+				</ul>
+			</nav>
 		</div>
-
-
 	</div>
 </body>
 </html>

@@ -4,19 +4,16 @@
 
 <body>
 <div th:replace="fragments/navbar :: navbar"></div>
-<div class="container" style="margin-top:60px">
-    <div th:replace="fragments/error-bar :: error-bar"></div>
+<div class="container root">
     <div class="row">
-        <div class="col s12">
-            <h1><i class="material-icons" style="font-size: 3rem">inbox</i>Inbox</h1>
+        <div class="col">
+            <h1><i class="material-icons">inbox</i>Inbox</h1>
             <div th:if="${mails.totalElements == 0}">
-                <div class="card light-blue lighten-4">
-                    <div class="card-content">No emails available.</div>
-                </div>
+                <div class="alert alert-info" role="alert">No emails available.</div>
             </div>
             <div th:if="${mails.totalElements > 0}">
-                <button data-target="delete-all-modal" class="btn red modal-trigger"><i class="material-icons left">delete</i>Delete All</button>
-                <table class="striped responsive-table">
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete-all-modal"><i class="material-icons left">delete</i><span>Delete All</span></button>
+                <table class="table table-hover">
                     <thead>
                     <tr>
                         <th>ID</th>
@@ -35,10 +32,10 @@
                         <td th:with="df='yyyy-MM-dd HH:mm:ss'" th:text="${#calendars.format(mail.receivedOn,df)}">Received On</td>
                         <td th:text="${mail.subject}"></td>
                         <td>
-                            <a class="waves-effect waves-light btn blue darken-3" alt="Details" th:href="@{|/email/${mail.id}|}"><i class="material-icons">email</i></a>
+                            <a class="btn btn-primary" alt="Details" th:href="@{|/email/${mail.id}|}"><i class="material-icons">email</i></a>
                             <form action="#" th:action="@{'/email/{id}'(id=${mail.id})}" th:method="delete" class="inline">
                                 <input type="hidden" name="_method" value="delete" />
-                                <button class="waves-effect waves-light btn blue darken-3" type="submit"><i class="material-icons">delete</i></button>
+                                <button class="btn btn-danger" type="submit"><i class="material-icons">delete</i></button>
                             </form>
                         </td>
                     </tr>
@@ -50,23 +47,25 @@
     </div>
 </div>
 
-<div id="delete-all-modal" class="modal">
-    <div class="modal-content">
-        <h4>Delete All Emails</h4>
-        <p>Do you really want to delete all emails?</p>
-    </div>
-    <div class="modal-footer">
-        <form action="#" th:action="@{'/email'}" th:method="delete" class="inline">
-            <input type="hidden" name="_method" value="delete" />
-            <button class="waves-effect waves-light btn red" type="submit">Yes</button>
-        </form>
-        <a href="#!" class="modal-close btn grey lighten-2 waves-effect waves-light">No</a>
+<div id="delete-all-modal" class="modal fade" aria-labelledby="modal dialog to delete all messages" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete All Emails</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Do you really want to delete all emails?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="#" th:action="@{'/email'}" th:method="delete" class="inline">
+                    <input type="hidden" name="_method" value="delete" />
+                    <button class="btn btn-danger" type="submit">Yes</button>
+                </form>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
     </div>
 </div>
-<script>
-    $(document).ready(function(){
-        $('.modal').modal();
-      });
-</script>
 </body>
 </html>
