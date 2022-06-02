@@ -141,7 +141,8 @@ class EmailRestControllerTest {
     void shouldDeleteAllEmails(){
         sut.deleteAllEmails();
 
-        verify(emailRepository).deleteAll();
+        verify(emailAttachmentRepository).deleteAllInBatch();
+        verify(emailRepository).deleteAllInBatch();
         verify(emailRepository).flush();
         verifyNoMoreInteractions(emailRepository);
     }
