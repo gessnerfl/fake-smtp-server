@@ -80,7 +80,8 @@ public class EmailRestController {
 
     @DeleteMapping("/email")
     public void deleteAllEmails() {
-        emailRepository.deleteAll();
+        emailAttachmentRepository.deleteAllInBatch();
+        emailRepository.deleteAllInBatch();
         emailRepository.flush();
     }
 

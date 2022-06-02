@@ -1,6 +1,7 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
@@ -25,11 +26,13 @@ public class EmailController {
     static final String REDIRECT_EMAIL_LIST_VIEW = "redirect:/email";
 
     private final EmailRepository emailRepository;
+    private final EmailAttachmentRepository emailAttachmentRepository;
     private final BuildProperties buildProperties;
 
     @Autowired
-    public EmailController(EmailRepository emailRepository, BuildProperties buildProperties) {
+    public EmailController(EmailRepository emailRepository, EmailAttachmentRepository emailAttachmentRepository, BuildProperties buildProperties) {
         this.emailRepository = emailRepository;
+        this.emailAttachmentRepository = emailAttachmentRepository;
         this.buildProperties = buildProperties;
     }
 
@@ -71,7 +74,8 @@ public class EmailController {
 
     @DeleteMapping("/email")
     public String deleteAllEmails() {
-        emailRepository.deleteAll();
+        emailAttachmentRepository.deleteAllInBatch();
+        emailRepository.deleteAllInBatch();
         emailRepository.flush();
         return REDIRECT_EMAIL_LIST_VIEW;
     }

@@ -1,6 +1,7 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,8 @@ class EmailControllerTest {
     private Model model;
     @Mock
     private EmailRepository emailRepository;
+    @Mock
+    private EmailAttachmentRepository emailAttachmentRepository;
     @Mock
     private BuildProperties buildProperties;
     @InjectMocks
@@ -165,7 +168,8 @@ class EmailControllerTest {
     void shouldDeleteAllEmails(){
         sut.deleteAllEmails();
 
-        verify(emailRepository).deleteAll();
+        verify(emailAttachmentRepository).deleteAllInBatch();
+        verify(emailRepository).deleteAllInBatch();
         verify(emailRepository).flush();
         verifyNoMoreInteractions(emailRepository);
         verifyNoInteractions(buildProperties);
