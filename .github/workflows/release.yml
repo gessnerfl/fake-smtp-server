@@ -108,7 +108,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: gessnerfl/fake-smtp-server:${{ steps.get_version.outputs.APP_VERSION }} , gessnerfl/fake-smtp-server:latest
           build-args: APP_VERSION=${{ steps.get_version.outputs.APP_VERSION }}
