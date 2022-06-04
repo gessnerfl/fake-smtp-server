@@ -9,6 +9,8 @@ EXPOSE 5080
 EXPOSE 5081
 EXPOSE 5025
 
+RUN yum update --assumeyes --skip-broken && yum clean all
+
 ADD build/libs/fake-smtp-server-$APP_VERSION.jar /opt/fake-smtp-server.jar
 RUN ["touch", "/opt/fake-smtp-server.jar"]
 ENV JAVA_OPTS=""
