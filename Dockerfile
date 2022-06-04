@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=amazoncorretto:11.0.15-alpine3.15
+ARG BASE_IMAGE=amazoncorretto:11.0.15-al2
 FROM ${BASE_IMAGE}
 
 ARG APP_VERSION
