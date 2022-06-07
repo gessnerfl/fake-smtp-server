@@ -20,11 +20,11 @@
 				<ul class='pagination float-end'>
 					<li th:class="${page.first}?'page-item disabled':'page-item'">
 						<a th:if='${page.first}' class="page-link"><i class="material-icons">first_page</i></a>
-						<a th:if='${not page.first}' class="page-link" title="Go to first page"><i class="material-icons">first_page</i></a>
+						<a th:if='${not page.first}' class="page-link" th:href='@{${url}(page=0,size=${page.size})}' title="Go to first page"><i class="material-icons">first_page</i></a>
 					</li>
 					<li th:class="${page.hasPrevious()}? 'page-item' : 'page-item disabled'">
 						<a th:if='${not page.hasPrevious()}' class="page-link"><i class="material-icons">navigate_before</i></a>
-						<a th:if='${page.hasPrevious()}' class="page-link" th:href='@{${url}(page=${page.number-2},size=${page.size})}' title='Go to previous page'><i class="material-icons">navigate_before</i></a>
+						<a th:if='${page.hasPrevious()}' class="page-link" th:href='@{${url}(page=${page.number-1},size=${page.size})}' title='Go to previous page'><i class="material-icons">navigate_before</i></a>
 					</li>
 					<li th:class="${page.hasNext()}? 'page-item' : 'page-item disabled'">
 						<a th:if='${not page.hasNext()}' class="page-link"><i class="material-icons">navigate_next</i></a>
