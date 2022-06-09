@@ -23,7 +23,7 @@ jobs:
           distribution: 'corretto'
           java-version: 11
 
-      - name: Snyk Monitor execution
+      - name: Snyk Monitor
         run: snyk test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
