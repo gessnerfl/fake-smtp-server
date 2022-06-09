@@ -24,7 +24,7 @@ jobs:
           java-version: 11
 
       - name: Snyk Monitor execution
-        run: snyk test --project-name=gessnerfl/fake-smtp-server
+        run: snyk test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
