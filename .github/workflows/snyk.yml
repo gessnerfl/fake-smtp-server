@@ -18,4 +18,4 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
-          args: --project-name=gessnerfl/fake-smtp-server/build.gradle
+          args: --project-name=gessnerfl/fake-smtp-server
