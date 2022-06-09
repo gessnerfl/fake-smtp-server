@@ -27,3 +27,4 @@ jobs:
         run: snyk test --project-name=gessnerfl/fake-smtp-server
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
