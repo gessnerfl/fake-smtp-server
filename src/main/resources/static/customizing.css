@@ -24,3 +24,7 @@ a > span {
 form.inline {
     display: inline
 }
+
+.mail-content-plain {
+    white-space: break-spaces;
+}
