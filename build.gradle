@@ -41,7 +41,7 @@ dependencies {
 	implementation('commons-io:commons-io:2.11.0')
 	implementation('org.subethamail:subethasmtp:3.1.7')
 	implementation('org.flywaydb:flyway-core:8.5.13')
-	implementation('com.sun.xml.bind:jaxb-impl:3.0.2')
+	implementation('com.sun.xml.bind:jaxb-impl:4.0.0')
 	implementation('org.springdoc:springdoc-openapi-ui:1.6.9')
 
 	implementation('org.webjars:bootstrap:5.1.3')
