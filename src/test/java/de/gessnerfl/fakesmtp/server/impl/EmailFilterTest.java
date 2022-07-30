@@ -3,6 +3,8 @@ package de.gessnerfl.fakesmtp.server.impl;
 import de.gessnerfl.fakesmtp.config.FakeSmtpConfigurationProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -46,15 +48,10 @@ class EmailFilterTest {
     assertTrue(sut.ignore(TEST_EMAIL_ADDRESS_1,TEST_EMAIL_ADDRESS_2));
   }
 
-  @Test
-  void matchingFilterMultipleRegexAnyMatch(){
-    when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn(".*@other\\.com,jane@.*");
-    assertTrue(sut.ignore(TEST_EMAIL_ADDRESS_1,TEST_EMAIL_ADDRESS_2));
-  }
-
-  @Test
-  void matchingFilterMultipleRegexAllMatch(){
-    when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn(".*@doe\\.com,jane@.*");
+  @ParameterizedTest
+  @ValueSource(strings = {".*@other\\.com,jane@.*", ".*@doe\\.com,jane@.*"})
+  void matchingFilterMultipleRegex(String regex){
+    when(fakeSmtpConfigurationProperties.getFilteredEmailRegexList()).thenReturn(regex);
     assertTrue(sut.ignore(TEST_EMAIL_ADDRESS_1,TEST_EMAIL_ADDRESS_2));
   }
 

@@ -8,6 +8,8 @@ import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,10 +35,10 @@ class EmailFactoryTest {
     @InjectMocks
     private EmailFactory sut;
 
-    @Test
-    void shouldCreateEmailForEmlFileWithSubjectAndContentTypePlain() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"mail-with-subject.eml", "mail-with-subject-without-content-type.em", "multipart-mail-plain-only.eml"})
+    void shouldCreateMailPlainTextEmails(String testFilename) throws Exception {
         var now = new Date();
-        var testFilename = "mail-with-subject.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var dataAsString = new String(data, StandardCharsets.UTF_8);
         var rawData = new RawData(SENDER, RECEIVER, data);
@@ -83,21 +85,6 @@ class EmailFactoryTest {
         assertEquals("<html><head></head><body>Mail Body</body></html>", result.getHtmlContent().get().getData());
         assertEquals(now, result.getReceivedOn());
         assertThat(result.getAttachments(), empty());
-    }
-
-    @Test
-    void shouldCreateEmailForEmlFileWithSubjectAndWithoutContentType() throws Exception {
-        var now = new Date();
-        var testFilename = "mail-with-subject-without-content-type.eml";
-        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        var dataAsString = new String(data, StandardCharsets.UTF_8);
-        var rawData = new RawData(SENDER, RECEIVER, data);
-
-        when(timestampProvider.now()).thenReturn(now);
-
-        var result = sut.convert(rawData);
-
-        assertPlainTextEmail(now, dataAsString, result);
     }
 
     @Test
@@ -170,21 +157,6 @@ class EmailFactoryTest {
         assertEquals("<html><head></head><body>Mail Body</body></html>", result.getHtmlContent().get().getData());
         assertEquals(now, result.getReceivedOn());
         assertThat(result.getAttachments(), empty());
-    }
-
-    @Test
-    void shouldCreateMailForMultipartWithoutContentTypeHtml() throws Exception {
-        var now = new Date();
-        var testFilename = "multipart-mail-plain-only.eml";
-        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
-        var dataAsString = new String(data, StandardCharsets.UTF_8);
-        var rawData = new RawData(SENDER, RECEIVER, data);
-
-        when(timestampProvider.now()).thenReturn(now);
-
-        var result = sut.convert(rawData);
-
-        assertPlainTextEmail(now, dataAsString, result);
     }
 
     @Test
