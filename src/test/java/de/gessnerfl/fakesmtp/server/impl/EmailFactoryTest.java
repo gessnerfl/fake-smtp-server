@@ -36,7 +36,7 @@ class EmailFactoryTest {
     private EmailFactory sut;
 
     @ParameterizedTest
-    @ValueSource(strings = {"mail-with-subject.eml", "mail-with-subject-without-content-type.em", "multipart-mail-plain-only.eml"})
+    @ValueSource(strings = {"mail-with-subject.eml", "mail-with-subject-without-content-type.eml", "multipart-mail-plain-only.eml"})
     void shouldCreateMailPlainTextEmails(String testFilename) throws Exception {
         var now = new Date();
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
