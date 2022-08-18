@@ -33,7 +33,10 @@
                         </li>
                     </ul>
                     <div class="tab-content p-3" id="mail-tabs-content">
-                        <div class="tab-pane fade mail-content-plain" th:each="c,is : ${mail.contents}" th:id="'mail-content-'+${c.id}" th:classappend="${is.first} ? 'show active' : ''" th:utext="${c.data}"></div>
+                        <div class="tab-pane fade mail-content-plain position-relative" th:each="c,is : ${mail.contents}" th:id="'mail-content-'+${c.id}" th:classappend="${is.first} ? 'show active' : ''">
+                            <div th:if="${c.contentType == T(de.gessnerfl.fakesmtp.model.ContentType).PLAIN}" class="position-absolute top-0 start-0 w-100" th:text="${c.data}"></div>
+                            <iframe th:unless="${c.contentType == T(de.gessnerfl.fakesmtp.model.ContentType).PLAIN}" class="position-absolute top-0 start-0 w-100" th:attr="srcdoc=${c.data}" sandbox></iframe>
+                        </div>
                         <div class="tab-pane fade" id="mail-content-raw">
                             <pre class="card-content" th:text="${mail.rawData}"></pre>
                         </div>
