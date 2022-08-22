@@ -7,6 +7,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 import javax.mail.MessagingException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class TestDataCreator {
 
@@ -55,11 +58,20 @@ public class TestDataCreator {
             helper.setTo("receiver@example.com");
             helper.setFrom("sender@example.com");
             helper.setSubject("Test-Alternative-Mail " + i);
-            helper.addInline("icon", new ClassPathResource("/static/gfx/app-icon.png"));
             helper.setText("This is the test mail number" + i, "<html><head></head><body>This is the test mail number " + i + "<img src=\"cid:icon\"></img></body>");
+            helper.addInline("icon", new ClassPathResource("/static/gfx/app-icon.png"));
             helper.addAttachment("app-icon.png", new ClassPathResource("/static/gfx/app-icon.png"));
             helper.addAttachment("customizing.css", new ClassPathResource("/static/customizing.css"));
             sender.send(message);
+            if(i == 0){
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                try {
+                    message.writeTo(os);
+                    System.out.println(new String(os.toByteArray(), StandardCharsets.UTF_8));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (MessagingException e){
             throw new RuntimeException("Failed to create mail", e);
         }
