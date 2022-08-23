@@ -43,6 +43,10 @@ public class EmailContent {
         this.email = email;
     }
 
+    public String getRawData(){
+        return data;
+    }
+
     public String getData() {
         if (data != null && data.contains("cid:")) {
             var matcher = CID_PATTERN.matcher(data);

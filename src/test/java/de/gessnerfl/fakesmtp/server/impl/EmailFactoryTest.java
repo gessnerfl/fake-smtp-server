@@ -88,6 +88,35 @@ class EmailFactoryTest {
     }
 
     @Test
+    void shouldCreateEmailForEmlFileWithSubjectAndContentTypeHtmlAndEmbeddedImage() throws Exception {
+        var now = new Date();
+        var testFilename = "mail-with-subect-and-content-type-html-with-inline-image.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var dataAsString = new String(data, StandardCharsets.UTF_8);
+        var rawData = new RawData(SENDER, RECEIVER, data);
+        final var imageBase64 = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAolBMVEUAAAA0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNuo1pBsAAAANXRSTlMAAQMEBQYHCQsMDQ4PEB0eKi0uOTs8PT5KTGdpa2xzdHuGiKiqq621t7m+xcfO2dze4unt+xTcEm4AAACdSURBVCjPrY/JEsFQFAX7IcQ8xDzPhBiT8/+/ZoFQPAtK72533cWBr8lvZMHPsZQVn7M9nBjbw5Dk3uYPKcgE7z7IQAPTe/UDQx31DaXDsz6WMV0hBUUSk4efJihsJSRFHaiGVx3WoB3pGqR5GmchSXOH9EyKg8IKeLudB5XbK/EiA2BG9zsO2jddt/VYiz7wQ1jb/Yqcb/PrLP/jAkeJUZTlAz/+AAAAAElFTkSuQmCC";
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        var result = sut.convert(rawData);
+
+        assertEquals(SENDER, result.getFromAddress());
+        assertEquals(RECEIVER, result.getToAddress());
+        assertEquals("This is the mail title", result.getSubject());
+        assertEquals(dataAsString, result.getRawData());
+        assertThat(result.getContents(), hasSize(2));
+        assertTrue(result.getPlainContent().isPresent());
+        assertEquals("This is the test mail", result.getPlainContent().get().getData());
+        assertTrue(result.getHtmlContent().isPresent());
+        assertEquals("<html><head></head><body>This is the test mail <img src=\"cid:icon\"></img></body>", result.getHtmlContent().get().getRawData());
+        assertEquals("<html><head></head><body>This is the test mail <img src=\"data:image/png;base64, " + imageBase64 + "\"></img></body>", result.getHtmlContent().get().getData());
+        assertEquals(now, result.getReceivedOn());
+        assertThat(result.getAttachments(), empty());
+        assertThat(result.getInlineImages(), hasSize(1));
+        assertEquals(imageBase64, result.getInlineImages().get(0).getData());
+    }
+
+    @Test
     void shouldCreateEmailForEmlFileWithoutSubjectAndContentTypePlain() throws Exception {
         var now = new Date();
         var testFilename = "mail-without-subject.eml";
