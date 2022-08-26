@@ -114,6 +114,7 @@ class EmailFactoryTest {
         assertThat(result.getAttachments(), empty());
         assertThat(result.getInlineImages(), hasSize(1));
         assertEquals(imageBase64, result.getInlineImages().get(0).getData());
+        assertEquals("image/png", result.getInlineImages().get(0).getContentType());
     }
 
     @Test
