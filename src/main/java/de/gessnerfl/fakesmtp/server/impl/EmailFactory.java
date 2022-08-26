@@ -149,9 +149,7 @@ public class EmailFactory {
         var headerValues = part.getHeader("Content-ID");
         if (headerValues != null && headerValues.length > 0) {
             var contentId = headerValues[0];
-            var start = contentId.startsWith("<") ? 1 : 0;
-            var end = contentId.endsWith(">") ? contentId.length()-1 : contentId.length();
-            return Optional.of(contentId.substring(start, end));
+            return Optional.of(contentId.substring(1, contentId.length()-1));
         }
         return Optional.empty();
     }

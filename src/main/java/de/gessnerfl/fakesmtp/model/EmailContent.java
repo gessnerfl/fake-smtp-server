@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 @Entity
 @Table(name = "email_content")
 public class EmailContent {
-    private static final Pattern CID_PATTERN = Pattern.compile("(< *img.*src=[\"']cid:)(.*)([\"'].*\\/?>)");
+    private static final Pattern CID_PATTERN = Pattern.compile("<img[^>]+src=(?:\"cid:([^\">]+)\"|'cid:([^'>]+)')");
     @Id
     @SequenceGenerator(name = "email_content_generator", sequenceName = "email_content_sequence", allocationSize = 1)
     @GeneratedValue(generator = "email_content_generator")
@@ -56,13 +56,13 @@ public class EmailContent {
     }
 
     private String replaceContentIdWithBase64DataWhenAvailable(MatchResult mr) {
-        return email.getInlineImageByContentId(mr.group(2))
+        return email.getInlineImageByContentId(mr.group(1))
                 .map(i -> mapInlineImage(mr, i))
                 .orElseGet(mr::group);
     }
 
     private static String mapInlineImage(MatchResult mr, InlineImage i) {
-        return mr.group().replace("cid:" + mr.group(2), "data:" + i.getContentType() + ";base64, " + i.getData());
+        return mr.group().replace("cid:" + mr.group(1), "data:" + i.getContentType() + ";base64, " + i.getData());
     }
 
     public void setData(String data) {
