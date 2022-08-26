@@ -27,6 +27,7 @@ public class EmailContent extends EmailPart {
         return super.getData();
     }
 
+    @Override
     public String getData() {
         var data = super.getData();
         if (data != null && data.contains("cid:")) {
