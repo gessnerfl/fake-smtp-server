@@ -1,9 +1,7 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
-import de.gessnerfl.fakesmtp.model.ContentType;
-import de.gessnerfl.fakesmtp.model.Email;
-import de.gessnerfl.fakesmtp.model.EmailAttachment;
-import de.gessnerfl.fakesmtp.model.EmailContent;
+import com.sun.mail.util.BASE64DecoderStream;
+import de.gessnerfl.fakesmtp.model.*;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.*;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -82,9 +81,11 @@ public class EmailFactory {
         if (partContentType == ContentType.HTML || partContentType == ContentType.PLAIN) {
             final var partContent = part.getContent();
             createEmailContent(rawData, partContentType, partContent).ifPresent(email::addContent);
-        }else if(partContentType == ContentType.MULTIPART_RELATED || partContentType == ContentType.MULTIPART_ALTERNATIVE){
-            final var content = (Multipart)part.getContent();
+        } else if (partContentType == ContentType.MULTIPART_RELATED || partContentType == ContentType.MULTIPART_ALTERNATIVE) {
+            final var content = (Multipart) part.getContent();
             appendMultipartBodyParts(email, rawData, content);
+        } else if (partContentType == ContentType.IMAGE) {
+            createInlineImage(part).ifPresent(email::addInlineImage);
         }
     }
 
@@ -111,13 +112,46 @@ public class EmailFactory {
     private Optional<EmailContent> createEmailContent(RawData rawData, ContentType contentType, Object messageContent) {
         var data = Optional.ofNullable(Objects.toString(messageContent, null))
                 .map(this::normalizeContent).orElseGet(() -> normalizeContent(rawData.getContentAsString()));
-        if(data == null){
+        if (data == null) {
             return Optional.empty();
         }
         var content = new EmailContent();
         content.setContentType(contentType);
         content.setData(data);
         return Optional.of(content);
+    }
+
+    private Optional<InlineImage> createInlineImage(final BodyPart part) throws MessagingException, IOException {
+        var contentType = part.getContentType();
+        Object rawContent = part.getContent();
+        var content = rawContent instanceof BASE64DecoderStream ? readBase64EncodedData((BASE64DecoderStream)rawContent) : Objects.toString(rawContent, null);
+        var data = Optional.ofNullable(content);
+        return extractContentId(part).flatMap(contentId ->
+            data.map(d -> {
+                var img = new InlineImage();
+                img.setContentId(contentId);
+                img.setContentType(contentType);
+                img.setData(d);
+                return img;
+            }));
+    }
+
+    private String readBase64EncodedData(BASE64DecoderStream stream){
+        try {
+            var byteArray = IOUtils.toByteArray(stream);
+            return Base64.getEncoder().encodeToString(byteArray);
+        } catch (IOException e) {
+            throw new EmailProcessingException("Failed to read inline image", e);
+        }
+    }
+
+    private Optional<String> extractContentId(BodyPart part) throws MessagingException {
+        var headerValues = part.getHeader("Content-ID");
+        if (headerValues != null && headerValues.length > 0) {
+            var contentId = headerValues[0];
+            return Optional.of(contentId.substring(1, contentId.length()-1));
+        }
+        return Optional.empty();
     }
 
     private EmailAttachment createAttachment(BodyPart part) throws MessagingException, IOException {
@@ -127,7 +161,7 @@ public class EmailFactory {
         return attachment;
     }
 
-    private String normalizeContent(String input){
+    private String normalizeContent(String input) {
         return input != null && !input.trim().isEmpty() ? input.trim() : null;
     }
 }

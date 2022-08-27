@@ -55,8 +55,8 @@ public class TestDataCreator {
             helper.setTo("receiver@example.com");
             helper.setFrom("sender@example.com");
             helper.setSubject("Test-Alternative-Mail " + i);
-            helper.addInline("icon", new ClassPathResource("/static/gfx/app-icon.png"));
             helper.setText("This is the test mail number" + i, "<html><head></head><body>This is the test mail number " + i + "<img src=\"cid:icon\"></img></body>");
+            helper.addInline("icon", new ClassPathResource("/static/gfx/app-icon.png"));
             helper.addAttachment("app-icon.png", new ClassPathResource("/static/gfx/app-icon.png"));
             helper.addAttachment("customizing.css", new ClassPathResource("/static/customizing.css"));
             sender.send(message);
