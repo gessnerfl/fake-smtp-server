@@ -68,7 +68,7 @@ The following snippet shows the configuration of a fake smtp server with its def
     #The maximum number of emails which should be stored in the database; Defualts to 100
     fakesmtp.persistence.maxNumberEmails=100  
     
-    #A comma separated list of regex expressions to filter out unwanted emails by email address
+    #List of sender email addresses to ignore, as a comma-separated list of regex expressions.
     fakesmtp.filteredEmailRegexList=john@doe\\.com,.*@google\\.com ; empty by default
     
     #When set to true emails will be forwarded to a configured target email system. Therefore
