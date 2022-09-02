@@ -108,8 +108,7 @@ class EmailFactoryTest {
         assertTrue(result.getPlainContent().isPresent());
         assertEquals("This is the test mail", result.getPlainContent().get().getData());
         assertTrue(result.getHtmlContent().isPresent());
-        assertEquals("<html><head></head><body>This is the test mail <img src=\"cid:icon\"></img></body>", result.getHtmlContent().get().getRawData());
-        assertEquals("<html><head></head><body>This is the test mail <img src=\"data:image/png;base64, " + imageBase64 + "\"></img></body>", result.getHtmlContent().get().getData());
+        assertEquals("<html><head></head><body>This is the test mail <img src=\"cid:icon\"></img></body>", result.getHtmlContent().get().getData());
         assertEquals(now, result.getReceivedOn());
         assertThat(result.getAttachments(), empty());
         assertThat(result.getInlineImages(), hasSize(1));
