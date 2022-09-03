@@ -1,91 +1,97 @@
 plugins {
-	id 'pl.allegro.tech.build.axion-release' version '1.14.0'
-	id 'org.springframework.boot' version '2.7.3'
-	id "org.sonarqube" version "3.4.0.2513"
+    id "pl.allegro.tech.build.axion-release" version "1.14.0"
+    id "org.springframework.boot" version "2.7.3"
+    id "org.sonarqube" version "3.4.0.2513"
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'jacoco'
-apply plugin: 'org.sonarqube'
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "io.spring.dependency-management"
+apply plugin: "jacoco"
+apply plugin: "org.sonarqube"
 
 scmVersion {
-	tag {
-		prefix = ''
-	}
+    tag {
+        prefix = ""
+    }
 }
 
-group = 'de.gessnerfl'
+group = "de.gessnerfl"
 description = """Fake SMTP Server :: Simple SMTP Server which stores emails in memory and lists email in a web ui"""
-project.version = project.findProperty('projectVersion') ?: scmVersion.version
-project.archivesBaseName = 'fake-smtp-server'
+project.version = project.findProperty("projectVersion") ?: scmVersion.version
+project.archivesBaseName = "fake-smtp-server"
 
-ext.scmUrl = 'git@github.com:gessnerfl/fake-smtp-server.git'
-ext.projectUrl = 'https://github.com/gessnerfl/fake-smtp-server'
+ext.bootstrapVersion = "5.2.0"
+ext.scmUrl = "git@github.com:gessnerfl/fake-smtp-server.git"
+ext.projectUrl = "https://github.com/gessnerfl/fake-smtp-server"
 
 sourceCompatibility = 11
 targetCompatibility = 11
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation('org.springframework.boot:spring-boot-starter-actuator')
-	implementation('org.springframework.boot:spring-boot-starter-web')
-	implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
-	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-	implementation('org.springframework.boot:spring-boot-starter-mail')
-	implementation('commons-io:commons-io:2.11.0')
-	implementation('org.subethamail:subethasmtp:3.1.7')
-	implementation('org.flywaydb:flyway-core:8.5.13')
-	implementation('com.sun.xml.bind:jaxb-impl:4.0.0')
-	implementation('org.springdoc:springdoc-openapi-ui:1.6.11')
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("commons-io:commons-io:2.11.0")
+    implementation("org.subethamail:subethasmtp:3.1.7")
+    implementation("org.flywaydb:flyway-core:8.5.13")
+    implementation("org.jsoup:jsoup:1.15.3")
+    implementation("com.sun.xml.bind:jaxb-impl:4.0.0")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
 
-	implementation('org.webjars:bootstrap:5.2.0')
-	implementation('org.webjars:material-design-icons:4.0.0')
+    implementation("org.webjars:bootstrap:$bootstrapVersion")
+    implementation("org.webjars:material-design-icons:4.0.0")
 
-	runtimeOnly('com.h2database:h2:2.1.214')
-	testImplementation('org.springframework.boot:spring-boot-starter-test')
-	testImplementation('org.ow2.asm:asm:9.3')
-	testImplementation('org.apache.commons:commons-lang3:3.12.0')
-	testImplementation('org.hamcrest:hamcrest-core:2.2')
+    runtimeOnly("com.h2database:h2:2.1.214")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.ow2.asm:asm:9.3")
+    testImplementation("org.apache.commons:commons-lang3:3.12.0")
+    testImplementation("org.hamcrest:hamcrest-core:2.2")
 }
 
 java {
-	withSourcesJar()
-	withJavadocJar()
+    withSourcesJar()
+    withJavadocJar()
 }
 
 gradle.projectsEvaluated {
-	tasks.withType(JavaCompile){
-		options.compilerArgs << "-Xlint:deprecation"
-	}
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation"
+    }
 }
 
 springBoot {
-	buildInfo()
+    buildInfo {
+        properties {
+            additional = ["bootstrap.version": "$bootstrapVersion"]
+        }
+    }
 }
 
 sonarqube {
-	properties {
-		property 'sonar.host.url', 'https://sonarcloud.io'
-		property 'sonar.organization', 'gessnerfl-github'
-		property "sonar.projectName", "Fake SMTP Server"
-		property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
-	}
+    properties {
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.organization", "gessnerfl-github"
+        property "sonar.projectName", "Fake SMTP Server"
+        property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
+    }
 }
 
 test {
-	useJUnitPlatform()
-	finalizedBy jacocoTestReport
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
-	dependsOn test
-	reports {
-		xml.enabled true
-	}
+    dependsOn test
+    reports {
+        xml.enabled true
+    }
 }

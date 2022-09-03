@@ -18,6 +18,7 @@ public class TestDataCreator {
             createHtmlEmail(i);
             createMimeAlternativeEmail(i);
         }
+        createHtmlEmailWithoutHtmlStructure();
     }
 
     private static void createEmail(int i) {
@@ -39,6 +40,23 @@ public class TestDataCreator {
             helper.setFrom("sender@example.com");
             helper.setSubject("Test-Html-Mail " + i);
             helper.setText("<html><head><style>body {color: green; font-size:30px;}</style></head><body>This is the test mail number " + i + "</body>", true);
+
+            sender.send(message);
+        } catch (MessagingException e){
+            throw new RuntimeException("Failed to create mail", e);
+        }
+    }
+
+    private static void createHtmlEmailWithoutHtmlStructure(){
+        try {
+            var sender = getEmailSender();
+
+            var message = sender.createMimeMessage();
+            var helper = new MimeMessageHelper(message);
+            helper.setTo("receiver@example.com");
+            helper.setFrom("sender@example.com");
+            helper.setSubject("Test-Html-Mail-Format-Only");
+            helper.setText("<p>This is the test mail <b>With formatting only</b></p><p>foo bar</p>", true);
 
             sender.send(message);
         } catch (MessagingException e){
