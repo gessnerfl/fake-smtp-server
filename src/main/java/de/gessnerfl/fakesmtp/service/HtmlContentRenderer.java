@@ -5,6 +5,10 @@ import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.model.EmailContent;
 import de.gessnerfl.fakesmtp.model.InlineImage;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,6 +18,16 @@ import java.util.regex.Pattern;
 @Service
 public class HtmlContentRenderer {
     private static final Pattern CID_PATTERN = Pattern.compile("<img[^>]+src=(?:\"cid:([^\">]+)\"|'cid:([^'>]+)')");
+    static final String BOOTSTRAP_VERSION = "bootstrap.version";
+
+    private final ApplicationContext applicationContext;
+    private final BuildProperties buildProperties;
+
+    @Autowired
+    public HtmlContentRenderer(ApplicationContext applicationContext) {
+        this.applicationContext =  applicationContext;
+        this.buildProperties = applicationContext.getBean(BuildProperties.class);
+    }
 
     public String render(EmailContent content) {
         if (content.getContentType() == ContentType.HTML) {
@@ -25,7 +39,7 @@ public class HtmlContentRenderer {
     private String harmonizeHtmlContent(EmailContent content) {
         return Optional.ofNullable(content.getData())
                 .map(c -> replaceCidImageSourcesWithInlineImages(c, content.getEmail()))
-                .map(this::parseHtmlHarmonizeAndAppendBootstrapCss)
+                .map(this::harmonizeHtmlDocument)
                 .orElse("");
     }
 
@@ -37,15 +51,21 @@ public class HtmlContentRenderer {
         return html;
     }
 
-    private String parseHtmlHarmonizeAndAppendBootstrapCss(String html) {
+    private String harmonizeHtmlDocument(String html) {
         var doc = Jsoup.parse(html);
         doc = doc.normalise();
-
-        var bootstrapCss = doc.createElement("link")
-                .attr("rel", "stylesheet")
-                .attr("href", "/webjars/bootstrap/5.2.0/css/bootstrap.min.css");
-        doc.head().insertChildren(0, bootstrapCss);
+        appendBootstrapCss(doc);
         return doc.html();
+    }
+
+    private void appendBootstrapCss(Document doc) {
+        var bootstrapVersion = buildProperties.get(BOOTSTRAP_VERSION);
+        if (bootstrapVersion != null) {
+            var bootstrapCss = doc.createElement("link")
+                    .attr("rel", "stylesheet")
+                    .attr("href", "/webjars/bootstrap/" + bootstrapVersion + "/css/bootstrap.min.css");
+            doc.head().insertChildren(0, bootstrapCss);
+        }
     }
 
     private String replaceContentIdWithBase64DataWhenAvailable(MatchResult mr, Email email) {
