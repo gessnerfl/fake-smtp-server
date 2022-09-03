@@ -20,12 +20,10 @@ public class HtmlContentRenderer {
     private static final Pattern CID_PATTERN = Pattern.compile("<img[^>]+src=(?:\"cid:([^\">]+)\"|'cid:([^'>]+)')");
     static final String BOOTSTRAP_VERSION = "bootstrap.version";
 
-    private final ApplicationContext applicationContext;
     private final BuildProperties buildProperties;
 
     @Autowired
     public HtmlContentRenderer(ApplicationContext applicationContext) {
-        this.applicationContext =  applicationContext;
         this.buildProperties = applicationContext.getBean(BuildProperties.class);
     }
 
