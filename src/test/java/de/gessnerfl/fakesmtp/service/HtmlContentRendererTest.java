@@ -29,7 +29,7 @@ class HtmlContentRendererTest {
     }
 
     @Test
-    void shouldReturnContentAsIsWhenContentTypeIsNotHtml(){
+    void shouldReturnContentAsIsWhenContentTypeIsNotHtmlAndNotPlain(){
         var data = "content";
         var content = mock(EmailContent.class);
         when(content.getData()).thenReturn(data);
@@ -96,6 +96,18 @@ class HtmlContentRendererTest {
         var result = sut.render(content);
 
         assertEquals("<html>\n <head></head>\n <body>\n  <img alt=\"test image\" src=\"cid:test\">\n </body>\n</html>", result);
+    }
+
+    @Test
+    void shouldReturnConvertLinebreaksToParagraphsForPlainContentType(){
+        var data = "content1\ncontent2";
+        var content = mock(EmailContent.class);
+        when(content.getData()).thenReturn(data);
+        when(content.getContentType()).thenReturn(ContentType.PLAIN);
+
+        var result = sut.render(content);
+
+        assertEquals("<p>content1</p><p>content2</p>", result);
     }
 
 }

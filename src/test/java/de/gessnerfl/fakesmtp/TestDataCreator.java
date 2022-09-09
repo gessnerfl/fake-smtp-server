@@ -18,6 +18,7 @@ public class TestDataCreator {
             createHtmlEmail(i);
             createMimeAlternativeEmail(i);
         }
+        createLongPlainEmail();
         createHtmlEmailWithoutHtmlStructure();
     }
 
@@ -27,6 +28,19 @@ public class TestDataCreator {
         message.setFrom("sender@example.com");
         message.setSubject("Test-Plain-Mail " + i);
         message.setText("This is the test mail number "+i);
+        getEmailSender().send(message);
+    }
+
+    private static void createLongPlainEmail() {
+        var message = new SimpleMailMessage();
+        message.setTo("receiver@example.com");
+        message.setFrom("sender@example.com");
+        message.setSubject("Long-Plain-Mail ");
+        message.setText("Das grundsätzliche Problem liegt laut Dolan-Gavitt darin, dass die sogenannten subnormalen Zahlen – die auch als nichtnormalisierte Fließkommazahlen bezeichnet werden – durch die Fehler als Null-Wert behandelt werden. Diese Zahlen besitzen eine 0 vor dem Binärpunkt, während bei den “normalen“ Fließkommazahlen an dieser Stelle immer eine 1 zu finden ist. Die subnormalen Zahlen bieten die Garantie, dass bei Addition und Subtraktion von Gleitkommazahlen niemals ein Unterlauf (underflow) zweier nahe beieinander liegende Gleitkommazahlen auftreten kann. Sie haben immer eine darstellbare Differenz ungleich Null.\n" +
+                "\n" +
+                "Durch eine Suche fand der Wissenschaftler einen entsprechenden GitHub-Eintrag, der auf eine gemeinsam genutzte Bibliothek hinwies, die mit der gcc/clang-Option -ffast-math kompiliert und als Verursacher des Problems geladen wurde. Dabei stellte sich heraus, dass der Compiler bei Aktivierung dieser Option sogar bei gemeinsam genutzten Bibliotheken einen Konstruktor einbindet, der die FTZ/DAZ-Flags setzt, sobald die Bibliothek geladen wird.\n" +
+                "\n" +
+                "Das bedeutet, dass jede Anwendung, die diese Bibliothek lädt, ihr Fließkommaverhalten für den gesamten Prozess ändert. Zudem aktiviert die Option -Ofast, die auf den ersten Blick nach einem \"Mach mein Programm schnell\"-Flag klingt, automatisch -ffast-math, sodass einige Projekte es unwissentlich aktivieren, ohne dass ein Entwickler oder eine Entwicklerin sich der Auswirkungen bewusst ist.");
         getEmailSender().send(message);
     }
 

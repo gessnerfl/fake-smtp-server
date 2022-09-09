@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class HtmlContentRenderer {
@@ -30,6 +32,9 @@ public class HtmlContentRenderer {
     public String render(EmailContent content) {
         if (content.getContentType() == ContentType.HTML) {
             return harmonizeHtmlContent(content);
+        }
+        if (content.getContentType() == ContentType.PLAIN) {
+            return convertLineBreaksToParagraphs(content);
         }
         return content.getData();
     }
@@ -74,5 +79,9 @@ public class HtmlContentRenderer {
 
     private static String mapInlineImage(MatchResult mr, InlineImage i) {
         return mr.group().replace("cid:" + mr.group(1), "data:" + i.getContentType() + ";base64, " + i.getData());
+    }
+
+    private String convertLineBreaksToParagraphs(EmailContent content) {
+        return Stream.of(content.getData().split("\n")).map(v -> "<p>" + v + "</p>").collect(Collectors.joining());
     }
 }
