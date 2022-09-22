@@ -101,7 +101,6 @@ public class Email {
         contents.add(content);
     }
 
-    @JsonIgnore
     public List<EmailContent> getContents() {
         return contents.stream().sorted(comparing(EmailContent::getContentType)).collect(toList());
     }
@@ -135,6 +134,7 @@ public class Email {
         this.inlineImages.add(inlineImage);
     }
 
+    @JsonIgnore
     public Optional<InlineImage> getInlineImageByContentId(String cid){
         return inlineImages.stream().filter(i -> i.getContentId().equals(cid)).findFirst();
     }

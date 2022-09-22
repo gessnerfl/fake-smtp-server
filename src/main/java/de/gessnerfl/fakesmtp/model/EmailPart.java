@@ -1,5 +1,7 @@
 package de.gessnerfl.fakesmtp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @MappedSuperclass
@@ -17,6 +19,7 @@ public abstract class EmailPart {
     @Basic(optional = false)
     private String data;
 
+    @JsonIgnore
     public Long getId() {
         return id;
     }
@@ -25,6 +28,7 @@ public abstract class EmailPart {
         this.id = id;
     }
 
+    @JsonIgnore
     public Email getEmail() {
         return email;
     }
