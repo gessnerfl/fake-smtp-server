@@ -22,7 +22,7 @@ description = """Fake SMTP Server :: Simple SMTP Server which stores emails in m
 project.version = project.findProperty("projectVersion") ?: scmVersion.version
 project.archivesBaseName = "fake-smtp-server"
 
-ext.bootstrapVersion = "5.2.0"
+ext.bootstrapVersion = "5.2.2"
 ext.scmUrl = "git@github.com:gessnerfl/fake-smtp-server.git"
 ext.projectUrl = "https://github.com/gessnerfl/fake-smtp-server"
 
