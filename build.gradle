@@ -1,6 +1,6 @@
 plugins {
     id "pl.allegro.tech.build.axion-release" version "1.14.2"
-    id "org.springframework.boot" version "2.7.4"
+    id "org.springframework.boot" version "2.7.5"
     id "org.sonarqube" version "3.4.0.2513"
 }
 
