@@ -1,6 +1,6 @@
 plugins {
     id "pl.allegro.tech.build.axion-release" version "1.14.1"
-    id "org.springframework.boot" version "2.7.3"
+    id "org.springframework.boot" version "2.7.5"
     id "org.sonarqube" version "3.4.0.2513"
 }
 
@@ -22,7 +22,7 @@ description = """Fake SMTP Server :: Simple SMTP Server which stores emails in m
 project.version = project.findProperty("projectVersion") ?: scmVersion.version
 project.archivesBaseName = "fake-smtp-server"
 
-ext.bootstrapVersion = "5.2.0"
+ext.bootstrapVersion = "5.2.2"
 ext.scmUrl = "git@github.com:gessnerfl/fake-smtp-server.git"
 ext.projectUrl = "https://github.com/gessnerfl/fake-smtp-server"
 
@@ -44,14 +44,14 @@ dependencies {
     implementation("org.flywaydb:flyway-core:8.5.13")
     implementation("org.jsoup:jsoup:1.15.3")
     implementation("com.sun.xml.bind:jaxb-impl:4.0.1")
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.12")
 
     implementation("org.webjars:bootstrap:$bootstrapVersion")
     implementation("org.webjars:material-design-icons:4.0.0")
 
     runtimeOnly("com.h2database:h2:2.1.214")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.ow2.asm:asm:9.3")
+    testImplementation('org.ow2.asm:asm:9.4')
     testImplementation("org.apache.commons:commons-lang3:3.12.0")
     testImplementation("org.hamcrest:hamcrest-core:2.2")
 }
