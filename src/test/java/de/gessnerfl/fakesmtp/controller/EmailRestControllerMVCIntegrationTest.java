@@ -94,6 +94,21 @@ class EmailRestControllerMVCIntegrationTest {
     }
 
     @Test
+    void shouldReturnEmailsToGivenToAddress() throws Exception {
+        final String address1 = "receiver_1@example.com";
+        final String address2 = "receiver_2@example.com";
+        var email1 = createRandomEmailTo(address1);
+        var email2 = createRandomEmailTo(address2);
+        var email3 = createRandomEmailTo(address1);
+
+        MvcResult mvcResult = this.mockMvc.perform(get(String.format("/api/email?toAddress=%s", address2))).andReturn();
+
+        assertEquals(200, mvcResult.getResponse().getStatus());
+        Email[] emails = mapFromJson(mvcResult.getResponse().getContentAsString(), Email[].class);
+        assertEquals(List.of(email2), List.of(emails));
+    }
+
+    @Test
     void shouldReturnMailById() throws Exception {
         var email = createRandomEmail(1);
 
@@ -174,6 +189,9 @@ class EmailRestControllerMVCIntegrationTest {
     private Email createRandomEmail(int minusMinutes) {
         return emailRepository.save(new EmailBuilder().receivedMinutesAgo(minusMinutes).build());
     }
+
+    private Email createRandomEmailTo(String toAddress) {
+        return emailRepository.save(new EmailBuilder().to(toAddress).build());
     }
 
 }
