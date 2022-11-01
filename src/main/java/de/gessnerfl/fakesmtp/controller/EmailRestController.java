@@ -6,6 +6,7 @@ import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -41,13 +42,16 @@ public class EmailRestController {
     }
 
     @GetMapping("/email")
-    public List<Email> all(@RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
+    public List<Email> all(@RequestParam Optional<String> toAddress,
+                           @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
                            @RequestParam(value = "size", defaultValue = "" + DEFAULT_PAGE_SIZE) @Min(0) int size,
                            @RequestParam(value = "sort", defaultValue = "DESC") Sort.Direction sort) {
-        var result = emailRepository.findAll(PageRequest.of(page, size, Sort.by(sort, DEFAULT_SORT_PROPERTY)));
-        if (result.getNumber() != 0 && result.getNumber() >= result.getTotalPages()) {
-            return Collections.emptyList();
-        }
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sort, DEFAULT_SORT_PROPERTY));
+        Page<Email> result = Page.empty();
+        if (toAddress.isPresent())
+            result = emailRepository.findByToAddress(toAddress.get(), pageRequest);
+        else
+            result = emailRepository.findAll(pageRequest);
         return result.getContent();
     }
 

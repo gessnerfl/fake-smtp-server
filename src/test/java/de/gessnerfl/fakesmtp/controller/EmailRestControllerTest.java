@@ -7,6 +7,8 @@ import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -39,15 +41,29 @@ class EmailRestControllerTest {
     @InjectMocks
     private EmailRestController sut;
 
-    @Test
-    void shouldReturnListOfEmails() {
+    @ParameterizedTest
+    @NullSource
+    void shouldReturnListOfEmails(String toAddress) {
         final Page<Email> page = createFirstPageEmail();
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
-        var result = sut.all(0, 5, Sort.Direction.DESC);
+        var result = sut.all(Optional.ofNullable(toAddress), 0, 5, Sort.Direction.DESC);
 
         assertEquals(page.getContent(), result);
         verify(emailRepository).findAll(argThat(matchPageable(0, 5)));
+        verifyNoMoreInteractions(emailRepository);
+    }
+
+    @Test
+    void shouldReturnListOfEmailsFilteredByToAddress() {
+        final Page<Email> page = createFirstPageEmail();
+        var email = Optional.of("receiver@test.com");
+        when(emailRepository.findByToAddress(eq(email.get()), any(Pageable.class))).thenReturn(page);
+
+        var result = sut.all(email, 0, 5, Sort.Direction.DESC);
+
+        assertEquals(page.getContent(), result);
+        verify(emailRepository).findByToAddress(eq(email.get()), argThat(matchPageable(0, 5)));
         verifyNoMoreInteractions(emailRepository);
     }
 
@@ -65,7 +81,6 @@ class EmailRestControllerTest {
 
     private Page<Email> createFirstPageEmail() {
         var page = mock(Page.class);
-        when(page.getNumber()).thenReturn(0);
         return page;
     }
 
