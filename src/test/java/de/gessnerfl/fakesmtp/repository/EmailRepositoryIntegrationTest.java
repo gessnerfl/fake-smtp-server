@@ -1,9 +1,7 @@
 package de.gessnerfl.fakesmtp.repository;
 
-import de.gessnerfl.fakesmtp.model.ContentType;
+import de.gessnerfl.fakesmtp.EmailBuilder;
 import de.gessnerfl.fakesmtp.model.Email;
-import de.gessnerfl.fakesmtp.model.EmailContent;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,10 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
-
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
@@ -76,23 +70,8 @@ class EmailRepositoryIntegrationTest {
         assertThat(beforeDeletion, contains(mail3, mail2, mail1));
     }
 
-    private Email createRandomEmail(int minusMinutes) {
-        var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
-
-        var content = new EmailContent();
-        content.setContentType(ContentType.PLAIN);
-        content.setData("Test Content "+randomToken);
-
-        var mail = new Email();
-        mail.setSubject("Test Subject "+randomToken);
-        mail.setRawData("Test Content "+randomToken);
-        mail.setReceivedOn(receivedOn);
-        mail.setFromAddress("sender@example.com");
-        mail.setToAddress("receiver@example.com");
-        mail.addContent(content);
-        return sut.save(mail);
+    private Email createRandomEmail(int minusMinutes) {        
+        return sut.save(new EmailBuilder().receivedMinutesAgo(minusMinutes).build());
     }
 
 }

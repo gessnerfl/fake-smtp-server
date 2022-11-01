@@ -1,6 +1,8 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.gessnerfl.fakesmtp.EmailBuilder;
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -170,7 +172,8 @@ class EmailRestControllerMVCIntegrationTest {
     }
 
     private Email createRandomEmail(int minusMinutes) {
-        return emailRepository.save(EmailControllerUtil.prepareRandomEmail(minusMinutes));
+        return emailRepository.save(new EmailBuilder().receivedMinutesAgo(minusMinutes).build());
+    }
     }
 
 }
