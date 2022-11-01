@@ -21,15 +21,6 @@ jobs:
           distribution: 'corretto'
           java-version: 11
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-
       - name: Get version number
         id: get_version
         run: echo ::set-output name=APP_VERSION::${GITHUB_REF#refs/tags/}
@@ -88,29 +79,10 @@ jobs:
           asset_name: fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-javadoc.jar
           asset_content_type: application/java-archive
 
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Setup Login to DockerHub
+        run: |
+          sed -i 's/docker_hub_username/${{ secrets.DOCKERHUB_USERNAME }}/' ./gradle.properties
+          sed -i 's/docker_hub_token/${{ secrets.DOCKERHUB_TOKEN }}/' ./gradle.properties
 
       - name: Build and Push docker images
-        uses: docker/build-push-action@v2
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64/v8
-          push: true
-          tags: gessnerfl/fake-smtp-server:${{ steps.get_version.outputs.APP_VERSION }} , gessnerfl/fake-smtp-server:latest
-          build-args: APP_VERSION=${{ steps.get_version.outputs.APP_VERSION }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
+        run: ./gradlew jib

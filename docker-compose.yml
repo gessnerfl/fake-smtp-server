@@ -1,0 +1,11 @@
+version: '2.2'
+
+services:
+  fakesmtp:
+    image: gessnerfl/fake-smtp-server:1.10.4
+    container_name: fakesmtp
+    hostname: fakesmtp
+    ports:
+      - "5080:5080"
+      - "5081:5081"
+      - "5025:5025"
