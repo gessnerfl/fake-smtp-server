@@ -1,7 +1,8 @@
 plugins {
     id "pl.allegro.tech.build.axion-release" version "1.14.2"
     id "org.springframework.boot" version "2.7.5"
-    id "org.sonarqube" version "3.4.0.2513"
+    id "org.sonarqube" version "3.5.0.2730"
+    id 'com.google.cloud.tools.jib' version '3.3.1'
 }
 
 apply plugin: "java"
@@ -93,5 +94,34 @@ jacocoTestReport {
     dependsOn test
     reports {
         xml.enabled true
+    }
+}
+
+jib{
+    from {
+        image = 'amazoncorretto:11.0.17-al2'
+        container {
+            ports = ["5080", "5081", "5025"]
+            creationTime='USE_CURRENT_TIMESTAMP'
+            jvmFlags = ['-Djava.security.egd=file:/dev/./urandom','-Dfile.encoding=utf-8']
+        }
+        platforms {
+            platform {
+                architecture = 'amd64'
+                os = 'linux'
+            }
+            platform {
+                architecture = 'arm64'
+                os = 'linux'
+            }
+        }
+    }
+    to {
+        image = 'gessnerfl/fake-smtp-server'
+        tags = [scmVersion.version, 'latest']
+        auth {
+            username = DOCKERHUB_USERNAME
+            password = DOCKERHUB_TOKEN
+        }
     }
 }
