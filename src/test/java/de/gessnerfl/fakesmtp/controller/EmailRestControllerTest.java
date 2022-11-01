@@ -81,6 +81,7 @@ class EmailRestControllerTest {
 
     private Page<Email> createFirstPageEmail() {
         var page = mock(Page.class);
+        when(page.getNumber()).thenReturn(0);
         return page;
     }
 

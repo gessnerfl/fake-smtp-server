@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +54,10 @@ public class EmailRestController {
             result = emailRepository.findByToAddress(toAddress.get(), pageRequest);
         else
             result = emailRepository.findAll(pageRequest);
+
+        if (result.getNumber() != 0 && result.getNumber() >= result.getTotalPages()) {
+            return Collections.emptyList();
+        }
         return result.getContent();
     }
 
