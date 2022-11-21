@@ -52,7 +52,7 @@ class EmailRestControllerTest {
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(emailRepository).findAll(pageableCaptor.capture());
         assertEquals(pageableCaptor.getValue(), pageable);
-        assertEquals(page.getContent(), result);
+        assertEquals(page, result);
         verifyNoMoreInteractions(emailRepository);
     }
 

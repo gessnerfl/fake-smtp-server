@@ -7,6 +7,7 @@ import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -16,8 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
-import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -40,13 +39,9 @@ public class EmailRestController {
     }
 
     @GetMapping("/email")
-    public List<Email> all(@SortDefault.SortDefaults({@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC)}) Pageable pageable) 
+    public Page<Email> all(@SortDefault.SortDefaults({@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC)}) Pageable pageable) 
     {
-        var result = emailRepository.findAll(pageable);
-        if (result.getNumber() != 0 && result.getNumber() >= result.getTotalPages()) {
-            return Collections.emptyList();
-        }
-        return result.getContent();
+        return emailRepository.findAll(pageable);
     }
 
     @GetMapping("/email/{id}")
