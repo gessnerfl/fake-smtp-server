@@ -45,7 +45,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core:8.5.13")
     implementation("org.jsoup:jsoup:1.15.3")
     implementation("com.sun.xml.bind:jaxb-impl:4.0.1")
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.12")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.13")
 
     implementation("org.webjars:bootstrap:$bootstrapVersion")
     implementation("org.webjars:material-design-icons:4.0.0")
