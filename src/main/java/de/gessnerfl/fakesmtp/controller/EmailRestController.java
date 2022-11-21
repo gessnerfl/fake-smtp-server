@@ -4,17 +4,18 @@ import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
-import javax.validation.constraints.Min;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,8 +23,6 @@ import java.util.List;
 @RequestMapping("/api")
 @Validated
 public class EmailRestController {
-
-    private static final int DEFAULT_PAGE_SIZE = 10;
 
     private static final String DEFAULT_SORT_PROPERTY = "receivedOn";
 
@@ -41,10 +40,9 @@ public class EmailRestController {
     }
 
     @GetMapping("/email")
-    public List<Email> all(@RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
-                           @RequestParam(value = "size", defaultValue = "" + DEFAULT_PAGE_SIZE) @Min(0) int size,
-                           @RequestParam(value = "sort", defaultValue = "DESC") Sort.Direction sort) {
-        var result = emailRepository.findAll(PageRequest.of(page, size, Sort.by(sort, DEFAULT_SORT_PROPERTY)));
+    public List<Email> all(@SortDefault.SortDefaults({@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC)}) Pageable pageable) 
+    {
+        var result = emailRepository.findAll(pageable);
         if (result.getNumber() != 0 && result.getNumber() >= result.getTotalPages()) {
             return Collections.emptyList();
         }
