@@ -70,13 +70,7 @@ class EmailRestControllerTest {
 
     private Page<Email> createFirstPageEmail() {
         var page = mock(Page.class);
-        //when(page.getNumber()).thenReturn(0);
-        //when(page.getPageable()).thenReturn(PageRequest.of(0, pageSize));
         return page;
-    }
-
-    private ArgumentMatcher<Pageable> matchPageable(int page, int size) {
-        return (item) -> item.getPageNumber() == page && item.getPageSize() == size;
     }
 
     @Test
