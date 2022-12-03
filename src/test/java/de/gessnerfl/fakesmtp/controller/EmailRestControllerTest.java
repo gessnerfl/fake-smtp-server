@@ -7,11 +7,13 @@ import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -43,11 +45,14 @@ class EmailRestControllerTest {
     void shouldReturnListOfEmails() {
         final Page<Email> page = createFirstPageEmail();
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
+        
+        var pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "receivedOn");
+        var result = sut.all(pageable);
 
-        var result = sut.all(0, 5, Sort.Direction.DESC);
-
-        assertEquals(page.getContent(), result);
-        verify(emailRepository).findAll(argThat(matchPageable(0, 5)));
+        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(emailRepository).findAll(pageableCaptor.capture());
+        assertEquals(pageableCaptor.getValue(), pageable);
+        assertEquals(page, result);
         verifyNoMoreInteractions(emailRepository);
     }
 
@@ -65,12 +70,7 @@ class EmailRestControllerTest {
 
     private Page<Email> createFirstPageEmail() {
         var page = mock(Page.class);
-        when(page.getNumber()).thenReturn(0);
         return page;
-    }
-
-    private ArgumentMatcher<Pageable> matchPageable(int page, int size) {
-        return (item) -> item.getPageNumber() == page && item.getPageSize() == size;
     }
 
     @Test
