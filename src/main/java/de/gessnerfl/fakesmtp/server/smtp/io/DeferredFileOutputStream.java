@@ -11,6 +11,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 
 /**
  * This works like a ByteArrayOutputStream until a certain size is reached, then
@@ -63,7 +67,9 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 		// Open a temp file, write the byte array version, and swap the
 		// output stream to the file version.
 
-		this.outFile = File.createTempFile(TMPFILE_PREFIX, TMPFILE_SUFFIX);
+		var attr = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
+		var outFile = Files.createTempFile(TMPFILE_PREFIX, TMPFILE_SUFFIX, attr);
+		this.outFile = outFile.toFile();
 		this.outFileStream = new FileOutputStream(this.outFile);
 
 		((ByteArrayOutputStream) this.output).writeTo(this.outFileStream);
