@@ -23,6 +23,15 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  data:
+    web:
+      pageable:
+        size-parameter: size
+        page-parameter: page
+        default-page-size: 10
+        one-indexed-parameters: false
+        max-page-size: 1000
+
   h2:
     console:
       enabled: true
