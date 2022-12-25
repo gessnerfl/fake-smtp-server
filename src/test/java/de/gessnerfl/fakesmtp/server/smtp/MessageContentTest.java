@@ -153,7 +153,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	private void testEightBitMessage(final String body, final String charset) throws Exception {
+	public void testEightBitMessage(final String body, final String charset) throws Exception {
 		final MimeMessage message = new MimeMessage(this.session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
 		message.setFrom(new InternetAddress("someone@somewhereelse.com"));

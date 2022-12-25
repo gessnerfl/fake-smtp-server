@@ -46,20 +46,21 @@ public class StartTLSCommand extends BaseCommand {
 
 			sess.sendResponse("220 Ready to start TLS");
 
-			final SSLSocket s = sess.getServer().createSSLSocket(socket);
-			s.startHandshake();
-			log.debug("Cipher suite: " + s.getSession().getCipherSuite());
+			try(final SSLSocket s = sess.getServer().createSSLSocket(socket)) {
+				s.startHandshake();
+				log.debug("Cipher suite: " + s.getSession().getCipherSuite());
 
-			sess.setSocket(s);
-			sess.resetSmtpProtocol(); // clean state
-			sess.setTlsStarted(true);
+				sess.setSocket(s);
+				sess.resetSmtpProtocol(); // clean state
+				sess.setTlsStarted(true);
 
-			if (s.getNeedClientAuth()) {
-				try {
-					final Certificate[] peerCertificates = s.getSession().getPeerCertificates();
-					sess.setTlsPeerCertificates(peerCertificates);
-				} catch (final SSLPeerUnverifiedException e) {
-					// IGNORE, just leave the certificate chain null
+				if (s.getNeedClientAuth()) {
+					try {
+						final Certificate[] peerCertificates = s.getSession().getPeerCertificates();
+						sess.setTlsPeerCertificates(peerCertificates);
+					} catch (final SSLPeerUnverifiedException e) {
+						// IGNORE, just leave the certificate chain null
+					}
 				}
 			}
 		} catch (final SSLHandshakeException ex) {

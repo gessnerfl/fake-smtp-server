@@ -89,7 +89,7 @@ class ServerThread extends Thread {
 				// block if too many connections are open
 				connectionPermits.acquire();
 			} catch (final InterruptedException consumed) {
-				continue; // exit or retry
+				Thread.currentThread().interrupt();
 			}
 
 			Socket socket = null;
@@ -104,7 +104,7 @@ class ServerThread extends Thread {
 					try {
 						Thread.sleep(1000);
 					} catch (final InterruptedException consumed) {
-						// fall through
+						Thread.currentThread().interrupt();
 					}
 				}
 				continue;

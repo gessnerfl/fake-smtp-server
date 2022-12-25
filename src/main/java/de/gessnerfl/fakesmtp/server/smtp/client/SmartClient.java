@@ -133,15 +133,13 @@ public class SmartClient extends SMTPClient {
 	 */
 	private void parseEhloResponse(final Response resp) throws IOException {
 		final BufferedReader reader = new BufferedReader(new StringReader(resp.getMessage()));
-		// first line contains server name and welcome message, skip it
-		reader.readLine();
-		String line;
-		while (null != (line = reader.readLine())) {
+		//the first line is skipped as it contains server information only
+		reader.lines().skip(1).forEach(line -> {
 			final int iFirstSpace = line.indexOf(' ');
 			final String keyword = iFirstSpace == -1 ? line : line.substring(0, iFirstSpace);
 			final String parameters = iFirstSpace == -1 ? "" : line.substring(iFirstSpace + 1);
 			extensions.put(keyword.toUpperCase(Locale.ENGLISH), parameters);
-		}
+		});
 	}
 
 	/**
