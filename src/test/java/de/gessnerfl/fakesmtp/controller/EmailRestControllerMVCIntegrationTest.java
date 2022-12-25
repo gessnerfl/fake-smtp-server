@@ -1,7 +1,10 @@
 package de.gessnerfl.fakesmtp.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.model.RestResponsePage;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,8 +53,11 @@ class EmailRestControllerMVCIntegrationTest {
         MvcResult mvcResult = mockMvc.perform(get("/api/email")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
-        Email[] emails = mapFromJson(mvcResult.getResponse().getContentAsString(), Email[].class);
-        assertEquals(0, emails.length);
+        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        assertEquals(0, emailPage.getNumber());
+        assertEquals(0, emailPage.getNumberOfElements());
+        assertEquals(0, emailPage.getTotalElements());
+        assertEquals(0, emailPage.getContent().size());
     }
 
     @Test
@@ -63,8 +69,13 @@ class EmailRestControllerMVCIntegrationTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/email?page=0&size=2")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
-        Email[] emails = mapFromJson(mvcResult.getResponse().getContentAsString(), Email[].class);
-        assertEquals(List.of(email3, email2), List.of(emails));
+        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        assertEquals(0, emailPage.getNumber());
+        assertEquals(2, emailPage.getSize());
+        assertEquals(2, emailPage.getTotalPages());
+        assertEquals(2, emailPage.getNumberOfElements());
+        assertEquals(3, emailPage.getTotalElements());
+        assertEquals(List.of(email3, email2), emailPage.getContent());
     }
 
     @Test
@@ -76,8 +87,13 @@ class EmailRestControllerMVCIntegrationTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/email?page=1&size=2")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
-        Email[] emails = mapFromJson(mvcResult.getResponse().getContentAsString(), Email[].class);
-        assertEquals(List.of(email1), List.of(emails));
+        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        assertEquals(1, emailPage.getNumber());
+        assertEquals(2, emailPage.getSize());
+        assertEquals(2, emailPage.getTotalPages());
+        assertEquals(1, emailPage.getNumberOfElements());
+        assertEquals(3, emailPage.getTotalElements());
+        assertEquals(List.of(email1), emailPage.getContent());
     }
 
     @Test
@@ -87,8 +103,12 @@ class EmailRestControllerMVCIntegrationTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/email?page=2&size=1")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
-        Email[] emails = mapFromJson(mvcResult.getResponse().getContentAsString(), Email[].class);
-        assertEquals(0, emails.length);
+        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        assertEquals(2, emailPage.getNumber());
+        assertEquals(1, emailPage.getSize());
+        assertEquals(1, emailPage.getTotalPages());
+        assertEquals(1, emailPage.getTotalElements());
+        assertEquals(0, emailPage.getContent().size());
     }
 
     @Test
@@ -163,6 +183,12 @@ class EmailRestControllerMVCIntegrationTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(json, clazz);
+    }
+
+    private static <T> T mapFromJson(String json, TypeReference<T> typeReference) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(json, typeReference);
     }
 
     private List<Email> createRandomEmails(int numberOfEmails, int minusMinutes) {
