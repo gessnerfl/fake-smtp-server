@@ -4,7 +4,7 @@ import de.gessnerfl.fakesmtp.TestResourceUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 class RawDataTest {
 

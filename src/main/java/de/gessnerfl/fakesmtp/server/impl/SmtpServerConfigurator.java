@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.subethamail.smtp.auth.EasyAuthenticationHandlerFactory;
-import org.subethamail.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.auth.EasyAuthenticationHandlerFactory;
+import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
 
 @Service
 public class SmtpServerConfigurator {

@@ -5,8 +5,8 @@ import de.gessnerfl.fakesmtp.server.SmtpServerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.subethamail.smtp.helper.SimpleMessageListenerAdapter;
-import org.subethamail.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.helper.SimpleMessageListenerAdapter;
+import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
 
 @Profile("default")
 @Service

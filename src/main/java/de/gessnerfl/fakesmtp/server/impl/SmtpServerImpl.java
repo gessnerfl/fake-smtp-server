@@ -1,7 +1,7 @@
 package de.gessnerfl.fakesmtp.server.impl;
 
 import de.gessnerfl.fakesmtp.server.SmtpServer;
-import org.subethamail.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
 
 public class SmtpServerImpl implements SmtpServer {
 

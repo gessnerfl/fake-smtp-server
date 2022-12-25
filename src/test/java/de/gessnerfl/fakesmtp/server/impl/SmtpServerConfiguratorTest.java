@@ -8,9 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
-import org.subethamail.smtp.AuthenticationHandlerFactory;
-import org.subethamail.smtp.auth.EasyAuthenticationHandlerFactory;
-import org.subethamail.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandlerFactory;
+import de.gessnerfl.fakesmtp.server.smtp.auth.EasyAuthenticationHandlerFactory;
+import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
 
 import java.net.InetAddress;
 

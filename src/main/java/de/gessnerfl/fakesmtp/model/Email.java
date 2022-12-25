@@ -2,7 +2,7 @@ package de.gessnerfl.fakesmtp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.*;
 
 import static java.util.Comparator.comparing;

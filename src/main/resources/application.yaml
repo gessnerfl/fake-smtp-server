@@ -1,0 +1,41 @@
+server:
+  port: 5080
+
+management:
+  server:
+    port: 5081
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+spring:
+  profiles:
+    active: default
+
+  datasource:
+    url: jdbc:h2:mem:mail
+    username: admin
+    password: Test1234
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  h2:
+    console:
+      enabled: true
+
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+fakesmtp:
+  port: 5025
+

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.subethamail.smtp.auth.LoginFailedException;
+import de.gessnerfl.fakesmtp.server.smtp.auth.LoginFailedException;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

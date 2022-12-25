@@ -7,7 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.*;
+import jakarta.mail.*;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Objects;

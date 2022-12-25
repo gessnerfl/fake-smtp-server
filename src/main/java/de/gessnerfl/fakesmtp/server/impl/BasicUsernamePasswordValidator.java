@@ -3,8 +3,8 @@ package de.gessnerfl.fakesmtp.server.impl;
 import de.gessnerfl.fakesmtp.config.FakeSmtpConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.subethamail.smtp.auth.LoginFailedException;
-import org.subethamail.smtp.auth.UsernamePasswordValidator;
+import de.gessnerfl.fakesmtp.server.smtp.auth.LoginFailedException;
+import de.gessnerfl.fakesmtp.server.smtp.auth.UsernamePasswordValidator;
 
 @Service
 public class BasicUsernamePasswordValidator implements UsernamePasswordValidator {
