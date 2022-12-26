@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import de.gessnerfl.fakesmtp.server.smtp.util.Base64;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandler;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.RejectException;
+import org.springframework.util.Base64Utils;
 
 /**
  * Implements the SMTP AUTH LOGIN mechanism.<br>
@@ -67,33 +67,33 @@ public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerF
                 }
 
                 if (!stk.hasMoreTokens()) {
-                    return "334 " + Base64.encodeToString(USERNAME_ASCII_BYTES, false);
+                    return "334 " + Base64Utils.encodeToString(USERNAME_ASCII_BYTES);
                 }
                 // The client submitted an initial response, which should be
                 // the username.
                 // .Net's built in System.Net.Mail.SmtpClient sends its
                 // authentication this way (and this way only).
-                final byte[] decoded = Base64.decode(stk.nextToken());
+                final byte[] decoded = Base64Utils.decodeFromString(stk.nextToken());
                 if (decoded == null) {
                     throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
                 }
                 username = new String(decoded, StandardCharsets.UTF_8);
 
-                return "334 " + Base64.encodeToString(PASSWORD_ASCII_BYTES, false);
+                return "334 " + Base64Utils.encodeToString(PASSWORD_ASCII_BYTES);
             }
 
             if (this.username == null) {
-                final byte[] decoded = Base64.decode(clientInput);
+                final byte[] decoded = Base64Utils.decodeFromString(clientInput);
                 if (decoded == null) {
                     throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
                 }
 
                 this.username = new String(decoded, StandardCharsets.UTF_8);
 
-                return "334 " + Base64.encodeToString(PASSWORD_ASCII_BYTES, false);
+                return "334 " + Base64Utils.encodeToString(PASSWORD_ASCII_BYTES);
             }
 
-            final var decoded = Base64.decode(clientInput);
+            final var decoded = Base64Utils.decodeFromString(clientInput);
             if (decoded == null) {
                 throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
             }

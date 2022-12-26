@@ -3,9 +3,9 @@ package de.gessnerfl.fakesmtp.server.smtp.server;
 import de.gessnerfl.fakesmtp.server.smtp.auth.EasyAuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.auth.LoginFailedException;
 import de.gessnerfl.fakesmtp.server.smtp.auth.UsernamePasswordValidator;
-import de.gessnerfl.fakesmtp.server.smtp.util.Base64;
 import org.junit.jupiter.api.Test;
 import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
+import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
 
@@ -80,12 +80,12 @@ public class RequireAuthTest extends ServerTestCase {
         this.send("AUTH LOGIN");
         this.expect("334");
 
-        final String enc_username = Base64.encodeToString(REQUIRED_USERNAME.getBytes(StandardCharsets.US_ASCII), false);
+        final String enc_username = Base64Utils.encodeToString(REQUIRED_USERNAME.getBytes(StandardCharsets.US_ASCII));
 
         this.send(enc_username);
         this.expect("334");
 
-        final String enc_pwd = Base64.encodeToString(REQUIRED_PASSWORD.getBytes(StandardCharsets.US_ASCII), false);
+        final String enc_pwd = Base64Utils.encodeToString(REQUIRED_PASSWORD.getBytes(StandardCharsets.US_ASCII));
         this.send(enc_pwd);
         this.expect("235");
 

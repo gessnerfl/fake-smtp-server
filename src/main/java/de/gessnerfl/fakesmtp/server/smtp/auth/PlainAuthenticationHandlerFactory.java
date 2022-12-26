@@ -1,15 +1,13 @@
 package de.gessnerfl.fakesmtp.server.smtp.auth;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.stream.Stream;
 
-import de.gessnerfl.fakesmtp.server.smtp.util.Base64;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandler;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.RejectException;
+import org.springframework.util.Base64Utils;
 
 /**
  * Implements the SMTP AUTH PLAIN mechanism.<br>
@@ -65,7 +63,7 @@ public class PlainAuthenticationHandlerFactory implements AuthenticationHandlerF
                 secret = stk.nextToken();
             }
 
-            final byte[] decodedSecret = Base64.decode(secret);
+            final byte[] decodedSecret = Base64Utils.decodeFromString(secret);
             if (decodedSecret == null) {
                 throw new RejectException(501, /* 5.5.4 */
                         "Invalid command argument, not a valid Base64 string");

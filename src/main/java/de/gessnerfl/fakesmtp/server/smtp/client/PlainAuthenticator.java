@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.gessnerfl.fakesmtp.server.smtp.util.Base64;
+import org.springframework.util.Base64Utils;
 
 /**
  * PlainAuthenticator implements the SASL PLAIN mechanism which authenticates
@@ -78,6 +78,6 @@ public class PlainAuthenticator implements Authenticator {
         out.write(user.getBytes(StandardCharsets.UTF_8));
         out.write(0);
         out.write(password.getBytes(StandardCharsets.UTF_8));
-        return Base64.encodeToString(out.toByteArray(), false);
+        return Base64Utils.encodeToString(out.toByteArray());
     }
 }
