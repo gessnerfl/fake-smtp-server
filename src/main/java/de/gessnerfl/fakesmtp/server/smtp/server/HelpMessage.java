@@ -1,5 +1,6 @@
 package de.gessnerfl.fakesmtp.server.smtp.server;
 
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 public class HelpMessage {
@@ -7,19 +8,19 @@ public class HelpMessage {
 
 	private final String argumentDescription;
 
-	private final String helpMessage;
+	private final String helpMessageText;
 
 	private String outputString;
 
-	public HelpMessage(final String commandName, final String helpMessage, final String argumentDescription) {
+	public HelpMessage(final String commandName, final String helpMessageText, final String argumentDescription) {
 		this.commandName = commandName;
 		this.argumentDescription = argumentDescription == null ? "" : " " + argumentDescription;
-		this.helpMessage = helpMessage;
+		this.helpMessageText = helpMessageText;
 		this.buildOutputString();
 	}
 
-	public HelpMessage(final String commandName, final String helpMessage) {
-		this(commandName, helpMessage, null);
+	public HelpMessage(final String commandName, final String helpMessageText) {
+		this(commandName, helpMessageText, null);
 	}
 
 	public String getName() {
@@ -31,7 +32,7 @@ public class HelpMessage {
 	}
 
 	private void buildOutputString() {
-		final StringTokenizer stringTokenizer = new StringTokenizer(this.helpMessage, "\n");
+		final StringTokenizer stringTokenizer = new StringTokenizer(this.helpMessageText, "\n");
 		final StringBuilder stringBuilder
 				= new StringBuilder().append("214-").append(this.commandName).append(this.argumentDescription);
 		while (stringTokenizer.hasMoreTokens()) {
@@ -51,14 +52,9 @@ public class HelpMessage {
 			return false;
 		}
 		final HelpMessage that = (HelpMessage) o;
-		if ((this.argumentDescription != null
-				? !this.argumentDescription.equals(that.argumentDescription)
-				: that.argumentDescription != null)
-				|| (this.commandName != null ? !this.commandName.equals(that.commandName) : that.commandName != null)
-				|| (this.helpMessage != null ? !this.helpMessage.equals(that.helpMessage) : that.helpMessage != null)) {
-			return false;
-		}
-		return true;
+		return (Objects.equals(this.argumentDescription, that.argumentDescription))
+				&& (Objects.equals(this.commandName, that.commandName))
+				&& (Objects.equals(this.helpMessageText, that.helpMessageText));
 	}
 
 	@Override
@@ -66,7 +62,7 @@ public class HelpMessage {
 		int result;
 		result = this.commandName != null ? this.commandName.hashCode() : 0;
 		result = 29 * result + (this.argumentDescription != null ? this.argumentDescription.hashCode() : 0);
-		result = 29 * result + (this.helpMessage != null ? this.helpMessage.hashCode() : 0);
+		result = 29 * result + (this.helpMessageText != null ? this.helpMessageText.hashCode() : 0);
 		return result;
 	}
 }

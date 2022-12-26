@@ -36,10 +36,10 @@ import de.gessnerfl.fakesmtp.server.smtp.Version;
  * an AuthenticationHandlerFactory.
  */
 public class SMTPServer {
-	private final static Logger log = LoggerFactory.getLogger(SMTPServer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SMTPServer.class);
 
 	/** Hostname used if we can't find one */
-	private final static String UNKNOWN_HOSTNAME = "localhost";
+	private static final String UNKNOWN_HOSTNAME = "localhost";
 
 	private InetAddress bindAddress = null; // default to all interfaces
 
@@ -262,8 +262,8 @@ public class SMTPServer {
 	 * An SMTPServer which has been shut down, must not be reused.
 	 */
 	public synchronized void start() {
-		if (log.isInfoEnabled()) {
-			log.info("SMTP server {} starting", getDisplayableLocalSocketAddress());
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("SMTP server {} starting", getDisplayableLocalSocketAddress());
 		}
 
 		if (this.started) {
@@ -276,7 +276,7 @@ public class SMTPServer {
 		try {
 			serverSocket = this.createServerSocket();
 		} catch (final Exception e) {
-			throw new RuntimeException(e);
+			throw new FailedToCreateServerSocketException(e);
 		}
 
 		this.serverThread = new ServerThread(this, serverSocket);
@@ -289,7 +289,7 @@ public class SMTPServer {
 	 * Shut things down gracefully.
 	 */
 	public synchronized void stop() {
-		log.info("SMTP server {} stopping...", getDisplayableLocalSocketAddress());
+		LOGGER.info("SMTP server {} stopping...", getDisplayableLocalSocketAddress());
 		if (this.serverThread == null) {
 			return;
 		}
@@ -297,7 +297,7 @@ public class SMTPServer {
 		this.serverThread.shutdown();
 		this.serverThread = null;
 
-		log.info("SMTP server {} stopped", getDisplayableLocalSocketAddress());
+		LOGGER.info("SMTP server {} stopped", getDisplayableLocalSocketAddress());
 	}
 
 	/**
@@ -399,7 +399,7 @@ public class SMTPServer {
 	 */
 	public void setMaxConnections(final int maxConnections) {
 		if (this.isRunning()) {
-			throw new RuntimeException(
+			throw new ServerAlreadyRunningException(
 					"Server is already running. It isn't possible to set the maxConnections. Please stop the server first.");
 		}
 
@@ -455,22 +455,6 @@ public class SMTPServer {
 
 	public boolean getEnableTLS() {
 		return enableTLS;
-	}
-
-	/**
-	 * @deprecated use {@link #enableTLS}
-	 */
-	@Deprecated
-	public boolean getDisableTLS() {
-		return !this.enableTLS;
-	}
-
-	/**
-	 * @deprecated use {@link #setEnableTLS(boolean)}
-	 */
-	@Deprecated
-	public void setDisableTLS(final boolean value) {
-		this.enableTLS = !value;
 	}
 
 	public boolean getHideTLS() {
