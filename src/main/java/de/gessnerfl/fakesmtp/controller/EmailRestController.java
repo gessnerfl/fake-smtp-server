@@ -39,7 +39,7 @@ public class EmailRestController {
     }
 
     @GetMapping("/email")
-    public Page<Email> all(@SortDefault.SortDefaults({@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC)}) Pageable pageable)
+    public Page<Email> all(@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC) Pageable pageable)
     {
         return emailRepository.findAll(pageable);
     }

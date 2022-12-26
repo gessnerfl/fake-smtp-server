@@ -1,8 +1,10 @@
 package de.gessnerfl.fakesmtp.server.smtp.auth;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Stream;
 
 import de.gessnerfl.fakesmtp.server.smtp.util.Base64;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandler;
@@ -19,106 +21,101 @@ import de.gessnerfl.fakesmtp.server.smtp.RejectException;
  * @author Ian White &lt;ibwhite@gmail.com&gt;
  */
 public class PlainAuthenticationHandlerFactory implements AuthenticationHandlerFactory {
-	static List<String> MECHANISMS = new ArrayList<>(1);
-	static {
-		MECHANISMS.add("PLAIN");
-	}
+    private final static List<String> MECHANISMS = Collections.singletonList("PLAIN");
 
-	private final UsernamePasswordValidator helper;
+    private final UsernamePasswordValidator helper;
 
-	public PlainAuthenticationHandlerFactory(final UsernamePasswordValidator helper) {
-		this.helper = helper;
-	}
+    public PlainAuthenticationHandlerFactory(final UsernamePasswordValidator helper) {
+        this.helper = helper;
+    }
 
-	@Override
-	public List<String> getAuthenticationMechanisms() {
-		return MECHANISMS;
-	}
+    @Override
+    public List<String> getAuthenticationMechanisms() {
+        return MECHANISMS;
+    }
 
-	@Override
-	public AuthenticationHandler create() {
-		return new Handler();
-	}
+    @Override
+    public AuthenticationHandler create() {
+        return new Handler();
+    }
 
-	/**
-	 */
-	class Handler implements AuthenticationHandler {
-		private String username;
+    /**
+     *
+     */
+    class Handler implements AuthenticationHandler {
+        private String username;
 
-		private String password;
+        /* */
+        @Override
+        public String auth(final String clientInput) throws RejectException {
+            final StringTokenizer stk = new StringTokenizer(clientInput);
+            String secret = stk.nextToken();
+            if (secret.trim().equalsIgnoreCase("AUTH")) {
+                // Let's read the RFC2554 "initial-response" parameter
+                // The line could be in the form of "AUTH PLAIN <base64Secret>"
+                if (!stk.nextToken().trim().equalsIgnoreCase("PLAIN")) {
+                    throw new RejectException(504, "AUTH mechanism mismatch");
+                }
 
-		/* */
-		@Override
-		public String auth(final String clientInput) throws RejectException {
-			final StringTokenizer stk = new StringTokenizer(clientInput);
-			String secret = stk.nextToken();
-			if (secret.trim().equalsIgnoreCase("AUTH")) {
-				// Let's read the RFC2554 "initial-response" parameter
-				// The line could be in the form of "AUTH PLAIN <base64Secret>"
-				if (!stk.nextToken().trim().equalsIgnoreCase("PLAIN")) {
-					// Mechanism mismatch
-					throw new RejectException(504, "AUTH mechanism mismatch");
-				}
+                if (!stk.hasMoreTokens()) {
+                    // the client did not submit an initial response, we'll get it in the next pass
+                    return "334 Ok";
+                }
+                // the client submitted an initial response
+                secret = stk.nextToken();
+            }
 
-				if (!stk.hasMoreTokens()) {
-					// the client did not submit an initial response, we'll get it in the next pass
-					return "334 Ok";
-				}
-				// the client submitted an initial response
-				secret = stk.nextToken();
-			}
+            final byte[] decodedSecret = Base64.decode(secret);
+            if (decodedSecret == null) {
+                throw new RejectException(501, /* 5.5.4 */
+                        "Invalid command argument, not a valid Base64 string");
+            }
 
-			final byte[] decodedSecret = Base64.decode(secret);
-			if (decodedSecret == null) {
-				throw new RejectException(501, /* 5.5.4 */
-						"Invalid command argument, not a valid Base64 string");
-			}
+            /*
+             * RFC4616: The client presents the authorization identity (identity to act as),
+             * followed by a NUL (U+0000) character, followed by the authentication identity
+             * (identity whose password will be used), followed by a NUL (U+0000) character,
+             * followed by the clear-text password.
+             */
+            int firstNul;
+            for (firstNul = 0; firstNul < decodedSecret.length && decodedSecret[firstNul] != 0; firstNul++) {
+                //Nothing to do; loop required to find first NUL character in decoded secret
+            }
+            if (firstNul >= decodedSecret.length) {
+                throw new RejectException(501, "Invalid command argument, does not contain NUL");
+            }
 
-			/*
-			 * RFC4616: The client presents the authorization identity (identity to act as),
-			 * followed by a NUL (U+0000) character, followed by the authentication identity
-			 * (identity whose password will be used), followed by a NUL (U+0000) character,
-			 * followed by the clear-text password.
-			 */
+            int secondNul;
+            for (secondNul = firstNul + 1; secondNul < decodedSecret.length && decodedSecret[secondNul] != 0; secondNul++) {
+                //Nothing to do; loop required to find second NUL character in decoded secret
+            }
+            if (secondNul >= decodedSecret.length) {
+                throw new RejectException(501, "Invalid command argument, does not contain the second NUL");
+            }
 
-			int i, j;
-			for (i = 0; i < decodedSecret.length && decodedSecret[i] != 0; i++) {}
-			if (i >= decodedSecret.length) {
-				throw new RejectException(501, /* 5.5.4 */
-						"Invalid command argument, does not contain NUL");
-			}
+            @SuppressWarnings("unused") final var authorizationId = new String(decodedSecret, 0, firstNul);
+            final var authenticationId = new String(decodedSecret, firstNul + 1, secondNul - firstNul - 1);
+            final var password = new String(decodedSecret, secondNul + 1, decodedSecret.length - secondNul - 1);
 
-			for (j = i + 1; j < decodedSecret.length && decodedSecret[j] != 0; j++) {}
-			if (j >= decodedSecret.length) {
-				throw new RejectException(501, /* 5.5.4 */
-						"Invalid command argument, does not contain the second NUL");
-			}
+            // might be nice to do something with authorizationId, but for
+            // purposes of the UsernamePasswordValidator, we just want to use
+            // authenticationId
 
-			@SuppressWarnings("unused")
-			final String authorizationId = new String(decodedSecret, 0, i);
-			final String authenticationId = new String(decodedSecret, i + 1, j - i - 1);
-			final String passwd = new String(decodedSecret, j + 1, decodedSecret.length - j - 1);
+            this.username = authenticationId;
+            try {
+                PlainAuthenticationHandlerFactory.this.helper.login(this.username.toString(), password);
+            } catch (final LoginFailedException lfe) {
+                throw new RejectException(535, /* 5.7.8 */
+                        "Authentication credentials invalid");
+            }
 
-			// might be nice to do something with authorizationId, but for
-			// purposes of the UsernamePasswordValidator, we just want to use
-			// authenticationId
+            return null;
+        }
 
-			this.username = authenticationId;
-			this.password = passwd;
-			try {
-				PlainAuthenticationHandlerFactory.this.helper.login(this.username.toString(), this.password);
-			} catch (final LoginFailedException lfe) {
-				throw new RejectException(535, /* 5.7.8 */
-						"Authentication credentials invalid");
-			}
-
-			return null;
-		}
-
-		/* */
-		@Override
-		public Object getIdentity() {
-			return this.username;
-		}
-	}
+        /* */
+        @Override
+        public Object getIdentity() {
+            return this.username;
+        }
+    }
 }

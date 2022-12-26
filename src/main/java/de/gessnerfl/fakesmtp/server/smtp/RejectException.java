@@ -1,18 +1,7 @@
-/*
- * $Id$ $Source:
- * /cvsroot/Similarity4/src/java/com/similarity/mbean/BindStatisticsManagerMBean
- * .java,v $
- */
 package de.gessnerfl.fakesmtp.server.smtp;
 
-/**
- * Thrown to reject an SMTP command with a specific code.
- *
- * @author Jeff Schnitzer
- */
-@SuppressWarnings("serial")
 public class RejectException extends RuntimeException {
-	int code;
+	private final int code;
 
 	public RejectException() {
 		this("Transaction failed");

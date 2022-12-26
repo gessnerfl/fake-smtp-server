@@ -64,8 +64,6 @@ public interface MessageHandler {
 	 *
 	 * @throws RejectException         if at any point the data should be rejected.
 	 * @throws DropConnectionException if the connection should be dropped
-	 * @throws TooMuchDataException    if the listener can't handle that much data.
-	 *                                 An error will be reported to the client.
 	 * @throws IOException             if there is an IO error reading the input
 	 *                                 data.
 	 */

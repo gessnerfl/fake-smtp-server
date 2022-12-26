@@ -32,12 +32,9 @@ public class EmailFactory {
             var messageContent = mimeMessage.getContent();
 
             switch (contentType) {
-                case HTML:
-                case PLAIN:
+                case HTML, PLAIN:
                     return createPlainOrHtmlMail(rawData, subject, contentType, messageContent);
-                case MULTIPART_ALTERNATIVE:
-                case MULTIPART_MIXED:
-                case MULTIPART_RELATED:
+                case MULTIPART_ALTERNATIVE, MULTIPART_MIXED, MULTIPART_RELATED:
                     return createMultipartMail(rawData, subject, (Multipart) messageContent);
                 default:
                     throw new IllegalStateException("Unsupported e-mail content type " + contentType.name());
