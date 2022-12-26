@@ -19,7 +19,6 @@ import java.io.FilterReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 /**
@@ -35,6 +34,9 @@ import java.nio.charset.Charset;
  */
 public class CRLFTerminatedReader extends FilterReader {
 	private static final int MAX_LINE_LENGTH = 998;
+	private static final int EOF = -1;
+	private static final char CR = 13;
+	private static final char LF = 10;
 
 	public static class TerminationException extends IOException {
 		private final int where;
@@ -65,12 +67,6 @@ public class CRLFTerminatedReader extends FilterReader {
 		super(new InputStreamReader(in, charset));
 	}
 
-	private static final int EOF = -1;
-
-	private static final char CR = 13;
-
-	private static final char LF = 10;
-
 	/**
 	 * Read a line of text which is terminated by CRLF. The concluding CRLF
 	 * characters are not returned with the String, but if either CR or LF appears
@@ -84,16 +80,14 @@ public class CRLFTerminatedReader extends FilterReader {
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public String readLine() throws IOException {
-		final StringBuilder lineBuilder = new StringBuilder();
-
 		/*
 		 * This boolean tells which state we are in, depending upon whether or not we
 		 * got a CR in the preceding read().
 		 */
 		boolean crJustReceived = false;
-
 		/* If not -1 this int tells us where the first "wrong" line break is */
 		int tainted = -1;
+		final StringBuilder lineBuilder = new StringBuilder();
 
 		while (true) {
 			final int inChar = this.read();
@@ -144,4 +138,5 @@ public class CRLFTerminatedReader extends FilterReader {
 			}
 		}
 	}
+
 }

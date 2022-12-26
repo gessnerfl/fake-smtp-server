@@ -9,9 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.DropConnectionException;
 
-abstract public class BaseCommand implements Command {
-	@SuppressWarnings("unused")
-	private final static Logger log = LoggerFactory.getLogger(BaseCommand.class);
+public abstract class BaseCommand implements Command {
+	private static final Logger log = LoggerFactory.getLogger(BaseCommand.class);
 
 	/** Name of the command, ie HELO */
 	private final String name;
@@ -28,13 +27,6 @@ abstract public class BaseCommand implements Command {
 		this.name = name;
 		this.helpMsg = new HelpMessage(name, help, argumentDescription);
 	}
-
-	/**
-	 * This is the main method that you need to override in order to implement a
-	 * command.
-	 */
-	@Override
-	abstract public void execute(String commandString, Session context) throws IOException, DropConnectionException;
 
 	@Override
 	public HelpMessage getHelp() {

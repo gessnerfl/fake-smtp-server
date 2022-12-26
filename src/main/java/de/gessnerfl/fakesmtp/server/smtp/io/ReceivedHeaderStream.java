@@ -40,21 +40,21 @@ public class ReceivedHeaderStream extends FilterInputStream {
         final DateFormat fmt = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z (z)", Locale.US);
         final String timestamp = fmt.format(new Date());
 
-        final StringBuilder header = new StringBuilder();
-        header.append("Received: from " + heloHost + " (" + constructTcpInfo(host) + ")\r\n");
-        header.append("        by " + whoami + "\r\n");
-        header.append("        with SMTP");
+        final StringBuilder headerBuilder = new StringBuilder();
+        headerBuilder.append("Received: from " + heloHost + " (" + constructTcpInfo(host) + ")\r\n");
+        headerBuilder.append("        by " + whoami + "\r\n");
+        headerBuilder.append("        with SMTP");
         if (softwareName != null) {
-            header.append(" (" + softwareName + ")");
+            headerBuilder.append(" (" + softwareName + ")");
         }
-        header.append(" id ").append(id);
+        headerBuilder.append(" id ").append(id);
         if (singleRecipient != null) {
-            header.append("\r\n        for " + singleRecipient);
+            headerBuilder.append("\r\n        for " + singleRecipient);
         }
-        header.append(";\r\n");
-        header.append("        " + timestamp + "\r\n");
+        headerBuilder.append(";\r\n");
+        headerBuilder.append("        " + timestamp + "\r\n");
 
-        this.header = new ByteArrayInputStream(header.toString().getBytes(StandardCharsets.US_ASCII));
+        this.header = new ByteArrayInputStream(headerBuilder.toString().getBytes(StandardCharsets.US_ASCII));
     }
 
     /**
@@ -79,12 +79,6 @@ public class ReceivedHeaderStream extends FilterInputStream {
     @Override
     public int available() throws IOException {
         return this.header.available() + super.available();
-    }
-
-    /* */
-    @Override
-    public void close() throws IOException {
-        super.close();
     }
 
     /* */

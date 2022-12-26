@@ -8,7 +8,7 @@ import java.io.OutputStream;
  * of bytes) is about to be written. This can be used to limit output data, swap
  * writers, etc.
  */
-abstract public class ThresholdingOutputStream extends OutputStream {
+public abstract class ThresholdingOutputStream extends OutputStream {
 	protected OutputStream output;
 
 	/** When to trigger */
@@ -21,7 +21,7 @@ abstract public class ThresholdingOutputStream extends OutputStream {
 
 	/**
 	 */
-	public ThresholdingOutputStream(final OutputStream base, final int thresholdBytes) {
+	protected ThresholdingOutputStream(final OutputStream base, final int thresholdBytes) {
 		this.output = base;
 		this.threshold = thresholdBytes;
 	}
@@ -114,5 +114,5 @@ abstract public class ThresholdingOutputStream extends OutputStream {
 	 * @param current   is the current number of bytes that have been written
 	 * @param predicted is the total number after the write completes
 	 */
-	abstract protected void thresholdReached(int current, int predicted) throws IOException;
+	protected abstract void thresholdReached(int current, int predicted) throws IOException;
 }
