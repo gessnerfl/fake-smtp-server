@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * @author Jeff Schnitzer
  */
 public class SmartClient extends SMTPClient {
-	private static Logger log = LoggerFactory.getLogger(SmartClient.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SmartClient.class);
 
 	boolean sentFrom;
 
@@ -199,7 +198,7 @@ public class SmartClient extends SMTPClient {
 				this.sendAndCheck("QUIT");
 			}
 		} catch (final IOException ex) {
-			log.warn("Failed to issue QUIT to {}", this.hostPort);
+			LOGGER.warn("Failed to issue QUIT to {}", this.hostPort);
 		}
 
 		this.close();
