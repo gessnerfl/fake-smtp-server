@@ -27,7 +27,7 @@ import de.gessnerfl.fakesmtp.server.smtp.io.CRLFTerminatedReader;
  * responsibilities off to the CommandHandler.
  */
 public class Session implements Runnable, MessageContext {
-	private final static Logger log = LoggerFactory.getLogger(Session.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
 
 	/** A link to our parent server */
 	private final SMTPServer server;
@@ -137,11 +137,11 @@ public class Session implements Runnable, MessageContext {
 			originalName = null;
 		}
 
-		if (log.isDebugEnabled()) {
+		if (LOGGER.isDebugEnabled()) {
 			final InetAddress remoteInetAddress = this.getRemoteAddress().getAddress();
 			remoteInetAddress.getHostName(); // Causes future toString() to print the name too
 
-			log.debug("SMTP connection from {}, new connection count: {}",
+			LOGGER.debug("SMTP connection from {}, new connection count: {}",
 					remoteInetAddress,
 					this.serverThread.getNumberOfConnections());
 		}
@@ -156,12 +156,12 @@ public class Session implements Runnable, MessageContext {
 					this.sendResponse("421 4.4.0 Problem attempting to execute commands. Please try again later.");
 				} catch (final IOException e) {}
 
-				if (log.isWarnEnabled()) {
-					log.warn("Exception during SMTP transaction", e1);
+				if (LOGGER.isWarnEnabled()) {
+					LOGGER.warn("Exception during SMTP transaction", e1);
 				}
 			}
 		} catch (final Throwable e) {
-			log.error("Unexpected error in the SMTP handler thread", e);
+			LOGGER.error("Unexpected error in the SMTP handler thread", e);
 			try {
 				this.sendResponse("421 4.3.0 Mail system failure, closing transmission channel");
 			} catch (final IOException e1) {
@@ -195,7 +195,7 @@ public class Session implements Runnable, MessageContext {
 	 */
 	private void runCommandLoop() throws IOException {
 		if (this.serverThread.hasTooManyConnections()) {
-			log.debug("SMTP Too many connections!");
+			LOGGER.debug("SMTP Too many connections!");
 
 			this.sendResponse("421 Too many connections, try again later");
 			return;
@@ -212,20 +212,20 @@ public class Session implements Runnable, MessageContext {
 					// Lots of clients just "hang up" rather than issuing QUIT,
 					// which would
 					// fill our logs with the warning in the outer catch.
-					if (log.isDebugEnabled()) {
-						log.debug("Error reading client command: " + ex.getMessage(), ex);
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("Error reading client command: " + ex.getMessage(), ex);
 					}
 
 					return;
 				}
 
 				if (line == null) {
-					log.debug("no more lines from client");
+					LOGGER.debug("no more lines from client");
 					return;
 				}
 
-				if (log.isDebugEnabled()) {
-					log.debug("Client: " + line);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Client: " + line);
 				}
 
 				this.server.getCommandHandler().handleCommand(this, line);
@@ -240,7 +240,7 @@ public class Session implements Runnable, MessageContext {
 						+ te.position()
 						+ ". CR and LF must be CRLF paired.  See RFC 2821 #2.7.1.";
 
-				log.debug(msg);
+				LOGGER.debug(msg);
 				this.sendResponse(msg);
 
 				// if people are screwing with things, close connection
@@ -248,7 +248,7 @@ public class Session implements Runnable, MessageContext {
 			} catch (final CRLFTerminatedReader.MaxLineLengthException mlle) {
 				final String msg = "501 " + mlle.getMessage();
 
-				log.debug(msg);
+				LOGGER.debug(msg);
 				this.sendResponse(msg);
 
 				// if people are screwing with things, close connection
@@ -270,7 +270,7 @@ public class Session implements Runnable, MessageContext {
 				this.closeSocket();
 			}
 		} catch (final IOException e) {
-			log.info(e.toString());
+			LOGGER.info(e.toString());
 		}
 	}
 
@@ -320,8 +320,8 @@ public class Session implements Runnable, MessageContext {
 
 	/** Sends the response to the client */
 	public void sendResponse(final String response) throws IOException {
-		if (log.isDebugEnabled()) {
-			log.debug("Server: " + response);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Server: " + response);
 		}
 
 		this.writer.print(response + "\r\n");
@@ -478,7 +478,7 @@ public class Session implements Runnable, MessageContext {
 			try {
 				this.messageHandler.done();
 			} catch (final Throwable ex) {
-				log.error("done() threw exception", ex);
+				LOGGER.error("done() threw exception", ex);
 			}
 		}
 	}

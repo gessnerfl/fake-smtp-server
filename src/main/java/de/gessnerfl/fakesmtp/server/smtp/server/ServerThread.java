@@ -3,10 +3,7 @@ package de.gessnerfl.fakesmtp.server.smtp.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +18,7 @@ import org.slf4j.MDC;
  * On shutdown it terminates not only this thread, but the session threads too.
  */
 class ServerThread extends Thread {
-	private final Logger log = LoggerFactory.getLogger(ServerThread.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ServerThread.class);
 
 	private final SMTPServer server;
 
@@ -64,17 +61,11 @@ class ServerThread extends Thread {
 	@Override
 	public void run() {
 		MDC.put("smtpServerLocalSocketAddress", server.getDisplayableLocalSocketAddress());
-		log.info("SMTP server {} started", server.getDisplayableLocalSocketAddress());
+		LOGGER.info("SMTP server {} started", server.getDisplayableLocalSocketAddress());
 
 		try {
 			runAcceptLoop();
-			log.info("SMTP server {} stopped accepting connections", server.getDisplayableLocalSocketAddress());
-		} catch (final RuntimeException e) {
-			log.error("Unexpected exception in server socket thread, server is stopped", e);
-			throw e;
-		} catch (final Error e) {
-			log.error("Unexpected error in server socket thread, server is stopped", e);
-			throw e;
+			LOGGER.info("SMTP server {} stopped accepting connections", server.getDisplayableLocalSocketAddress());
 		} finally {
 			MDC.remove("smtpServerLocalSocketAddress");
 		}
@@ -85,66 +76,86 @@ class ServerThread extends Thread {
 	 */
 	private void runAcceptLoop() {
 		while (!this.shuttingDown) {
-			try {
-				// block if too many connections are open
-				connectionPermits.acquire();
-			} catch (final InterruptedException consumed) {
-				Thread.currentThread().interrupt();
-			}
+			onServerLoop();
+		}
+	}
 
-			Socket socket = null;
-			try {
-				socket = this.serverSocket.accept();
-			} catch (final IOException e) {
-				connectionPermits.release();
-				// it also happens during shutdown, when the socket is closed
-				if (!this.shuttingDown) {
-					log.error("Error accepting connection", e);
-					// prevent a possible loop causing 100% processor usage
-					try {
-						Thread.sleep(1000);
-					} catch (final InterruptedException consumed) {
-						Thread.currentThread().interrupt();
-					}
-				}
-				continue;
-			}
+	private void onServerLoop() {
+		acquireConnectionPermit();
 
-			Session session = null;
-			try {
-				session = new Session(server, this, socket);
-				session.setUpdateThreadName(isUpdateThreadName());
-			} catch (final IOException e) {
-				connectionPermits.release();
-				log.error("Error while starting a connection", e);
+		acceptServerSocket(this.serverSocket)
+				.flatMap(this::establishSocketSession)
+				.map(this::addSessionsSynchronizedToActiveList)
+				.ifPresent(this::executeSocketSession);
+	}
+
+	private void acquireConnectionPermit() {
+		try {
+			// block if too many connections are open
+			connectionPermits.acquire();
+		} catch (final InterruptedException consumed) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private Optional<Socket> acceptServerSocket(ServerSocket serverSocket){
+		try {
+			return Optional.of(serverSocket.accept());
+		} catch (final IOException e) {
+			connectionPermits.release();
+			// it also happens during shutdown, when the socket is closed
+			if (!this.shuttingDown) {
+				LOGGER.error("Error accepting connection", e);
+				// prevent a possible loop causing 100% processor usage
 				try {
-					socket.close();
-				} catch (final IOException e1) {
-					log.debug("Cannot close socket after exception", e1);
+					Thread.sleep(1000);
+				} catch (final InterruptedException consumed) {
+					Thread.currentThread().interrupt();
 				}
-				continue;
 			}
+			return Optional.empty();
+		}
+	}
 
-			// add thread before starting it,
-			// because it will check the count of sessions
+	private Optional<SocketSession> establishSocketSession(Socket socket){
+		try {
+			var session = new Session(server, this, socket);
+			session.setUpdateThreadName(isUpdateThreadName());
+			return Optional.of(new SocketSession(socket, session));
+		} catch (final IOException e) {
+			connectionPermits.release();
+			LOGGER.error("Error while starting a connection", e);
+			try {
+				socket.close();
+			} catch (final IOException e1) {
+				LOGGER.debug("Cannot close socket after exception", e1);
+			}
+			return Optional.empty();
+		}
+	}
+
+	private SocketSession addSessionsSynchronizedToActiveList(SocketSession socketSession) {
+		// add thread before starting it,
+		// because it will check the count of sessions
+		synchronized (this) {
+			this.sessionThreads.add(socketSession.session);
+		}
+		return socketSession;
+	}
+
+	private void executeSocketSession(SocketSession socketSession){
+		try {
+			server.getExecutorService().execute(socketSession.session);
+		} catch (final RejectedExecutionException e) {
+			connectionPermits.release();
 			synchronized (this) {
-				this.sessionThreads.add(session);
+				this.sessionThreads.remove(socketSession.session);
 			}
-
+			LOGGER.error("Error while executing a session", e);
 			try {
-				server.getExecutorService().execute(session);
-			} catch (final RejectedExecutionException e) {
-				connectionPermits.release();
-				synchronized (this) {
-					this.sessionThreads.remove(session);
-				}
-				log.error("Error while executing a session", e);
-				try {
-					socket.close();
-				} catch (final IOException e1) {
-					log.debug("Cannot close socket after exception", e1);
-				}
-				continue;
+				socketSession.socket.close();
+			} catch (final IOException e1) {
+				LOGGER.debug("Cannot close socket after exception", e1);
 			}
 		}
 	}
@@ -176,9 +187,9 @@ class ServerThread extends Thread {
 	private void closeServerSocket() {
 		try {
 			this.serverSocket.close();
-			log.debug("SMTP Server socket shut down");
+			LOGGER.debug("SMTP Server socket shut down");
 		} catch (final IOException e) {
-			log.error("Failed to close server socket.", e);
+			LOGGER.error("Failed to close server socket.", e);
 		}
 	}
 
@@ -200,7 +211,7 @@ class ServerThread extends Thread {
 		try {
 			server.getExecutorService().awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (final InterruptedException e) {
-			log.warn("Interrupted waiting for termination of session threads", e);
+			LOGGER.warn("Interrupted waiting for termination of session threads", e);
 			Thread.currentThread().interrupt();
 		}
 	}
@@ -230,5 +241,15 @@ class ServerThread extends Thread {
 
 	public void setUpdateThreadName(final boolean updateThreadName) {
 		this.updateThreadName = updateThreadName;
+	}
+
+	private static final class SocketSession {
+		final Socket socket;
+		final Session session;
+
+		public SocketSession(Socket socket, Session session) {
+			this.socket = socket;
+			this.session = session;
+		}
 	}
 }
