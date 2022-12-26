@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.Certificate;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,8 +156,8 @@ public class Session implements Runnable, MessageContext {
             runCommandLoop();
         } catch (final IOException e1) {
             handleIOExceptionOnRun(e1);
-        } catch (final Throwable e) {
-            handleThrowableDuringRun(e);
+        } catch (final Exception e) {
+            handleExceptionDuringRun(e);
         } finally {
             onRunCompleted(originalName);
         }
@@ -189,20 +190,17 @@ public class Session implements Runnable, MessageContext {
         }
     }
 
-    private void handleThrowableDuringRun(Throwable e) {
+    private void handleExceptionDuringRun(Exception e) {
         LOGGER.error("Unexpected error in the SMTP handler thread", e);
         try {
             this.sendResponse("421 4.3.0 Mail system failure, closing transmission channel");
         } catch (final IOException e1) {
             // just swallow this, the outer exception is the real problem.
         }
-        if (e instanceof RuntimeException) {
-            throw (RuntimeException) e;
+        if (e instanceof RuntimeException re) {
+            throw re;
         }
-        if (e instanceof Error) {
-            throw (Error) e;
-        }
-        throw new RuntimeException("Unexpected exception", e);
+        throw new UnexpectedSMTPServerException("Unexpected exception", e);
     }
 
     private void onRunCompleted(String originalName) {
@@ -234,56 +232,49 @@ public class Session implements Runnable, MessageContext {
         this.sendResponse("220 " + this.server.getHostName() + " ESMTP " + this.server.getSoftwareName());
 
         while (!this.quitting) {
-            try {
-                String line;
-                try {
-                    line = this.reader.readLine();
-                } catch (final SocketException ex) {
-                    // Lots of clients just "hang up" rather than issuing QUIT,
-                    // which would
-                    // fill our logs with the warning in the outer catch.
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Error reading client command: " + ex.getMessage(), ex);
-                    }
+            onCommandLoop();
+        }
+    }
 
-                    return;
-                }
-
-                if (line == null) {
-                    LOGGER.debug("no more lines from client");
-                    return;
-                }
-
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Client: " + line);
-                }
-
-                this.server.getCommandHandler().handleCommand(this, line);
-            } catch (final DropConnectionException ex) {
-                this.sendResponse(ex.getErrorResponse());
-                return;
-            } catch (final SocketTimeoutException ex) {
-                this.sendResponse("421 Timeout waiting for data from client.");
-                return;
-            } catch (final CRLFTerminatedReader.TerminationException te) {
-                final String msg = "501 Syntax error at character position "
-                        + te.position()
-                        + ". CR and LF must be CRLF paired.  See RFC 2821 #2.7.1.";
-
-                LOGGER.debug(msg);
-                this.sendResponse(msg);
-
-                // if people are screwing with things, close connection
-                return;
-            } catch (final CRLFTerminatedReader.MaxLineLengthException mlle) {
-                final String msg = "501 " + mlle.getMessage();
-
-                LOGGER.debug(msg);
-                this.sendResponse(msg);
-
-                // if people are screwing with things, close connection
-                return;
+    private void onCommandLoop() throws IOException {
+        try {
+            Optional<String> line = readCommandLine();
+            if (line.isPresent()) {
+                LOGGER.debug("Client: {}", line);
+                this.server.getCommandHandler().handleCommand(this, line.get());
+            } else {
+                LOGGER.debug("no more lines from client");
             }
+        } catch (final DropConnectionException ex) {
+            this.sendResponse(ex.getErrorResponse());
+        } catch (final SocketTimeoutException ex) {
+            this.sendResponse("421 Timeout waiting for data from client.");
+        } catch (final CRLFTerminatedReader.TerminationException te) {
+            final String msg = "501 Syntax error at character position "
+                    + te.position()
+                    + ". CR and LF must be CRLF paired.  See RFC 2821 #2.7.1.";
+
+            LOGGER.debug(msg);
+            this.sendResponse(msg);
+        } catch (final CRLFTerminatedReader.MaxLineLengthException mlle) {
+            final String msg = "501 " + mlle.getMessage();
+
+            LOGGER.debug(msg);
+            this.sendResponse(msg);
+        }
+    }
+
+    private Optional<String> readCommandLine() throws IOException {
+        try {
+            return Optional.ofNullable(this.reader.readLine());
+        } catch (final SocketException ex) {
+            // Lots of clients just "hang up" rather than issuing QUIT,
+            // which would
+            // fill our logs with the warning in the outer catch.
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Error reading client command: " + ex.getMessage(), ex);
+            }
+            return Optional.empty();
         }
     }
 
