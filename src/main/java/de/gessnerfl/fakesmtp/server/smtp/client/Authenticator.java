@@ -11,5 +11,5 @@ import java.io.IOException;
  *      Extension for Authentication</a>
  */
 public interface Authenticator {
-	void authenticate() throws SMTPException, AuthenticationNotSupportedException, IOException;
+	void authenticate() throws IOException;
 }

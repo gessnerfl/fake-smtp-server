@@ -2,10 +2,10 @@ package de.gessnerfl.fakesmtp.server.smtp.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import de.gessnerfl.fakesmtp.server.smtp.client.SMTPException;
 import de.gessnerfl.fakesmtp.server.smtp.client.SmartClient;
-import de.gessnerfl.fakesmtp.server.smtp.util.TextUtils;
 import jakarta.mail.MessagingException;
 
 import org.junit.jupiter.api.AfterEach;
@@ -54,7 +54,7 @@ public class MessageHandlerTest {
 		client.from("john@example.com");
 		client.to("jane@example.com");
 		client.dataStart();
-		client.dataWrite(TextUtils.getAsciiBytes("body"), 4);
+		client.dataWrite("body".getBytes(StandardCharsets.US_ASCII), 4);
 		client.dataEnd();
 		client.quit();
 		smtpServer.stop(); // wait for the server to catch up
@@ -98,13 +98,13 @@ public class MessageHandlerTest {
 		client.from("john1@example.com");
 		client.to("jane1@example.com");
 		client.dataStart();
-		client.dataWrite(TextUtils.getAsciiBytes("body1"), 5);
+		client.dataWrite("body1".getBytes(StandardCharsets.US_ASCII), 5);
 		client.dataEnd();
 
 		client.from("john2@example.com");
 		client.to("jane2@example.com");
 		client.dataStart();
-		client.dataWrite(TextUtils.getAsciiBytes("body2"), 5);
+		client.dataWrite("body2".getBytes(StandardCharsets.US_ASCII), 5);
 		client.dataEnd();
 
 		client.quit();

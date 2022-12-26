@@ -103,7 +103,7 @@ public class PlainAuthenticationHandlerFactory implements AuthenticationHandlerF
 
             this.username = authenticationId;
             try {
-                PlainAuthenticationHandlerFactory.this.helper.login(this.username.toString(), password);
+                PlainAuthenticationHandlerFactory.this.helper.login(this.username, password);
             } catch (final LoginFailedException lfe) {
                 throw new RejectException(535, /* 5.7.8 */
                         "Authentication credentials invalid");

@@ -1,12 +1,11 @@
 package de.gessnerfl.fakesmtp.server.smtp.auth;
 
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import de.gessnerfl.fakesmtp.server.smtp.util.Base64;
-import de.gessnerfl.fakesmtp.server.smtp.util.TextUtils;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandler;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.RejectException;
@@ -32,7 +31,9 @@ import de.gessnerfl.fakesmtp.server.smtp.RejectException;
  */
 public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerFactory {
     private final static List<String> MECHANISMS = Collections.singletonList("LOGIN");
-    public static final String INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING = "Invalid command argument, not a valid Base64 string";
+    private static final String INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING = "Invalid command argument, not a valid Base64 string";
+    private static final byte[] USERNAME_ASCII_BYTES = "Username:".getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] PASSWORD_ASCII_BYTES = "Password:".getBytes(StandardCharsets.US_ASCII);
 
     private final UsernamePasswordValidator helper;
 
@@ -66,7 +67,7 @@ public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerF
                 }
 
                 if (!stk.hasMoreTokens()) {
-                    return "334 " + Base64.encodeToString(TextUtils.getAsciiBytes("Username:"), false);
+                    return "334 " + Base64.encodeToString(USERNAME_ASCII_BYTES, false);
                 }
                 // The client submitted an initial response, which should be
                 // the username.
@@ -76,9 +77,9 @@ public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerF
                 if (decoded == null) {
                     throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
                 }
-                username = TextUtils.getStringUtf8(decoded);
+                username = new String(decoded, StandardCharsets.UTF_8);
 
-                return "334 " + Base64.encodeToString(TextUtils.getAsciiBytes("Password:"), false);
+                return "334 " + Base64.encodeToString(PASSWORD_ASCII_BYTES, false);
             }
 
             if (this.username == null) {
@@ -87,9 +88,9 @@ public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerF
                     throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
                 }
 
-                this.username = TextUtils.getStringUtf8(decoded);
+                this.username = new String(decoded, StandardCharsets.UTF_8);
 
-                return "334 " + Base64.encodeToString(TextUtils.getAsciiBytes("Password:"), false);
+                return "334 " + Base64.encodeToString(PASSWORD_ASCII_BYTES, false);
             }
 
             final var decoded = Base64.decode(clientInput);
@@ -97,7 +98,7 @@ public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerF
                 throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
             }
 
-            final var password = TextUtils.getStringUtf8(decoded);
+            final var password = new String(decoded, StandardCharsets.UTF_8);
             try {
                 LoginAuthenticationHandlerFactory.this.helper.login(this.username, password);
             } catch (final LoginFailedException lfe) {
