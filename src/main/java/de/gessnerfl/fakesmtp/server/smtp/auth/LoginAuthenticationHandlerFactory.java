@@ -30,7 +30,7 @@ import org.springframework.util.Base64Utils;
  * "http://download.microsoft.com/download/5/d/d/5dd33fdf-91f5-496d-9884-0a0b0ee698bb/%5BMS-XLOGIN%5D.pdf">[MS-XLOGIN]</a>
  */
 public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerFactory {
-    private final static List<String> MECHANISMS = Collections.singletonList("LOGIN");
+    private static final List<String> MECHANISMS = Collections.singletonList("LOGIN");
     private static final String INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING = "Invalid command argument, not a valid Base64 string";
     private static final byte[] USERNAME_ASCII_BYTES = "Username:".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] PASSWORD_ASCII_BYTES = "Password:".getBytes(StandardCharsets.US_ASCII);

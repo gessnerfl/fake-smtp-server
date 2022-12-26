@@ -58,24 +58,18 @@ public class SmartClient extends SMTPClient {
 	/**
 	 * Connects to the specified server and issues the initial HELO command.
 	 *
-	 * @throws UnknownHostException if problem looking up hostname
-	 * @throws SMTPException        if problem reported by the server
 	 * @throws IOException          if problem communicating with host
 	 */
-	public SmartClient(final String host, final int port, final String myHost)
-			throws UnknownHostException, IOException, SMTPException {
+	public SmartClient(final String host, final int port, final String myHost) throws IOException {
 		this(host, port, null, myHost);
 	}
 
 	/**
 	 * Connects to the specified server and issues the initial HELO command.
 	 *
-	 * @throws UnknownHostException if problem looking up hostname
-	 * @throws SMTPException        if problem reported by the server
 	 * @throws IOException          if problem communicating with host
 	 */
-	public SmartClient(final String host, final int port, final SocketAddress bindpoint, final String myHost)
-			throws UnknownHostException, IOException, SMTPException {
+	public SmartClient(final String host, final int port, final SocketAddress bindpoint, final String myHost) throws IOException {
 		this.setBindpoint(bindpoint);
 		this.setHeloHost(myHost);
 		this.connect(host, port);
@@ -87,8 +81,7 @@ public class SmartClient extends SMTPClient {
 	 * it fails or if the server does not accept messages.
 	 */
 	@Override
-	public void connect(final String host, final int port)
-			throws SMTPException, AuthenticationNotSupportedException, IOException {
+	public void connect(final String host, final int port) throws IOException {
 		if (heloHost == null) {
 			throw new IllegalStateException("Helo host must be specified before connecting");
 		}
@@ -113,7 +106,7 @@ public class SmartClient extends SMTPClient {
 	 * Sends the EHLO command, or HELO if EHLO is not supported, and saves the list
 	 * of SMTP extensions which are supported by the server.
 	 */
-	protected void sendHeloOrEhlo() throws IOException, SMTPException {
+	protected void sendHeloOrEhlo() throws IOException {
 		extensions.clear();
 		final Response resp = this.sendReceive("EHLO " + heloHost);
 		if (resp.isSuccess()) {
@@ -131,7 +124,7 @@ public class SmartClient extends SMTPClient {
 	 * Extracts the list of SMTP extensions from the server's response to EHLO, and
 	 * stores them in {@link #extensions}.
 	 */
-	private void parseEhloResponse(final Response resp) throws IOException {
+	private void parseEhloResponse(final Response resp) {
 		final BufferedReader reader = new BufferedReader(new StringReader(resp.getMessage()));
 		//the first line is skipped as it contains server information only
 		reader.lines().skip(1).forEach(line -> {
@@ -155,12 +148,12 @@ public class SmartClient extends SMTPClient {
 		return response;
 	}
 
-	public void from(final String from) throws IOException, SMTPException {
+	public void from(final String from) throws IOException {
 		this.sendAndCheck("MAIL FROM: <" + from + ">");
 		this.sentFrom = true;
 	}
 
-	public void to(final String to) throws IOException, SMTPException {
+	public void to(final String to) throws IOException {
 		this.sendAndCheck("RCPT TO: <" + to + ">");
 		this.recipientCount++;
 	}
@@ -168,7 +161,7 @@ public class SmartClient extends SMTPClient {
 	/**
 	 * Prelude to writing data
 	 */
-	public void dataStart() throws IOException, SMTPException {
+	public void dataStart() throws IOException {
 		this.sendAndCheck("DATA");
 	}
 
@@ -182,7 +175,7 @@ public class SmartClient extends SMTPClient {
 	/**
 	 * Last step after writing data
 	 */
-	public void dataEnd() throws IOException, SMTPException {
+	public void dataEnd() throws IOException {
 		this.dataOutput.flush();
 		this.dotTerminatedOutput.writeTerminatingSequence();
 		this.dotTerminatedOutput.flush();
@@ -206,7 +199,7 @@ public class SmartClient extends SMTPClient {
 				this.sendAndCheck("QUIT");
 			}
 		} catch (final IOException ex) {
-			log.warn("Failed to issue QUIT to " + this.hostPort);
+			log.warn("Failed to issue QUIT to {}", this.hostPort);
 		}
 
 		this.close();

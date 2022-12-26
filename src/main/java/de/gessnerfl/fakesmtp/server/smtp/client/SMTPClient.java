@@ -33,7 +33,8 @@ public class SMTPClient {
      */
     private static final int REPLY_TIMEOUT = 600 * 1000;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SMTPClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTPClient.class);
+    public static final String MALFORMED_SMTP_REPLY = "Malformed SMTP reply: ";
 
     /**
      * the local socket address
@@ -122,10 +123,9 @@ public class SMTPClient {
     /**
      * Establishes a connection to host and port.
      *
-     * @throws UnknownHostException if the hostname cannot be resolved
      * @throws IOException          if there is a problem connecting to the port
      */
-    public SMTPClient(final String host, final int port) throws UnknownHostException, IOException {
+    public SMTPClient(final String host, final int port) throws IOException {
         this(host, port, null);
     }
 
@@ -138,8 +138,7 @@ public class SMTPClient {
      * @throws UnknownHostException if the hostname cannot be resolved
      * @throws IOException          if there is a problem connecting to the port
      */
-    public SMTPClient(final String host, final int port, final SocketAddress bindpoint)
-            throws UnknownHostException, IOException {
+    public SMTPClient(final String host, final int port, final SocketAddress bindpoint) throws IOException {
         this.bindpoint = bindpoint;
         connect(host, port);
     }
@@ -209,9 +208,9 @@ public class SMTPClient {
      *
      * @param msg should not have any newlines
      */
-    protected void send(final String msg) throws IOException {
+    protected void send(final String msg) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Client: " + msg);
+            LOGGER.debug("Client: {}", msg);
         }
         if (!connected) {
             throw new IllegalStateException("Not connected");
@@ -240,15 +239,15 @@ public class SMTPClient {
                 if (builder.length() == 0) {
                     throw new EOFException("Server disconnected unexpectedly, no reply received");
                 }
-                throw new IOException("Malformed SMTP reply: " + builder);
+                throw new IOException(MALFORMED_SMTP_REPLY + builder);
             }
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Server: " + line);
+                LOGGER.debug("Server: {}", line);
             }
 
             if (line.length() < 4) {
-                throw new IOException("Malformed SMTP reply: " + line);
+                throw new IOException(MALFORMED_SMTP_REPLY + line);
             }
             builder.append(line.substring(4));
 
@@ -264,7 +263,7 @@ public class SMTPClient {
         try {
             code = Integer.parseInt(codeString);
         } catch (final NumberFormatException e) {
-            throw new IOException("Malformed SMTP reply: " + line, e);
+            throw new IOException(MALFORMED_SMTP_REPLY + line, e);
         }
 
         return new Response(code, builder.toString());
@@ -312,10 +311,10 @@ public class SMTPClient {
                 this.socket.close();
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Closed connection to " + this.hostPort);
+                    LOGGER.debug("Closed connection to {}", this.hostPort);
                 }
             } catch (final IOException ex) {
-                LOGGER.error("Problem closing connection to " + this.hostPort, ex);
+                LOGGER.error("Problem closing connection to {}", this.hostPort, ex);
             }
         }
     }

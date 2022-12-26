@@ -8,7 +8,7 @@ import java.io.IOException;
  */
 @SuppressWarnings("serial")
 public class SMTPException extends IOException {
-	SMTPClient.Response response;
+	private final transient SMTPClient.Response response;
 
 	public SMTPException(final SMTPClient.Response resp) {
 		super(resp.toString());

@@ -37,7 +37,6 @@ public interface MessageHandler {
 	 *             function, according to the strict rules, which means that "many
 	 *             (but not all) of the RFC822 syntax rules are enforced".
 	 * @throws RejectException         if the sender should be denied.
-	 * @throws DropConnectionException if the connection should be dropped
 	 */
 	void from(String from) throws RejectException;
 
@@ -48,7 +47,6 @@ public interface MessageHandler {
 	 * @param recipient is a rfc822-compliant email address, validated by the
 	 *                  server.
 	 * @throws RejectException         if the recipient should be denied.
-	 * @throws DropConnectionException if the connection should be dropped
 	 */
 	void recipient(String recipient) throws RejectException;
 
@@ -63,11 +61,10 @@ public interface MessageHandler {
 	 *             The data stream will be valid only for the duration of the call.
 	 *
 	 * @throws RejectException         if at any point the data should be rejected.
-	 * @throws DropConnectionException if the connection should be dropped
 	 * @throws IOException             if there is an IO error reading the input
 	 *                                 data.
 	 */
-	void data(InputStream data) throws RejectException, TooMuchDataException, IOException;
+	void data(InputStream data) throws RejectException, IOException;
 
 	/**
 	 * Called after all other methods are completed. Note that this method will be

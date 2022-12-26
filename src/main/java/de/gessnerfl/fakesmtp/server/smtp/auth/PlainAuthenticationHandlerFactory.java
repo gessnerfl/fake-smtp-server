@@ -19,7 +19,7 @@ import org.springframework.util.Base64Utils;
  * @author Ian White &lt;ibwhite@gmail.com&gt;
  */
 public class PlainAuthenticationHandlerFactory implements AuthenticationHandlerFactory {
-    private final static List<String> MECHANISMS = Collections.singletonList("PLAIN");
+    private static final List<String> MECHANISMS = Collections.singletonList("PLAIN");
 
     private final UsernamePasswordValidator helper;
 
