@@ -176,14 +176,9 @@ public class Session implements Runnable, MessageContext {
 
     private void handleIOExceptionOnRun(IOException e1) {
         if (!this.quitting) {
-            try {
-                // Send a temporary failure back so that the server will try to resend
-                // the message later.
-                this.sendResponse("421 4.4.0 Problem attempting to execute commands. Please try again later.");
-            } catch (final IOException e) {
-                //ignore exception in this case; out exception is the real error
-            }
-
+            // Send a temporary failure back so that the server will try to resend
+            // the message later.
+            this.sendResponse("421 4.4.0 Problem attempting to execute commands. Please try again later.");
             if (LOGGER.isWarnEnabled()) {
                 LOGGER.warn("Exception during SMTP transaction", e1);
             }
@@ -192,11 +187,7 @@ public class Session implements Runnable, MessageContext {
 
     private void handleExceptionDuringRun(Exception e) {
         LOGGER.error("Unexpected error in the SMTP handler thread", e);
-        try {
-            this.sendResponse("421 4.3.0 Mail system failure, closing transmission channel");
-        } catch (final IOException e1) {
-            // just swallow this, the outer exception is the real problem.
-        }
+        this.sendResponse("421 4.3.0 Mail system failure, closing transmission channel");
         if (e instanceof RuntimeException re) {
             throw re;
         }
@@ -344,9 +335,9 @@ public class Session implements Runnable, MessageContext {
     /**
      * Sends the response to the client
      */
-    public void sendResponse(final String response) throws IOException {
+    public void sendResponse(final String response) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Server: " + response);
+            LOGGER.debug("Server: {}", response);
         }
 
         this.writer.print(response + "\r\n");

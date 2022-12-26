@@ -16,8 +16,9 @@ import jakarta.mail.util.ByteArrayDataSource;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,7 +36,7 @@ class MessageContentTest {
 	protected Session session;
 
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		final Properties props = new Properties();
 		props.setProperty("mail.smtp.host", "localhost");
 		props.setProperty("mail.smtp.port", Integer.toString(PORT));
@@ -48,7 +49,7 @@ class MessageContentTest {
 	}
 
 	@AfterEach
-	void tearDown() throws Exception {
+	void tearDown() {
 		this.wiser.stop();
 		this.wiser = null;
 
@@ -70,6 +71,27 @@ class MessageContentTest {
 		final String[] receivedHeaders = this.wiser.getMessages().get(0).getMimeMessage().getHeader("Received");
 
 		assertEquals(1, receivedHeaders.length);
+	}
+
+	@ParameterizedTest
+	@CsvSource(value = {
+			"\u00a4uro ma\u00f1ana;UTF-8",
+			"ma\u00f1ana;ISO-8859-1",
+			"\u3042\u3044\u3046\u3048\u304a;iso-2022-jp",
+			"\u0080uro;ISO-8859-15"
+	}, delimiter = ';')
+	void testEightBitMessage(String inputBody, String charset) throws Exception {
+		final String body = inputBody + "\r\n";
+		final MimeMessage message = new MimeMessage(this.session);
+		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+		message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+		message.setSubject("hello");
+		message.setText(body, charset);
+		message.setHeader("Content-Transfer-Encoding", "8bit");
+
+		Transport.send(message);
+
+		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
 	}
 
 	@Test
@@ -101,67 +123,6 @@ class MessageContentTest {
 
 		assertEquals("barf", this.wiser.getMessages().get(0).getMimeMessage().getSubject());
 		assertEquals("barf", this.wiser.getMessages().get(1).getMimeMessage().getSubject());
-	}
-
-	@Test
-	void testUtf8EightBitMessage() throws Exception {
-		// Beware editor/compiler character encoding issues; safest to put unicode
-		// escapes here
-
-		final String body = "\u00a4uro ma\u00f1ana\r\n";
-		this.testEightBitMessage(body, "UTF-8");
-
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
-	}
-
-	@Test
-	void testIso88591EightBitMessage() throws Exception {
-		// Beware editor/compiler character encoding issues; safest to put unicode
-		// escapes here
-
-		final String body = "ma\u00f1ana\r\n"; // spanish ene (ie, n with diacritical tilde)
-		this.testEightBitMessage(body, "ISO-8859-1");
-
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
-	}
-
-	@Test
-	void testIso885915EightBitMessage() throws Exception {
-		// Beware editor/compiler character encoding issues; safest to put unicode
-		// escapes here
-
-		final String body = "\u0080uro\r\n"; // should be the euro symbol
-		this.testEightBitMessage(body, "ISO-8859-15");
-
-		// String content =
-		// (String)this.wiser.getMessages().get(0).getMimeMessage().getContent();
-		// for (int i=0; i<content.length(); i++)
-		// {
-		// log.info("Char is: " + Integer.toString(content.codePointAt(i), 16));
-		// }
-
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
-	}
-
-	@Test
-	@Disabled("TO BE FIXED")
-	void testEightBitMessage(final String body, final String charset) throws Exception {
-		final MimeMessage message = new MimeMessage(this.session);
-		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
-		message.setFrom(new InternetAddress("someone@somewhereelse.com"));
-		message.setSubject("hello");
-		message.setText(body, charset);
-		message.setHeader("Content-Transfer-Encoding", "8bit");
-
-		Transport.send(message);
-	}
-
-	@Test
-	void testIso2022JPEightBitMessage() throws Exception {
-		final String body = "\u3042\u3044\u3046\u3048\u304a\r\n"; // some Japanese letters
-		this.testEightBitMessage(body, "iso-2022-jp");
-
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
 	}
 
 	@Test
