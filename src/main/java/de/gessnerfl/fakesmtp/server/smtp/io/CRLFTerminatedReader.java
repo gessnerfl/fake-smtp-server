@@ -34,15 +34,10 @@ import java.nio.charset.Charset;
  * <a href="http://rfc.net/rfc2822.html#s2.1.1.">RFC 2822</a>.
  */
 public class CRLFTerminatedReader extends FilterReader {
-	private static int MAX_LINE_LENGTH = 998;
+	private static final int MAX_LINE_LENGTH = 998;
 
-	@SuppressWarnings("serial")
 	public static class TerminationException extends IOException {
 		private final int where;
-
-		public TerminationException(final int where) {
-			this.where = where;
-		}
 
 		public TerminationException(final String s, final int where) {
 			super(s);
@@ -54,10 +49,7 @@ public class CRLFTerminatedReader extends FilterReader {
 		}
 	}
 
-	@SuppressWarnings("serial")
 	public static class MaxLineLengthException extends IOException {
-		public MaxLineLengthException() {}
-
 		public MaxLineLengthException(final String s) {
 			super(s);
 		}
@@ -71,16 +63,6 @@ public class CRLFTerminatedReader extends FilterReader {
 	 */
 	public CRLFTerminatedReader(final InputStream in, final Charset charset) {
 		super(new InputStreamReader(in, charset));
-	}
-
-	/**
-	 * Constructs this CRLFTerminatedReader.
-	 *
-	 * @param in  an InputStream
-	 * @param enc the {@link Charset} to use
-	 */
-	public CRLFTerminatedReader(final InputStream in, final String enc) throws UnsupportedEncodingException {
-		this(in, Charset.forName(enc));
 	}
 
 	private static final int EOF = -1;
@@ -108,7 +90,7 @@ public class CRLFTerminatedReader extends FilterReader {
 		 * This boolean tells which state we are in, depending upon whether or not we
 		 * got a CR in the preceding read().
 		 */
-		boolean cr_just_received = false;
+		boolean crJustReceived = false;
 
 		/* If not -1 this int tells us where the first "wrong" line break is */
 		int tainted = -1;
@@ -116,11 +98,11 @@ public class CRLFTerminatedReader extends FilterReader {
 		while (true) {
 			final int inChar = this.read();
 
-			if (!cr_just_received) {
+			if (!crJustReceived) {
 				// the most common case, somewhere before the end of a line
 				switch (inChar) {
 				case CR:
-					cr_just_received = true;
+					crJustReceived = true;
 					break;
 				case EOF:
 					return null; // premature EOF -- discards data(?)
@@ -154,7 +136,7 @@ public class CRLFTerminatedReader extends FilterReader {
 					}
 					lineBuilder.append(CR);
 					lineBuilder.append((char) inChar);
-					cr_just_received = false;
+					crJustReceived = false;
 				}
 			}
 			if (lineBuilder.length() >= MAX_LINE_LENGTH) {

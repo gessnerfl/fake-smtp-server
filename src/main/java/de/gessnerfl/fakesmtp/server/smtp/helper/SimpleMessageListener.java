@@ -3,8 +3,6 @@ package de.gessnerfl.fakesmtp.server.smtp.helper;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.gessnerfl.fakesmtp.server.smtp.TooMuchDataException;
-
 /**
  * This is an interface for processing the end-result messages that is
  * higher-level than the MessageHandler and related factory.
@@ -36,9 +34,7 @@ public interface SimpleMessageListener {
 	 *                  chars. The data stream is only valid for the duration of
 	 *                  this call.
 	 *
-	 * @throws TooMuchDataException if the listener can't handle that much data. An
-	 *                              error will be reported to the client.
 	 * @throws IOException          if there is an IO error reading the input data.
 	 */
-	void deliver(String from, String recipient, InputStream data) throws TooMuchDataException, IOException;
+	void deliver(String from, String recipient, InputStream data) throws IOException;
 }

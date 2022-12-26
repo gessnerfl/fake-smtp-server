@@ -33,11 +33,11 @@ public class CRLFOutputStream extends FilterOutputStream {
 	 */
 	protected int statusLast;
 
-	protected final static int LAST_WAS_OTHER = 0;
+	protected  static final int LAST_WAS_OTHER = 0;
 
-	protected final static int LAST_WAS_CR = 1;
+	protected static final int LAST_WAS_CR = 1;
 
-	protected final static int LAST_WAS_LF = 2;
+	protected static final int LAST_WAS_LF = 2;
 
 	protected boolean startOfLine = true;
 
@@ -93,7 +93,7 @@ public class CRLFOutputStream extends FilterOutputStream {
 	 *
 	 * @see java.io.FilterOutputStream#write(byte[], int, int)
 	 */
-	protected void writeChunk(final byte buffer[], final int offset, final int length) throws IOException {
+	protected void writeChunk(final byte[] buffer, final int offset, final int length) throws IOException {
 		this.out.write(buffer, offset, length);
 	}
 
@@ -101,7 +101,7 @@ public class CRLFOutputStream extends FilterOutputStream {
 	 * @see java.io.FilterOutputStream#write(byte[], int, int)
 	 */
 	@Override
-	public synchronized void write(final byte buffer[], final int offset, final int length) throws IOException {
+	public synchronized void write(final byte[] buffer, final int offset, final int length) throws IOException {
 		/* optimized */
 		int lineStart = offset;
 		for (int i = offset; i < length + offset; i++) {

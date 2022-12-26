@@ -32,7 +32,7 @@ public class MailCommand extends BaseCommand {
 			return;
 		}
 
-		final String args = this.getArgPredicate(commandString);
+		final var args = this.getArgPredicate(commandString);
 		if (!args.toUpperCase(Locale.ENGLISH).startsWith("FROM:")) {
 			sess.sendResponse("501 Syntax: MAIL FROM: <address>  Error in parameters: \""
 					+ this.getArgPredicate(commandString)
@@ -40,22 +40,21 @@ public class MailCommand extends BaseCommand {
 			return;
 		}
 
-		final String emailAddress = EmailUtils.extractEmailAddress(args, 5);
+		final var emailAddress = EmailUtils.extractEmailAddress(args, 5);
 		if (!EmailUtils.isValidEmailAddress(emailAddress)) {
 			sess.sendResponse("553 <" + emailAddress + "> Invalid email address.");
 			return;
 		}
 
 		// extract SIZE argument from MAIL FROM command.
-		// disregard unknown parameters. TODO: reject unknown
-		// parameters.
+		// disregard unknown parameters
 		int size = 0;
-		final String largs = args.toLowerCase(Locale.ENGLISH);
-		final int sizec = largs.indexOf(" size=");
+		final var largs = args.toLowerCase(Locale.ENGLISH);
+		final var sizec = largs.indexOf(" size=");
 		if (sizec > -1) {
 			// disregard non-numeric values.
-			final String ssize = largs.substring(sizec + 6).trim();
-			if (ssize.length() > 0 && ssize.matches("[0-9]+")) {
+			final var ssize = largs.substring(sizec + 6).trim();
+			if (ssize.length() > 0 && ssize.matches("\\d+")) {
 				size = Integer.parseInt(ssize);
 			}
 		}

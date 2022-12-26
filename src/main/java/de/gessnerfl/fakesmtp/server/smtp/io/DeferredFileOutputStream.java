@@ -9,15 +9,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Set;
 
 /**
  * This works like a ByteArrayOutputStream until a certain size is reached, then
  * creates a temp file and acts like a buffered FileOutputStream. The data can
  * be retreived afterwards by calling getInputStream().
- *
  * When this object is closed, the temporary file is deleted. You can no longer
  * call getInputStream().
  */
@@ -41,8 +38,6 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 	/** When the output stream is closed, this becomes true */
 	boolean closed;
 
-	boolean thresholdReached = false;
-
 	/**
 	 * @param transitionSize is the number of bytes at which to convert from a byte
 	 *                       array to a real file.
@@ -63,8 +58,8 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 		// output stream to the file version.
 
 		var attr = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
-		var outFile = Files.createTempFile(TMPFILE_PREFIX, TMPFILE_SUFFIX, attr);
-		this.outFile = outFile.toFile();
+		var outFilePath = Files.createTempFile(TMPFILE_PREFIX, TMPFILE_SUFFIX, attr);
+		this.outFile = outFilePath.toFile();
 		this.outFileStream = new FileOutputStream(this.outFile);
 
 		((ByteArrayOutputStream) this.output).writeTo(this.outFileStream);
@@ -78,8 +73,8 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 	 *         depending on what state we are in.
 	 */
 	public InputStream getInputStream() throws IOException {
-		if (this.output instanceof BetterByteArrayOutputStream) {
-			return ((BetterByteArrayOutputStream) this.output).getInputStream();
+		if (this.output instanceof BetterByteArrayOutputStream os) {
+			return os.getInputStream();
 		}
 		if (!this.closed) {
 			this.output.flush();
@@ -104,7 +99,7 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 		}
 
 		if (this.outFile != null) {
-			this.outFile.delete();
+			Files.delete(this.outFile.toPath());
 		}
 	}
 }

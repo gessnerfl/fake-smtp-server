@@ -27,7 +27,7 @@ public class SmarterMessageListenerAdapter implements MessageHandlerFactory {
 	 * 5 megs by default. The server will buffer incoming messages to disk when they
 	 * hit this limit in the DATA received.
 	 */
-	private static int DEFAULT_DATA_DEFERRED_SIZE = 1024 * 1024 * 5;
+	private static final int DEFAULT_DATA_DEFERRED_SIZE = 1024 * 1024 * 5;
 
 	private final Collection<SmarterMessageListener> listeners;
 

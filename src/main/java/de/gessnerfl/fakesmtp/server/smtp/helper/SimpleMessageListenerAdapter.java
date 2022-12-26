@@ -11,7 +11,6 @@ import de.gessnerfl.fakesmtp.server.smtp.MessageContext;
 import de.gessnerfl.fakesmtp.server.smtp.MessageHandler;
 import de.gessnerfl.fakesmtp.server.smtp.MessageHandlerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.RejectException;
-import de.gessnerfl.fakesmtp.server.smtp.TooMuchDataException;
 import de.gessnerfl.fakesmtp.server.smtp.io.DeferredFileOutputStream;
 
 /**
@@ -23,7 +22,7 @@ public class SimpleMessageListenerAdapter implements MessageHandlerFactory {
 	 * 5 megs by default. The server will buffer incoming messages to disk when they
 	 * hit this limit in the DATA received.
 	 */
-	private static int DEFAULT_DATA_DEFERRED_SIZE = 1024 * 1024 * 5;
+	private static final int DEFAULT_DATA_DEFERRED_SIZE = 1024 * 1024 * 5;
 
 	private final Collection<SimpleMessageListener> listeners;
 
@@ -147,6 +146,8 @@ public class SimpleMessageListenerAdapter implements MessageHandlerFactory {
 		}
 
 		@Override
-		public void done() {}
+		public void done() {
+			//no action required on done
+		}
 	}
 }
