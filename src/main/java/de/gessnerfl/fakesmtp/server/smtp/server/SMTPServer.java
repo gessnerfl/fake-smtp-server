@@ -34,10 +34,6 @@ import de.gessnerfl.fakesmtp.server.smtp.Version;
  *
  * By default, no authentication methods are offered. To use authentication, set
  * an AuthenticationHandlerFactory.
- *
- * @author Jon Stevens
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jeff Schnitzer
  */
 public class SMTPServer {
 	private final static Logger log = LoggerFactory.getLogger(SMTPServer.class);

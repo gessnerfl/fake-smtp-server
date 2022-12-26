@@ -9,11 +9,6 @@ import de.gessnerfl.fakesmtp.server.smtp.server.BaseCommand;
 import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 import de.gessnerfl.fakesmtp.server.smtp.util.EmailUtils;
 
-/**
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jon Stevens
- * @author Jeff Schnitzer
- */
 public class ReceiptCommand extends BaseCommand {
 	public ReceiptCommand() {
 		super("RCPT", "Specifies the recipient. Can be used any number of times.", "TO: <recipient> [ <parameters> ]");

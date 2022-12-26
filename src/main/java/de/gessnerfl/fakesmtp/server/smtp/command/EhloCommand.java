@@ -7,12 +7,6 @@ import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.server.BaseCommand;
 import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 
-/**
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jon Stevens
- * @author Jeff Schnitzer
- * @author Scott Hernandez
- */
 public class EhloCommand extends BaseCommand {
     public EhloCommand() {
         super("EHLO", "Introduce yourself.", "<hostname>");

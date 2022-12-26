@@ -1,8 +1,3 @@
-/*
- * $Id: SimpleMessageListener.java 308 2009-05-06 02:25:23Z lhoriman $ $URL:
- * https://subethasmtp.googlecode.com/svn/trunk/src/org/subethamail/smtp/helper/
- * SimpleMessageListener.java $
- */
 package de.gessnerfl.fakesmtp.server.smtp.helper;
 
 import java.io.IOException;
@@ -14,8 +9,6 @@ import de.gessnerfl.fakesmtp.server.smtp.TooMuchDataException;
  * This is an interface for processing the end-result messages that is
  * higher-level than the MessageHandler and related factory but lower-level than
  * SimpleMessageListener.
- *
- * @author Jeff Schnitzer
  */
 public interface SmarterMessageListener {
 	/**

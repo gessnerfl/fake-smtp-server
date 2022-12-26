@@ -1,9 +1,3 @@
-/*
- * $Id: SimpleMessageListenerAdapter.java 320 2009-05-20 09:19:20Z lhoriman $
- * $URL:
- * https://subethasmtp.googlecode.com/svn/trunk/src/org/subethamail/smtp/helper/
- * SimpleMessageListenerAdapter.java $
- */
 package de.gessnerfl.fakesmtp.server.smtp.helper;
 
 import java.io.IOException;
@@ -17,7 +11,6 @@ import de.gessnerfl.fakesmtp.server.smtp.MessageContext;
 import de.gessnerfl.fakesmtp.server.smtp.MessageHandler;
 import de.gessnerfl.fakesmtp.server.smtp.MessageHandlerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.RejectException;
-import de.gessnerfl.fakesmtp.server.smtp.TooMuchDataException;
 import de.gessnerfl.fakesmtp.server.smtp.helper.SmarterMessageListener.Receiver;
 import de.gessnerfl.fakesmtp.server.smtp.io.DeferredFileOutputStream;
 
@@ -28,8 +21,6 @@ import de.gessnerfl.fakesmtp.server.smtp.io.DeferredFileOutputStream;
  *
  * The key point is that for any message, every accepted recipient will get a
  * separate delivery.
- *
- * @author Jeff Schnitzer
  */
 public class SmarterMessageListenerAdapter implements MessageHandlerFactory {
 	/**

@@ -12,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * This class attempts to quickly start/stop 10 Wiser servers. It makes sure
  * that the socket bind address is correctly shut down.
- *
- * @author Jon Stevens
  */
 class StartStopTest {
 	public static final int PORT = 2566;
@@ -23,7 +21,7 @@ class StartStopTest {
 	protected int counter = 0;
 
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		final Properties props = new Properties();
 		props.setProperty("mail.smtp.host", "localhost");
 		props.setProperty("mail.smtp.port", Integer.toString(PORT));

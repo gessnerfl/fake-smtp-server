@@ -9,9 +9,6 @@ import org.slf4j.LoggerFactory;
 /**
  * A base class for testing the SMTP server at the raw protocol level. Handles
  * setting up and tearing down of the server.
- *
- * @author Jon Stevens
- * @author Jeff Schnitzer
  */
 public abstract class ServerTestCase {
 	@SuppressWarnings("unused")

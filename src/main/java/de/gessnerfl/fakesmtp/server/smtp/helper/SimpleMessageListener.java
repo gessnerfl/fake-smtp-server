@@ -1,6 +1,3 @@
-/*
- * $Id$ $URL$
- */
 package de.gessnerfl.fakesmtp.server.smtp.helper;
 
 import java.io.IOException;
@@ -15,8 +12,6 @@ import de.gessnerfl.fakesmtp.server.smtp.TooMuchDataException;
  * While the SMTP message is being received, all listeners are asked if they
  * want to accept each recipient. After the message has arrived, the message is
  * handed off to all accepting listeners.
- *
- * @author Jeff Schnitzer
  */
 public interface SimpleMessageListener {
 	/**

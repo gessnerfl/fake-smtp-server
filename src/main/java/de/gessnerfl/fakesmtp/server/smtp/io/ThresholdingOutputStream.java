@@ -1,6 +1,3 @@
-/*
- * $Id$ $URL$
- */
 package de.gessnerfl.fakesmtp.server.smtp.io;
 
 import java.io.IOException;
@@ -10,8 +7,6 @@ import java.io.OutputStream;
  * This is an OutputStream wrapper which takes notice when a threshold (number
  * of bytes) is about to be written. This can be used to limit output data, swap
  * writers, etc.
- *
- * @author Jeff Schnitzer
  */
 abstract public class ThresholdingOutputStream extends OutputStream {
 	protected OutputStream output;

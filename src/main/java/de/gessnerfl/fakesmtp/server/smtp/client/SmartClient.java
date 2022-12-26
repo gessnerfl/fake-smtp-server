@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 /**
  * A somewhat smarter abstraction of an SMTP client which doesn't require
  * knowing anything about the nitty gritty of SMTP.
- *
- * @author Jeff Schnitzer
  */
 public class SmartClient extends SMTPClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SmartClient.class);

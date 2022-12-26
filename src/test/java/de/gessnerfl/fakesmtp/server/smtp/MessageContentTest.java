@@ -26,11 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This class serves as a test case for both Wiser (since it is used internally
  * here) as well as harder to reach code within the SMTP server that tests a
  * roundtrip message through the DATA portion of the SMTP spec.
- *
- * @author Jon Stevens
- * @author Jeff Schnitzer
- * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
- * @author Ville Skyttä (contributed some encoding tests)
  */
 class MessageContentTest {
 	public static final int PORT = 2566;

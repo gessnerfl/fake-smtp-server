@@ -10,9 +10,6 @@ import java.net.UnknownHostException;
 /**
  * A crude telnet client that can be used to send SMTP messages and test the
  * responses.
- *
- * @author Jeff Schnitzer
- * @author Jon Stevens
  */
 public class Client {
 	Socket socket;

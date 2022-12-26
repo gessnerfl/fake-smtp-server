@@ -10,11 +10,6 @@ import de.gessnerfl.fakesmtp.server.smtp.io.CRLFTerminatedReader;
 import de.gessnerfl.fakesmtp.server.smtp.server.BaseCommand;
 import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 
-/**
- * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
- * @author Jeff Schnitzer
- * @author Scott Hernandez
- */
 public class AuthCommand extends BaseCommand {
 	public static final String VERB = "AUTH";
 

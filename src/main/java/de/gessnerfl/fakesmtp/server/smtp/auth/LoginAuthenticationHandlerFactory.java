@@ -22,8 +22,6 @@ import org.springframework.util.Base64Utils;
  * 4954 (SMTP Service Extension for Authentication). However this implementation
  * is likely usable with clients following any of the two documents.
  *
- * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
- * @author Jeff Schnitzer
  * @see <a href="http://tools.ietf.org/html/draft-murchison-sasl-login-00">The
  * LOGIN SASL Mechanism</a>
  * @see <a href=

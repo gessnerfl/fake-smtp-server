@@ -15,8 +15,6 @@ import de.gessnerfl.fakesmtp.server.smtp.RejectException;
 /**
  * This handler combines the behavior of several other authentication handler
  * factories.
- *
- * @author Jeff Schnitzer
  */
 public class MultipleAuthenticationHandlerFactory implements AuthenticationHandlerFactory {
 	/**

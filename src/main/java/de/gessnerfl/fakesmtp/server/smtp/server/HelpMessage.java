@@ -2,10 +2,6 @@ package de.gessnerfl.fakesmtp.server.smtp.server;
 
 import java.util.StringTokenizer;
 
-/**
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jon Stevens
- */
 public class HelpMessage {
 	private final String commandName;
 

@@ -25,9 +25,6 @@ import de.gessnerfl.fakesmtp.server.smtp.io.CRLFTerminatedReader;
 /**
  * The thread that handles a connection. This class passes most of it's
  * responsibilities off to the CommandHandler.
- *
- * @author Jon Stevens
- * @author Jeff Schnitzer
  */
 public class Session implements Runnable, MessageContext {
 	private final static Logger log = LoggerFactory.getLogger(Session.class);

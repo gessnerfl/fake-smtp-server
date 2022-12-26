@@ -1,6 +1,3 @@
-/*
- * $Id$ $URL$
- */
 package de.gessnerfl.fakesmtp.server.smtp;
 
 import java.io.IOException;
@@ -22,8 +19,6 @@ import java.io.InputStream;
  * If multiple messages are delivered on a single connection (ie, using the RSET
  * command) then multiple message handlers will be instantiated. Each handler
  * services one and only one message.
- *
- * @author Jeff Schnitzer
  */
 public interface MessageHandler {
 	/**

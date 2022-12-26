@@ -5,12 +5,6 @@ import java.io.IOException;
 import de.gessnerfl.fakesmtp.server.smtp.server.BaseCommand;
 import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 
-/**
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jon Stevens
- * @author Jeff Schnitzer
- * @author Scott Hernandez
- */
 public class HelloCommand extends BaseCommand {
 	public HelloCommand() {
 		super("HELO", "Introduce yourself.", "<hostname>");

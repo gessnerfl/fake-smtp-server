@@ -5,9 +5,6 @@ import java.io.IOException;
 import de.gessnerfl.fakesmtp.server.smtp.server.BaseCommand;
 import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 
-/**
- * @author Michele Zuccala &lt;zuccala.m@gmail.com&gt;
- */
 public class ExpandCommand extends BaseCommand {
 	public ExpandCommand() {
 		super("EXPN", "The expn command.");

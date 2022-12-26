@@ -7,8 +7,6 @@ import de.gessnerfl.fakesmtp.server.smtp.DropConnectionException;
 /**
  * Verifies the presence of a TLS connection if TLS is required. The wrapped
  * command is executed when the test succeeds.
- *
- * @author Erik van Oosten
  */
 public class RequireTLSCommandWrapper implements Command {
 	private final Command wrapped;

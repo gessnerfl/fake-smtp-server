@@ -1,6 +1,3 @@
-/*
- * $Id$ $URL$
- */
 package de.gessnerfl.fakesmtp.server.smtp.helper;
 
 import java.io.IOException;
@@ -20,8 +17,6 @@ import de.gessnerfl.fakesmtp.server.smtp.io.DeferredFileOutputStream;
 /**
  * MessageHandlerFactory implementation which adapts to a collection of
  * MessageListeners. This allows us to preserve the old, convenient interface.
- *
- * @author Jeff Schnitzer
  */
 public class SimpleMessageListenerAdapter implements MessageHandlerFactory {
 	/**

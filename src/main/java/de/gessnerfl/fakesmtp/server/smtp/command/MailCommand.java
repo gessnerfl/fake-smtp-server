@@ -9,12 +9,6 @@ import de.gessnerfl.fakesmtp.server.smtp.server.BaseCommand;
 import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 import de.gessnerfl.fakesmtp.server.smtp.util.EmailUtils;
 
-/**
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jon Stevens
- * @author Scott Hernandez
- * @author Jeff Schnitzer
- */
 public class MailCommand extends BaseCommand {
 	public MailCommand() {
 		super("MAIL", "Specifies the sender.", "FROM: <sender> [ <parameters> ]");

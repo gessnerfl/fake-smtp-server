@@ -1,7 +1,3 @@
-/*
- * $Id$ $URL$
- */
-
 package de.gessnerfl.fakesmtp.server.smtp;
 
 import java.io.BufferedInputStream;
@@ -32,9 +28,6 @@ import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
  * purpose; it simply stores all mail in memory. Use the MessageHandlerFactory
  * interface (optionally with the SimpleMessageListenerAdapter) of SubEthaSMTP
  * instead.
- *
- * @author Jon Stevens
- * @author Jeff Schnitzer
  */
 public class Wiser implements SimpleMessageListener {
 	private final static Logger log = LoggerFactory.getLogger(Wiser.class);

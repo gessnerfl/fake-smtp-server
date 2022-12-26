@@ -3,9 +3,6 @@ package de.gessnerfl.fakesmtp.server.smtp.server;
 import org.junit.jupiter.api.Test;
 import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
 
-/**
- * @author Erik van Oosten
- */
 class RequireTlsTest extends ServerTestCase {
 
     @Override

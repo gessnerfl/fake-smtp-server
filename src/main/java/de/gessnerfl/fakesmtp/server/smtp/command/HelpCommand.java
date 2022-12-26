@@ -9,10 +9,6 @@ import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 
 /**
  * Provides a help topic system for people to interact with.
- *
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jon Stevens
- * @author Scott Hernandez
  */
 public class HelpCommand extends BaseCommand {
 	public HelpCommand() {

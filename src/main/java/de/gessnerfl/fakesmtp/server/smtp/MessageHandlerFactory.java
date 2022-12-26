@@ -1,6 +1,3 @@
-/*
- * $Id$ $URL$
- */
 package de.gessnerfl.fakesmtp.server.smtp;
 
 /**
@@ -8,8 +5,6 @@ package de.gessnerfl.fakesmtp.server.smtp;
  * factory is called for every message to be exchanged in an SMTP conversation.
  * If multiple messages are transmitted in a single connection (via RSET),
  * multiple handlers will be created from this factory.
- *
- * @author Jeff Schnitzer
  */
 public interface MessageHandlerFactory {
 	/**

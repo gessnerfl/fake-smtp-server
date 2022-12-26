@@ -9,9 +9,6 @@ import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
 
-/**
- * @author Evgeny Naumenko
- */
 class RequireAuthTest extends ServerTestCase {
     static final String REQUIRED_USERNAME = "myUserName";
 

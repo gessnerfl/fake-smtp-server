@@ -7,8 +7,6 @@ import de.gessnerfl.fakesmtp.server.smtp.DropConnectionException;
 /**
  * Thin wrapper around any command to make sure authentication has been
  * performed.
- *
- * @author Evgeny Naumenko
  */
 public class RequireAuthCommandWrapper implements Command {
 	private final Command wrapped;

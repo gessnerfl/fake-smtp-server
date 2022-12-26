@@ -9,12 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.DropConnectionException;
 
-/**
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jon Stevens
- * @author Jeff Schnitzer
- * @author Scott Hernandez
- */
 abstract public class BaseCommand implements Command {
 	@SuppressWarnings("unused")
 	private final static Logger log = LoggerFactory.getLogger(BaseCommand.class);

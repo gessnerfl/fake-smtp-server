@@ -5,8 +5,6 @@ package de.gessnerfl.fakesmtp.server.smtp.auth;
  * about; you can always add more afterwards. Currently this factory supports:
  *
  * PLAIN LOGIN
- *
- * @author Jeff Schnitzer
  */
 public class EasyAuthenticationHandlerFactory extends MultipleAuthenticationHandlerFactory {
 	/** Just hold on to this so that the caller can get it later, if necessary */

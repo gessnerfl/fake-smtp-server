@@ -3,9 +3,6 @@ package de.gessnerfl.fakesmtp.server.smtp.util;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 
-/**
- * @author Jeff Schnitzer
- */
 public class EmailUtils {
 	/**
 	 * @return true if the string is a valid email address

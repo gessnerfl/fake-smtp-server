@@ -13,12 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.DropConnectionException;
 
-/**
- * This class manages execution of a SMTP command.
- *
- * @author Jon Stevens
- * @author Scott Hernandez
- */
 public class CommandHandler {
 	private final static Logger log = LoggerFactory.getLogger(CommandHandler.class);
 

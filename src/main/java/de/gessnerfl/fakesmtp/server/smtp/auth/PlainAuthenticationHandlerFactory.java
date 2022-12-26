@@ -13,10 +13,6 @@ import org.springframework.util.Base64Utils;
  * Implements the SMTP AUTH PLAIN mechanism.<br>
  * You are only required to plug your UsernamePasswordValidator implementation
  * for username and password validation to take effect.
- *
- * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
- * @author Jeff Schnitzer
- * @author Ian White &lt;ibwhite@gmail.com&gt;
  */
 public class PlainAuthenticationHandlerFactory implements AuthenticationHandlerFactory {
     private static final List<String> MECHANISMS = Collections.singletonList("PLAIN");

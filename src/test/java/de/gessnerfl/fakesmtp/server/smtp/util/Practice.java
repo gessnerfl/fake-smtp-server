@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A simple command-line tool that lets us practice with the smtp library.
- *
- * @author Jeff Schnitzer
  */
 public class Practice {
 	@SuppressWarnings("unused")

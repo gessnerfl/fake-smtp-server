@@ -1,8 +1,3 @@
-/*
- * Commands.java Created on November 18, 2006, 12:26 PM To change this template,
- * choose Tools | Template Manager and open the template in the editor.
- */
-
 package de.gessnerfl.fakesmtp.server.smtp.server;
 
 import de.gessnerfl.fakesmtp.server.smtp.command.AuthCommand;
@@ -19,11 +14,6 @@ import de.gessnerfl.fakesmtp.server.smtp.command.ResetCommand;
 import de.gessnerfl.fakesmtp.server.smtp.command.StartTLSCommand;
 import de.gessnerfl.fakesmtp.server.smtp.command.VerifyCommand;
 
-/**
- * Enumerates all the Commands made available in this release.
- *
- * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
- */
 public enum CommandRegistry {
 	AUTH(new AuthCommand(), true, false),
 	DATA(new DataCommand(), true, true),

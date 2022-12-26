@@ -12,11 +12,6 @@ import de.gessnerfl.fakesmtp.server.smtp.io.ReceivedHeaderStream;
 import de.gessnerfl.fakesmtp.server.smtp.server.BaseCommand;
 import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 
-/**
- * @author Ian McFarland &lt;ian@neo.com&gt;
- * @author Jon Stevens
- * @author Jeff Schnitzer
- */
 public class DataCommand extends BaseCommand {
 	private static final int BUFFER_SIZE = 1024 * 32; // 32k seems reasonable
 

@@ -1,6 +1,3 @@
-/*
- * $Id$ $URL$
- */
 package de.gessnerfl.fakesmtp.server.smtp.io;
 
 import java.io.BufferedInputStream;
@@ -23,8 +20,6 @@ import java.util.Set;
  *
  * When this object is closed, the temporary file is deleted. You can no longer
  * call getInputStream().
- *
- * @author Jeff Schnitzer
  */
 public class DeferredFileOutputStream extends ThresholdingOutputStream {
 	/**

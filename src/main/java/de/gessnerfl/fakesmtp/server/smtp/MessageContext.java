@@ -1,6 +1,3 @@
-/*
- * $Id$ $URL$
- */
 package de.gessnerfl.fakesmtp.server.smtp;
 
 import java.net.SocketAddress;
@@ -10,8 +7,6 @@ import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
 
 /**
  * Interface which provides context to the message handlers.
- *
- * @author Jeff Schnitzer
  */
 public interface MessageContext {
 	/**

@@ -9,8 +9,6 @@ import jakarta.mail.internet.MimeMessage;
 /**
  * This class wraps a received message and provides a way to generate a JavaMail
  * MimeMessage from the data.
- *
- * @author Jon Stevens
  */
 public class WiserMessage {
 	byte[] messageData;

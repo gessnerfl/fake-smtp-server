@@ -8,10 +8,6 @@ package de.gessnerfl.fakesmtp.server.smtp;
  * can be stateful too.<br>
  * Do not share a single instance of this interface if you don't explicitly need
  * to do so.
- *
- * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
- * @author Jeff Schnitzer
- * @author Scott Hernandez
  */
 public interface AuthenticationHandler {
 	/**

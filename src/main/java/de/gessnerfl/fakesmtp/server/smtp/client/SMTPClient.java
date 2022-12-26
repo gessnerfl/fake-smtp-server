@@ -19,8 +19,6 @@ import de.gessnerfl.fakesmtp.server.smtp.io.ExtraDotOutputStream;
 /**
  * A very low level abstraction of the STMP stream which knows how to handle the
  * raw protocol for lines, whitespace, etc.
- *
- * @author Jeff Schnitzer
  */
 public class SMTPClient {
     /**
