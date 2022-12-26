@@ -121,7 +121,7 @@ public class EmailFactory {
     private Optional<InlineImage> createInlineImage(final BodyPart part) throws MessagingException, IOException {
         var contentType = part.getContentType();
         Object rawContent = part.getContent();
-        var content = rawContent instanceof BASE64DecoderStream ? readBase64EncodedData((BASE64DecoderStream)rawContent) : Objects.toString(rawContent, null);
+        var content = rawContent instanceof BASE64DecoderStream stream ? readBase64EncodedData(stream) : Objects.toString(rawContent, null);
         var data = Optional.ofNullable(content);
         return extractContentId(part).flatMap(contentId ->
             data.map(d -> {

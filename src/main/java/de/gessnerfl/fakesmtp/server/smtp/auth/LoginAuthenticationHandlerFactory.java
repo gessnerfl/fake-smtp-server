@@ -31,7 +31,6 @@ import org.springframework.util.Base64Utils;
  */
 public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerFactory {
     private static final List<String> MECHANISMS = Collections.singletonList("LOGIN");
-    private static final String INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING = "Invalid command argument, not a valid Base64 string";
     private static final byte[] USERNAME_ASCII_BYTES = "Username:".getBytes(StandardCharsets.US_ASCII);
     private static final byte[] PASSWORD_ASCII_BYTES = "Password:".getBytes(StandardCharsets.US_ASCII);
 

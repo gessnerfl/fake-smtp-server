@@ -118,7 +118,7 @@ public class SmarterMessageListenerAdapter implements MessageHandlerFactory {
 		}
 
 		@Override
-		public void data(final InputStream data) throws TooMuchDataException, IOException {
+		public void data(final InputStream data) throws IOException {
 			if (this.deliveries.size() == 1) {
 				this.deliveries.get(0).deliver(data);
 			} else {

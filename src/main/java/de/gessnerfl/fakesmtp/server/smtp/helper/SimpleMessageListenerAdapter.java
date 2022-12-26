@@ -132,7 +132,7 @@ public class SimpleMessageListenerAdapter implements MessageHandlerFactory {
 		}
 
 		@Override
-		public void data(final InputStream data) throws TooMuchDataException, IOException {
+		public void data(final InputStream data) throws IOException {
 			if (this.deliveries.size() == 1) {
 				final Delivery delivery = this.deliveries.get(0);
 				delivery.getListener().deliver(this.from, delivery.getRecipient(), data);

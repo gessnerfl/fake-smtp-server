@@ -158,7 +158,7 @@ public class SMTPClient {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Connecting to " + this.hostPort);
+            LOGGER.debug("Connecting to {}", this.hostPort);
         }
 
         this.socket = createSocket();

@@ -18,7 +18,7 @@ import de.gessnerfl.fakesmtp.server.smtp.server.Session;
  * @author Jeff Schnitzer
  */
 public class DataCommand extends BaseCommand {
-	private final static int BUFFER_SIZE = 1024 * 32; // 32k seems reasonable
+	private static final int BUFFER_SIZE = 1024 * 32; // 32k seems reasonable
 
 	public DataCommand() {
 		super("DATA", "Following text is collected as the message.\n" + "End data with <CR><LF>.<CR><LF>");
@@ -53,12 +53,6 @@ public class DataCommand extends BaseCommand {
 
 		try {
 			sess.getMessageHandler().data(stream);
-
-			// Just in case the handler didn't consume all the data, we might as well
-			// suck it up so it doesn't pollute further exchanges. This code used to
-			// throw an exception, but this seems an arbitrary part of the contract that
-			// we might as well relax.
-			while (stream.read() != -1) {}
 		} catch (final DropConnectionException ex) {
 			throw ex; // Propagate this
 		} catch (final RejectException ex) {
