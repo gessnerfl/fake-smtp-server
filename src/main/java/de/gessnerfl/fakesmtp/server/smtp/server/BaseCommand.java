@@ -1,17 +1,10 @@
 package de.gessnerfl.fakesmtp.server.smtp.server;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import de.gessnerfl.fakesmtp.server.smtp.DropConnectionException;
-
 public abstract class BaseCommand implements Command {
-	private static final Logger log = LoggerFactory.getLogger(BaseCommand.class);
-
 	/** Name of the command, ie HELO */
 	private final String name;
 

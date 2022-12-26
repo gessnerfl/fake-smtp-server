@@ -1,8 +1,6 @@
 package de.gessnerfl.fakesmtp.server.smtp.server;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -14,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.DropConnectionException;
 
 public class CommandHandler {
-	private final static Logger log = LoggerFactory.getLogger(CommandHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
 
 	/**
 	 * The map of known SMTP commands. Keys are upper case names of the commands.
@@ -29,50 +27,21 @@ public class CommandHandler {
 	}
 
 	/**
-	 * Create a command handler with a specific set of commands.
-	 *
-	 * @param availableCommands the available commands (not null) TLS note: wrap
-	 *                          commands with {@link RequireTLSCommandWrapper} when
-	 *                          appropriate.
-	 */
-	public CommandHandler(final Collection<Command> availableCommands) {
-		for (final Command command : availableCommands) {
-			this.addCommand(command);
-		}
-	}
-
-	/**
 	 * Adds or replaces the specified command.
 	 */
 	public void addCommand(final Command command) {
-		if (log.isDebugEnabled()) {
-			log.debug("Added command: " + command.getName());
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Added command: {}", command.getName());
 		}
 
 		this.commandMap.put(command.getName(), command);
-	}
-
-	/**
-	 * Returns the command object corresponding to the specified command name.
-	 *
-	 * @param commandName case insensitive name of the command.
-	 * @return the command object, or null, if the command is unknown.
-	 */
-	public Command getCommand(final String commandName) {
-		final String upperCaseCommandName = commandName.toUpperCase(Locale.ENGLISH);
-		return this.commandMap.get(upperCaseCommandName);
-	}
-
-	public boolean containsCommand(final String command) {
-		return this.commandMap.containsKey(command);
 	}
 
 	public Set<String> getVerbs() {
 		return this.commandMap.keySet();
 	}
 
-	public void handleCommand(final Session context, final String commandString)
-			throws SocketTimeoutException, IOException, DropConnectionException {
+	public void handleCommand(final Session context, final String commandString) throws IOException, DropConnectionException {
 		try {
 			final Command command = this.getCommandFromString(commandString);
 			command.execute(commandString, context);
@@ -91,17 +60,12 @@ public class CommandHandler {
 
 	private Command getCommandFromString(final String commandString)
 			throws UnknownCommandException, InvalidCommandNameException {
-		Command command = null;
 		final String key = this.toKey(commandString);
-		if (key != null) {
-			command = this.commandMap.get(key);
-		}
+		var command = this.commandMap.get(key);
 		if (command == null) {
 			// some commands have a verb longer than 4 letters
 			final String verb = this.toVerb(commandString);
-			if (verb != null) {
-				command = this.commandMap.get(verb);
-			}
+			command = this.commandMap.get(verb);
 		}
 		if (command == null) {
 			throw new UnknownCommandException("Error: command not implemented");
