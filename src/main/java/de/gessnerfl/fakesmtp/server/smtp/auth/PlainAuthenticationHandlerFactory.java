@@ -46,8 +46,8 @@ public class PlainAuthenticationHandlerFactory implements AuthenticationHandlerF
         /* */
         @Override
         public String auth(final String clientInput) throws RejectException {
-            final StringTokenizer stk = new StringTokenizer(clientInput);
-            String secret = stk.nextToken();
+            final var stk = new StringTokenizer(clientInput);
+            var secret = stk.nextToken();
             if (secret.trim().equalsIgnoreCase("AUTH")) {
                 // Let's read the RFC2554 "initial-response" parameter
                 // The line could be in the form of "AUTH PLAIN <base64Secret>"
@@ -63,12 +63,7 @@ public class PlainAuthenticationHandlerFactory implements AuthenticationHandlerF
                 secret = stk.nextToken();
             }
 
-            final byte[] decodedSecret = Base64Utils.decodeFromString(secret);
-            if (decodedSecret == null) {
-                throw new RejectException(501, /* 5.5.4 */
-                        "Invalid command argument, not a valid Base64 string");
-            }
-
+            final var decodedSecret = Base64Utils.decodeFromString(secret);
             /*
              * RFC4616: The client presents the authorization identity (identity to act as),
              * followed by a NUL (U+0000) character, followed by the authentication identity

@@ -59,8 +59,8 @@ public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerF
 
         @Override
         public String auth(final String clientInput) throws RejectException {
-            final StringTokenizer stk = new StringTokenizer(clientInput);
-            final String token = stk.nextToken();
+            final var stk = new StringTokenizer(clientInput);
+            final var token = stk.nextToken();
             if (token.trim().equalsIgnoreCase("AUTH")) {
                 if (!stk.nextToken().trim().equalsIgnoreCase("LOGIN")) {
                     throw new RejectException(504, "AUTH mechanism mismatch");
@@ -73,31 +73,18 @@ public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerF
                 // the username.
                 // .Net's built in System.Net.Mail.SmtpClient sends its
                 // authentication this way (and this way only).
-                final byte[] decoded = Base64Utils.decodeFromString(stk.nextToken());
-                if (decoded == null) {
-                    throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
-                }
+                final var decoded = Base64Utils.decodeFromString(stk.nextToken());
                 username = new String(decoded, StandardCharsets.UTF_8);
-
                 return "334 " + Base64Utils.encodeToString(PASSWORD_ASCII_BYTES);
             }
 
             if (this.username == null) {
                 final byte[] decoded = Base64Utils.decodeFromString(clientInput);
-                if (decoded == null) {
-                    throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
-                }
-
                 this.username = new String(decoded, StandardCharsets.UTF_8);
-
                 return "334 " + Base64Utils.encodeToString(PASSWORD_ASCII_BYTES);
             }
 
             final var decoded = Base64Utils.decodeFromString(clientInput);
-            if (decoded == null) {
-                throw new RejectException(501, INVALID_COMMAND_ARGUMENT_NOT_A_VALID_BASE_64_STRING);
-            }
-
             final var password = new String(decoded, StandardCharsets.UTF_8);
             try {
                 LoginAuthenticationHandlerFactory.this.helper.login(this.username, password);
