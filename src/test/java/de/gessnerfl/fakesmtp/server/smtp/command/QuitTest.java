@@ -3,13 +3,10 @@ package de.gessnerfl.fakesmtp.server.smtp.command;
 import org.junit.jupiter.api.Test;
 import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
 
-/**
- * @author Jon Stevens
- */
 public class QuitTest extends ServerTestCase {
 
 	@Test
-	public void testQuit() throws Exception {
+	void testQuit() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");

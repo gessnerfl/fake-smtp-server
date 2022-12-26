@@ -47,7 +47,7 @@ public class MessageHandlerTest {
 	}
 
 	// @Test
-	public void testCompletedMailTransaction() throws Exception {
+	void testCompletedMailTransaction() throws Exception {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler);
 
 		final SmartClient client = new SmartClient("localhost", smtpServer.getPort(), "localhost");
@@ -67,7 +67,7 @@ public class MessageHandlerTest {
 	}
 
 	// @Test
-	public void testDisconnectImmediately() throws Exception {
+	void testDisconnectImmediately() throws Exception {
 		final SmartClient client = new SmartClient("localhost", smtpServer.getPort(), "localhost");
 		client.quit();
 		smtpServer.stop(); // wait for the server to catch up
@@ -76,7 +76,7 @@ public class MessageHandlerTest {
 	}
 
 	// @Test
-	public void testAbortedMailTransaction() throws Exception {
+	void testAbortedMailTransaction() throws Exception {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler);
 
 		final SmartClient client = new SmartClient("localhost", smtpServer.getPort(), "localhost");
@@ -90,7 +90,7 @@ public class MessageHandlerTest {
 	}
 
 	// @Test
-	public void testTwoMailsInOneSession() throws Exception {
+	void testTwoMailsInOneSession() throws Exception {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler, messageHandler2);
 
 		final SmartClient client = new SmartClient("localhost", smtpServer.getPort(), "localhost");
@@ -133,7 +133,7 @@ public class MessageHandlerTest {
 	 * @throws MessagingException on messaging error
 	 */
 	// @Test
-	public void testMailFromRejectedFirst() throws IOException {
+	void testMailFromRejectedFirst() throws IOException {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler, messageHandler2);
 
 		final SmartClient client = new SmartClient("localhost", smtpServer.getPort(), "localhost");

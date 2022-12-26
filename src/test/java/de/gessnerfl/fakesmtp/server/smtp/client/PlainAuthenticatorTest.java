@@ -16,7 +16,7 @@ public class PlainAuthenticatorTest {
 	private final Map<String, String> extensions = new HashMap<>();
 
 	// @Test
-	public void testSuccess() throws IOException {
+	void testSuccess() throws IOException {
 		extensions.put("AUTH", "GSSAPI DIGEST-MD5 PLAIN");
 		final PlainAuthenticator authenticator = new PlainAuthenticator(smartClient, "test", "1234");
 

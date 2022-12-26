@@ -18,8 +18,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,9 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Ville Skyttä (contributed some encoding tests)
  */
 public class MessageContentTest {
-	@SuppressWarnings("unused")
-	private static Logger log = LoggerFactory.getLogger(MessageContentTest.class);
-
 	public static final int PORT = 2566;
 
 	protected Wiser wiser;
@@ -45,7 +40,7 @@ public class MessageContentTest {
 	protected Session session;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() throws Exception {
 		final Properties props = new Properties();
 		props.setProperty("mail.smtp.host", "localhost");
 		props.setProperty("mail.smtp.port", Integer.toString(PORT));
@@ -58,7 +53,7 @@ public class MessageContentTest {
 	}
 
 	@AfterEach
-	protected void tearDown() throws Exception {
+	void tearDown() throws Exception {
 		this.wiser.stop();
 		this.wiser = null;
 
@@ -66,7 +61,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	public void testReceivedHeader() throws Exception {
+	void testReceivedHeader() throws Exception {
 		final MimeMessage message = new MimeMessage(this.session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
 		message.setFrom(new InternetAddress("someone@somewhereelse.com"));
@@ -83,7 +78,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	public void testMultipleRecipients() throws Exception {
+	void testMultipleRecipients() throws Exception {
 		final MimeMessage message = new MimeMessage(this.session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone2@anywhere.com"));
@@ -97,7 +92,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	public void testLargeMessage() throws Exception {
+	void testLargeMessage() throws Exception {
 		final MimeMessage message = new MimeMessage(this.session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone2@anywhere.com"));
@@ -114,7 +109,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	public void testUtf8EightBitMessage() throws Exception {
+	void testUtf8EightBitMessage() throws Exception {
 		// Beware editor/compiler character encoding issues; safest to put unicode
 		// escapes here
 
@@ -125,7 +120,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	public void testIso88591EightBitMessage() throws Exception {
+	void testIso88591EightBitMessage() throws Exception {
 		// Beware editor/compiler character encoding issues; safest to put unicode
 		// escapes here
 
@@ -136,7 +131,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	public void testIso885915EightBitMessage() throws Exception {
+	void testIso885915EightBitMessage() throws Exception {
 		// Beware editor/compiler character encoding issues; safest to put unicode
 		// escapes here
 
@@ -155,7 +150,7 @@ public class MessageContentTest {
 
 	@Test
 	@Disabled("TO BE FIXED")
-	public void testEightBitMessage(final String body, final String charset) throws Exception {
+	void testEightBitMessage(final String body, final String charset) throws Exception {
 		final MimeMessage message = new MimeMessage(this.session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
 		message.setFrom(new InternetAddress("someone@somewhereelse.com"));
@@ -167,7 +162,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	public void testIso2022JPEightBitMessage() throws Exception {
+	void testIso2022JPEightBitMessage() throws Exception {
 		final String body = "\u3042\u3044\u3046\u3048\u304a\r\n"; // some Japanese letters
 		this.testEightBitMessage(body, "iso-2022-jp");
 
@@ -175,7 +170,7 @@ public class MessageContentTest {
 	}
 
 	@Test
-	public void testBinaryEightBitMessage() throws Exception {
+	void testBinaryEightBitMessage() throws Exception {
 		final byte[] body = new byte[64];
 		new Random().nextBytes(body);
 

@@ -39,7 +39,7 @@ public class RequireAuthTest extends ServerTestCase {
     }
 
     @Test
-    public void testAuthRequired() throws Exception {
+    void testAuthRequired() throws Exception {
         this.expect("220");
 
         this.send("HELO foo.com");
@@ -71,7 +71,7 @@ public class RequireAuthTest extends ServerTestCase {
     }
 
     @Test
-    public void testAuthSuccess() throws Exception {
+    void testAuthSuccess() throws Exception {
         this.expect("220");
 
         this.send("HELO foo.com");

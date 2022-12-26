@@ -3,13 +3,10 @@ package de.gessnerfl.fakesmtp.server.smtp.command;
 import org.junit.jupiter.api.Test;
 import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
 
-/**
- * @author Jon Stevens
- */
 public class ReceiptTest extends ServerTestCase {
 
 	@Test
-	public void testReceiptBeforeMail() throws Exception {
+	void testReceiptBeforeMail() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -20,7 +17,7 @@ public class ReceiptTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testReceiptErrorInParams() throws Exception {
+	void testReceiptErrorInParams() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -34,7 +31,7 @@ public class ReceiptTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testReceiptAccept() throws Exception {
+	void testReceiptAccept() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -51,7 +48,7 @@ public class ReceiptTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testReceiptNoWhiteSpace() throws Exception {
+	void testReceiptNoWhiteSpace() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");

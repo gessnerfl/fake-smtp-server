@@ -26,7 +26,7 @@ public class ThreadDeathLoggingTest {
 	 */
 	@Disabled("Requires manual setup and verification")
 	@Test()
-	public void testNoMailJar() throws SMTPException, IOException {
+	void testNoMailJar() throws SMTPException, IOException {
 		// if this variable is set to null, than a NPE will be thrown, which is
 		// also good for testing.
 		final MessageHandlerFactory handlerFactory = new SimpleMessageListenerAdapter(new SimpleMessageListener() {

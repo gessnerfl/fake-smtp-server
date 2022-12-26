@@ -39,7 +39,7 @@ public class WiserFailuresTest {
 
 	private final static int SMTP_PORT = 1081;
 
-	private static Logger log = LoggerFactory.getLogger(WiserFailuresTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WiserFailuresTest.class);
 
 	private BufferedReader input;
 
@@ -50,7 +50,7 @@ public class WiserFailuresTest {
 	private Socket socket;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() throws Exception {
 		this.server = new Wiser();
 		this.server.setPort(SMTP_PORT);
 		this.server.start();
@@ -60,7 +60,7 @@ public class WiserFailuresTest {
 	}
 
 	@AfterEach
-	protected void tearDown() throws Exception {
+	void tearDown() throws Exception {
 		try {
 			this.input.close();
 		} catch (final Exception e) {}
@@ -84,8 +84,8 @@ public class WiserFailuresTest {
 	 * @throws MessagingException on messaging error
 	 */
 	@Test
-	public void testMailFromAfterReset() throws IOException, MessagingException {
-		log.info("testMailFromAfterReset() start");
+	void testMailFromAfterReset() throws IOException, MessagingException {
+		LOGGER.info("testMailFromAfterReset() start");
 
 		this.assertConnect();
 		this.sendExtendedHello(HOST_NAME);
@@ -115,7 +115,7 @@ public class WiserFailuresTest {
 	 * @throws MessagingException on messaging error
 	 */
 	@Test
-	public void testMailFromWithInitialReset() throws IOException, MessagingException {
+	void testMailFromWithInitialReset() throws IOException, MessagingException {
 		this.assertConnect();
 		this.sendReset();
 		this.sendMailFrom(FROM_ADDRESS);
@@ -133,7 +133,7 @@ public class WiserFailuresTest {
 	}
 
 	@Test
-	public void testSendEncodedMessage() throws IOException, MessagingException {
+	void testSendEncodedMessage() throws IOException, MessagingException {
 		final String body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
 		final String charset = "iso-2022-jp";
 
@@ -156,7 +156,7 @@ public class WiserFailuresTest {
 	}
 
 	@Test
-	public void testSendMessageWithCarriageReturn() throws IOException, MessagingException {
+	void testSendMessageWithCarriageReturn() throws IOException, MessagingException {
 		final String bodyWithCR = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
 		try {
 			this.sendMessage(SMTP_PORT, "sender@hereagain.com", "CRTest", bodyWithCR, "receivingagain@there.com");
@@ -172,7 +172,7 @@ public class WiserFailuresTest {
 	}
 
 	@Test
-	public void testSendTwoMessagesSameConnection() throws IOException {
+	void testSendTwoMessagesSameConnection() throws IOException {
 		try {
 			final MimeMessage[] mimeMessages = new MimeMessage[2];
 			final Properties mailProps = this.getMailProperties(SMTP_PORT);
@@ -201,7 +201,7 @@ public class WiserFailuresTest {
 	}
 
 	@Test
-	public void testSendTwoMsgsWithLogin() throws MessagingException, IOException {
+	void testSendTwoMsgsWithLogin() throws MessagingException, IOException {
 		try {
 			final String From = "sender@here.com";
 			final String To = "receiver@there.com";

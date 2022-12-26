@@ -3,13 +3,10 @@ package de.gessnerfl.fakesmtp.server.smtp.command;
 import org.junit.jupiter.api.Test;
 import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
 
-/**
- * @author Jon Stevens
- */
 public class MailTest extends ServerTestCase {
 
 	@Test
-	public void testMailNoHello() throws Exception {
+	void testMailNoHello() throws Exception {
 		this.expect("220");
 
 		this.send("MAIL FROM: test@example.com");
@@ -17,7 +14,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testAlreadySpecified() throws Exception {
+	void testAlreadySpecified() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -31,7 +28,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testInvalidSenders() throws Exception {
+	void testInvalidSenders() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -44,7 +41,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testMalformedMailCommand() throws Exception {
+	void testMalformedMailCommand() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -55,7 +52,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testEmptyFromCommand() throws Exception {
+	void testEmptyFromCommand() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -66,7 +63,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testEmptyEmailFromCommand() throws Exception {
+	void testEmptyEmailFromCommand() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -77,7 +74,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testMailWithoutWhitespace() throws Exception {
+	void testMailWithoutWhitespace() throws Exception {
 		this.expect("220");
 
 		this.send("HELO foo.com");
@@ -88,7 +85,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testSize() throws Exception {
+	void testSize() throws Exception {
 		this.wiser.getServer().setMaxMessageSize(1000);
 		this.expect("220");
 
@@ -100,7 +97,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testSizeWithoutSize() throws Exception {
+	void testSizeWithoutSize() throws Exception {
 		this.wiser.getServer().setMaxMessageSize(1000);
 		this.expect("220");
 
@@ -112,7 +109,7 @@ public class MailTest extends ServerTestCase {
 	}
 
 	@Test
-	public void testSizeTooLarge() throws Exception {
+	void testSizeTooLarge() throws Exception {
 		this.wiser.getServer().setMaxMessageSize(1000);
 		this.expect("220");
 

@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import de.gessnerfl.fakesmtp.server.smtp.io.DotTerminatedInputStream;
 import org.junit.jupiter.api.Test;
@@ -15,31 +16,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DotTerminatedInputStreamTest {
 	@Test
-	public void testEmpty() throws IOException {
-		final InputStream in = new ByteArrayInputStream(".\r\n".getBytes("US-ASCII"));
+	void testEmpty() throws IOException {
+		final InputStream in = new ByteArrayInputStream(".\r\n".getBytes(StandardCharsets.US_ASCII));
 		try (DotTerminatedInputStream stream = new DotTerminatedInputStream(in)) {
 			assertEquals(-1, stream.read());
 		}
 	}
 
 	@Test
-	public void testPreserveLastCrLf() throws IOException {
-		final InputStream in = new ByteArrayInputStream("a\r\n.\r\n".getBytes("US-ASCII"));
+	void testPreserveLastCrLf() throws IOException {
+		final InputStream in = new ByteArrayInputStream("a\r\n.\r\n".getBytes(StandardCharsets.US_ASCII));
 		final DotTerminatedInputStream stream = new DotTerminatedInputStream(in);
 		assertEquals("a\r\n", readFull(stream));
 	}
 
 	@Test
-	public void testDotDot() throws IOException {
-		final InputStream in = new ByteArrayInputStream("..\r\n.\r\n".getBytes("US-ASCII"));
+	void testDotDot() throws IOException {
+		final InputStream in = new ByteArrayInputStream("..\r\n.\r\n".getBytes(StandardCharsets.US_ASCII));
 		final DotTerminatedInputStream stream = new DotTerminatedInputStream(in);
 		assertEquals("..\r\n", readFull(stream));
 	}
 
 	@Test
-	public void testMissingDotLine() throws IOException {
+	void testMissingDotLine() throws IOException {
 		assertThrows(EOFException.class, () -> {
-			final InputStream in = new ByteArrayInputStream("a\r\n".getBytes("US-ASCII"));
+			final InputStream in = new ByteArrayInputStream("a\r\n".getBytes(StandardCharsets.US_ASCII));
 			final DotTerminatedInputStream stream = new DotTerminatedInputStream(in);
 			readFull(stream);
 		});
@@ -51,6 +52,6 @@ public class DotTerminatedInputStreamTest {
 		while (-1 != (ch = in.read())) {
 			out.write(ch);
 		}
-		return out.toString("US-ASCII");
+		return out.toString(StandardCharsets.US_ASCII);
 	}
 }

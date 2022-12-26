@@ -6,8 +6,6 @@ import jakarta.mail.Session;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,9 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jon Stevens
  */
 public class StartStopTest {
-	@SuppressWarnings("unused")
-	private static Logger log = LoggerFactory.getLogger(StartStopTest.class);
-
 	public static final int PORT = 2566;
 
 	protected Session session;
@@ -28,7 +23,7 @@ public class StartStopTest {
 	protected int counter = 0;
 
 	@BeforeEach
-	protected void setUp() throws Exception {
+	void setUp() throws Exception {
 		final Properties props = new Properties();
 		props.setProperty("mail.smtp.host", "localhost");
 		props.setProperty("mail.smtp.port", Integer.toString(PORT));
@@ -36,7 +31,7 @@ public class StartStopTest {
 	}
 
 	@Test
-	public void testMultipleStartStop() throws Exception {
+	void testMultipleStartStop() throws Exception {
 		for (int i = 0; i < 10; i++) {
 			this.startStop(i > 5);
 		}

@@ -10,10 +10,6 @@ import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
 
-/**
- * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
- * @author Jeff Schnitzer
- */
 public class AuthTest extends ServerTestCase {
     static final String REQUIRED_USERNAME = "myUserName";
 
@@ -56,7 +52,7 @@ public class AuthTest extends ServerTestCase {
      * @throws Exception on error
      */
     @Test
-    public void testAuthPlain() throws Exception {
+    void testAuthPlain() throws Exception {
         this.expect("220");
 
         this.send("HELO foo.com");
@@ -96,7 +92,7 @@ public class AuthTest extends ServerTestCase {
      * @throws Exception on error
      */
     @Test
-    public void testAuthLogin() throws Exception {
+    void testAuthLogin() throws Exception {
         this.expect("220");
 
         this.send("HELO foo.com");
@@ -128,7 +124,7 @@ public class AuthTest extends ServerTestCase {
     }
 
     @Test
-    public void testMailBeforeAuth() throws Exception {
+    void testMailBeforeAuth() throws Exception {
         this.expect("220");
 
         this.send("HELO foo.com");

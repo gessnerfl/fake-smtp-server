@@ -5,8 +5,6 @@ import java.net.InetAddress;
 
 import de.gessnerfl.fakesmtp.server.smtp.io.ReceivedHeaderStream;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,11 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *      "http://www.subethamail.org/se/archive_msg.jsp?msgId=59719">http://www.subethamail.org/se/archive_msg.jsp?msgId=59719</a>
  */
 public class ReceivedHeaderStreamTest {
-	@SuppressWarnings("unused")
-	private final static Logger log = LoggerFactory.getLogger(ReceivedHeaderStreamTest.class);
-
 	@Test
-	public void testReceivedHeader() throws Exception {
+	void testReceivedHeader() throws Exception {
 		final int BUF_SIZE = 10000;
 		final int offset = 10;
 		final ByteArrayInputStream in = new ByteArrayInputStream("hello world".getBytes());

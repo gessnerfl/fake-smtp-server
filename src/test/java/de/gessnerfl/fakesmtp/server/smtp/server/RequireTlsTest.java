@@ -18,7 +18,7 @@ public class RequireTlsTest extends ServerTestCase {
     }
 
     @Test
-    public void testNeedSTARTTLS() throws Exception {
+    void testNeedSTARTTLS() throws Exception {
         this.expect("220");
 
         this.send("HELO foo.com");
