@@ -11,7 +11,7 @@ import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class ThreadDeathLoggingTest {
+class ThreadDeathLoggingTest {
 	/**
 	 * This test can be used to check if an Error or RuntimeException actually
 	 * logged, but it requires manual running. For example remove mail.jar from the

@@ -6,7 +6,7 @@ import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
 /**
  * @author Erik van Oosten
  */
-public class RequireTlsTest extends ServerTestCase {
+class RequireTlsTest extends ServerTestCase {
 
     @Override
     protected TestWiser createTestWiser() {

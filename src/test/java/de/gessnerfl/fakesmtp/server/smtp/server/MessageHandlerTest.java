@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
  * This class tests whether the event handler methods defined in MessageHandler
  * are called at the appropriate times and in good order.
  */
-public class MessageHandlerTest {
+class MessageHandlerTest {
 	@Mock
 	private MessageHandlerFactory messageHandlerFactory;
 

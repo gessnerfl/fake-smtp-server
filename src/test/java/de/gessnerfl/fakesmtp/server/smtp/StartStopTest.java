@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Jon Stevens
  */
-public class StartStopTest {
+class StartStopTest {
 	public static final int PORT = 2566;
 
 	protected Session session;

@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import de.gessnerfl.fakesmtp.server.smtp.io.DotTerminatedOutputStream;
 import org.junit.jupiter.api.Test;
 
-public class DotTerminatedOutputStreamTest {
+class DotTerminatedOutputStreamTest {
 	@Test
 	void testEmpty() throws IOException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();

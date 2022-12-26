@@ -3,7 +3,7 @@ package de.gessnerfl.fakesmtp.server.smtp.command;
 import org.junit.jupiter.api.Test;
 import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
 
-public class StartTLSTest extends ServerTestCase {
+class StartTLSTest extends ServerTestCase {
 	@Test
 	void testQuit() throws Exception {
 		this.expect("220");

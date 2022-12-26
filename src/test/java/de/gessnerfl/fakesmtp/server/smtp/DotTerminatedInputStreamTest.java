@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DotTerminatedInputStreamTest {
+class DotTerminatedInputStreamTest {
 	@Test
 	void testEmpty() throws IOException {
 		final InputStream in = new ByteArrayInputStream(".\r\n".getBytes(StandardCharsets.US_ASCII));

@@ -30,7 +30,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
  * This class tests various aspects of the server for smtp compliance by using
  * Wiser
  */
-public class WiserFailuresTest {
+class WiserFailuresTest {
 	private final static String FROM_ADDRESS = "from-addr@localhost";
 
 	private final static String HOST_NAME = "localhost";

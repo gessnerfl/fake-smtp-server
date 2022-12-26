@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class PlainAuthenticatorTest {
+class PlainAuthenticatorTest {
 	@Mock
 	private SmartClient smartClient;
 

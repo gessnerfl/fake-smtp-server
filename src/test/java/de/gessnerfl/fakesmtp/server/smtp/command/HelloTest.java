@@ -3,7 +3,7 @@ package de.gessnerfl.fakesmtp.server.smtp.command;
 import org.junit.jupiter.api.Test;
 import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
 
-public class HelloTest extends ServerTestCase {
+class HelloTest extends ServerTestCase {
 
 	@Test
 	void testHelloCommand() throws Exception {

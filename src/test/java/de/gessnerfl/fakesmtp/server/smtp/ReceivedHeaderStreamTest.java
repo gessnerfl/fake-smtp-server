@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @see <a href=
  *      "http://www.subethamail.org/se/archive_msg.jsp?msgId=59719">http://www.subethamail.org/se/archive_msg.jsp?msgId=59719</a>
  */
-public class ReceivedHeaderStreamTest {
+class ReceivedHeaderStreamTest {
 	@Test
 	void testReceivedHeader() throws Exception {
 		final int BUF_SIZE = 10000;

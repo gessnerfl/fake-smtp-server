@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  * @author Ville Skyttä (contributed some encoding tests)
  */
-public class MessageContentTest {
+class MessageContentTest {
 	public static final int PORT = 2566;
 
 	protected Wiser wiser;

@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * @author Evgeny Naumenko
  */
-public class RequireAuthTest extends ServerTestCase {
+class RequireAuthTest extends ServerTestCase {
     static final String REQUIRED_USERNAME = "myUserName";
 
     static final String REQUIRED_PASSWORD = "mySecret01";
