@@ -1,6 +1,7 @@
 package de.gessnerfl.fakesmtp.server.smtp.util;
 
 import de.gessnerfl.fakesmtp.server.smtp.Wiser;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
@@ -13,8 +14,6 @@ import org.slf4j.LoggerFactory;
 public abstract class ServerTestCase {
 	@SuppressWarnings("unused")
 	private final static Logger log = LoggerFactory.getLogger(ServerTestCase.class);
-
-	public static final int PORT = 2566;
 
 	/**
 	 * Override the accept method in Wiser so we can test the accept method().
@@ -32,15 +31,16 @@ public abstract class ServerTestCase {
 
 	@BeforeEach
 	protected void setUp() throws Exception {
-		this.wiser = createTestWiser();
+		int randomPort = RandomUtils.nextInt(1024,65536);
+		this.wiser = createTestWiser(randomPort);
 		this.wiser.start();
-		this.c = new Client("localhost", PORT);
+		this.c = new Client("localhost", randomPort);
 	}
 
-	protected TestWiser createTestWiser() {
+	protected TestWiser createTestWiser(int serverPort) {
 		var wiser = new TestWiser();
 		wiser.setHostname("localhost");
-		wiser.setPort(PORT);
+		wiser.setPort(serverPort);
 		return wiser;
 	}
 

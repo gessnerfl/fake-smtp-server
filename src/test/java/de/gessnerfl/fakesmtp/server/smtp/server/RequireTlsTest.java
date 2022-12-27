@@ -6,10 +6,10 @@ import de.gessnerfl.fakesmtp.server.smtp.util.ServerTestCase;
 class RequireTlsTest extends ServerTestCase {
 
     @Override
-    protected TestWiser createTestWiser() {
+    protected TestWiser createTestWiser(int serverPort) {
         var wiser = new TestWiser();
         wiser.setHostname("localhost");
-        wiser.setPort(PORT);
+        wiser.setPort(serverPort);
         wiser.getServer().setRequireTLS(true);
         return wiser;
     }

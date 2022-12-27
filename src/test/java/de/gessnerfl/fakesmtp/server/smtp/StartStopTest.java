@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import jakarta.mail.Session;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,17 +16,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * that the socket bind address is correctly shut down.
  */
 class StartStopTest {
-	public static final int PORT = 2566;
-
-	protected Session session;
+	private Session session;
+	private int randomPort;
 
 	protected int counter = 0;
 
 	@BeforeEach
 	void setUp() {
+		randomPort = RandomUtils.nextInt(1024,65536);
 		final Properties props = new Properties();
 		props.setProperty("mail.smtp.host", "localhost");
-		props.setProperty("mail.smtp.port", Integer.toString(PORT));
+		props.setProperty("mail.smtp.port", Integer.toString(randomPort));
 		this.session = Session.getDefaultInstance(props);
 	}
 
@@ -39,12 +40,12 @@ class StartStopTest {
 
 	private void startStop(final boolean pause) throws Exception {
 		final Wiser wiser = new Wiser();
-		wiser.setPort(PORT);
+		wiser.setPort(randomPort);
 
 		wiser.start();
 
 		if (pause) {
-			Duration.ofSeconds(1).wait();
+			Thread.sleep(1000);
 		}
 
 		wiser.stop();

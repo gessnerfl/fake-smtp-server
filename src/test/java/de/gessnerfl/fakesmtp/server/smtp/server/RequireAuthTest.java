@@ -24,12 +24,12 @@ class RequireAuthTest extends ServerTestCase {
     }
 
     @Override
-    protected TestWiser createTestWiser() {
+    protected TestWiser createTestWiser(int serverPort) {
         var validator = new RequiredUsernamePasswordValidator();
         var fact = new EasyAuthenticationHandlerFactory(validator);
         var wiser = new TestWiser();
         wiser.setHostname("localhost");
-        wiser.setPort(PORT);
+        wiser.setPort(serverPort);
         wiser.getServer().setAuthenticationHandlerFactory(fact);
         wiser.getServer().setRequireAuth(true);
         return wiser;

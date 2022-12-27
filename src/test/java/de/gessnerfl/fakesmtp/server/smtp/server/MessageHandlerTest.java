@@ -8,6 +8,7 @@ import de.gessnerfl.fakesmtp.server.smtp.client.SMTPException;
 import de.gessnerfl.fakesmtp.server.smtp.client.SmartClient;
 import jakarta.mail.MessagingException;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -40,8 +41,9 @@ class MessageHandlerTest {
 	@BeforeEach
 	public void setup() {
 		MockitoAnnotations.openMocks(this);
+		int randomPort = RandomUtils.nextInt(1024,65536);
 		smtpServer = new SMTPServer(messageHandlerFactory);
-		smtpServer.setPort(2566);
+		smtpServer.setPort(randomPort);
 		smtpServer.start();
 	}
 
