@@ -3,6 +3,7 @@ package de.gessnerfl.fakesmtp.server.impl;
 import de.gessnerfl.fakesmtp.server.SmtpServer;
 import de.gessnerfl.fakesmtp.server.SmtpServerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.subethamail.smtp.helper.SimpleMessageListenerAdapter;
@@ -21,10 +22,14 @@ public class SmtpServerFactoryImpl implements SmtpServerFactory {
         this.configurator = configurator;
     }
 
+    @Value("${fakesmtp.smtpServer.maxConnections:40}")
+    Integer maxConnections;
+    
     @Override
     public SmtpServer create() {
         var simpleMessageListenerAdapter = new SimpleMessageListenerAdapter(messageListener);
         var smtpServer = new SMTPServer(simpleMessageListenerAdapter);
+        smtpServer.setMaxConnections(maxConnections):
         configurator.configure(smtpServer);
         return new SmtpServerImpl(smtpServer);
     }
