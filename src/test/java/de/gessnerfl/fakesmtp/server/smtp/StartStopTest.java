@@ -1,5 +1,6 @@
 package de.gessnerfl.fakesmtp.server.smtp;
 
+import java.time.Duration;
 import java.util.Properties;
 
 import jakarta.mail.Session;
@@ -33,7 +34,7 @@ class StartStopTest {
 		for (int i = 0; i < 10; i++) {
 			this.startStop(i > 5);
 		}
-		assertEquals(this.counter, 10);
+		assertEquals(10, this.counter);
 	}
 
 	private void startStop(final boolean pause) throws Exception {
@@ -43,7 +44,7 @@ class StartStopTest {
 		wiser.start();
 
 		if (pause) {
-			Thread.sleep(1000);
+			Duration.ofSeconds(1).wait();
 		}
 
 		wiser.stop();

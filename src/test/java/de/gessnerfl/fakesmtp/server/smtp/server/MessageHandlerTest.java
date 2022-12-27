@@ -10,10 +10,13 @@ import jakarta.mail.MessagingException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import de.gessnerfl.fakesmtp.server.smtp.MessageContext;
 import de.gessnerfl.fakesmtp.server.smtp.MessageHandler;
 import de.gessnerfl.fakesmtp.server.smtp.MessageHandlerFactory;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -36,6 +39,7 @@ class MessageHandlerTest {
 
 	@BeforeEach
 	public void setup() {
+		MockitoAnnotations.openMocks(this);
 		smtpServer = new SMTPServer(messageHandlerFactory);
 		smtpServer.setPort(2566);
 		smtpServer.start();
@@ -46,7 +50,7 @@ class MessageHandlerTest {
 		smtpServer.stop();
 	}
 
-	// @Test
+	@Test
 	void testCompletedMailTransaction() throws Exception {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler);
 
@@ -66,16 +70,16 @@ class MessageHandlerTest {
 		verify(messageHandler).done();
 	}
 
-	// @Test
+	@Test
 	void testDisconnectImmediately() throws Exception {
 		final SmartClient client = new SmartClient("localhost", smtpServer.getPort(), "localhost");
 		client.quit();
 		smtpServer.stop(); // wait for the server to catch up
 
-		verify(messageHandlerFactory).create(any(MessageContext.class));
+		verifyNoInteractions(messageHandlerFactory);
 	}
 
-	// @Test
+	@Test
 	void testAbortedMailTransaction() throws Exception {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler);
 
@@ -89,7 +93,7 @@ class MessageHandlerTest {
 		verify(messageHandler).done();
 	}
 
-	// @Test
+	@Test
 	void testTwoMailsInOneSession() throws Exception {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler, messageHandler2);
 
@@ -132,7 +136,8 @@ class MessageHandlerTest {
 	 * @throws IOException        on IO error
 	 * @throws MessagingException on messaging error
 	 */
-	// @Test
+	@Test
+	@Disabled("To be fixed")
 	void testMailFromRejectedFirst() throws IOException {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler, messageHandler2);
 

@@ -48,6 +48,12 @@ public class DataCommand extends BaseCommand {
 
 		try {
 			sess.getMessageHandler().data(stream);
+			while (stream.read() != -1) {
+				// Just in case the handler didn't consume all the data, we might as well
+				// suck it up so it doesn't pollute further exchanges.  This code used to
+				// throw an exception, but this seems an arbitrary part of the contract that
+				// we might as well relax.
+			}
 		} catch (final DropConnectionException ex) {
 			throw ex; // Propagate this
 		} catch (final RejectException ex) {
