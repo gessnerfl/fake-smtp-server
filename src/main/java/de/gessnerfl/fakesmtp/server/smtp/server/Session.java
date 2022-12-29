@@ -33,7 +33,7 @@ public class Session implements Runnable, MessageContext {
     /**
      * A link to our parent server
      */
-    private final SMTPServer server;
+    private final BaseSmtpServer server;
 
     /**
      * A link to our parent server thread, which must be notified when this
@@ -118,7 +118,7 @@ public class Session implements Runnable, MessageContext {
      * @param socket is the socket to the client
      * @throws IOException on IO error
      */
-    public Session(final SMTPServer server, final ServerThread serverThread, final Socket socket) throws IOException {
+    public Session(final BaseSmtpServer server, final ServerThread serverThread, final Socket socket) throws IOException {
         this.server = server;
         this.serverThread = serverThread;
 
@@ -128,7 +128,7 @@ public class Session implements Runnable, MessageContext {
     /**
      * @return a reference to the master server object
      */
-    public SMTPServer getServer() {
+    public BaseSmtpServer getServer() {
         return this.server;
     }
 
@@ -368,7 +368,7 @@ public class Session implements Runnable, MessageContext {
      * @see org.subethamail.smtp.MessageContext#getSMTPServer()
      */
     @Override
-    public SMTPServer getSMTPServer() {
+    public BaseSmtpServer getSMTPServer() {
         return this.server;
     }
 

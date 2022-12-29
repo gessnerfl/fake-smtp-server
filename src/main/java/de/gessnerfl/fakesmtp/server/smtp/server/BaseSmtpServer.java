@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import de.gessnerfl.fakesmtp.server.SmtpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandlerFactory;
@@ -35,8 +36,8 @@ import de.gessnerfl.fakesmtp.server.smtp.Version;
  * By default, no authentication methods are offered. To use authentication, set
  * an AuthenticationHandlerFactory.
  */
-public class SMTPServer {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SMTPServer.class);
+public class BaseSmtpServer implements SmtpServer {
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseSmtpServer.class);
 
 	/** Hostname used if we can't find one */
 	private static final String UNKNOWN_HOSTNAME = "localhost";
@@ -123,14 +124,14 @@ public class SMTPServer {
 	/**
 	 * Simple constructor.
 	 */
-	public SMTPServer(final MessageHandlerFactory handlerFactory) {
+	public BaseSmtpServer(final MessageHandlerFactory handlerFactory) {
 		this(handlerFactory, null, null);
 	}
 
 	/**
 	 * Constructor with {@link AuthenticationHandlerFactory}.
 	 */
-	public SMTPServer(final MessageHandlerFactory handlerFactory, final AuthenticationHandlerFactory authHandlerFact) {
+	public BaseSmtpServer(final MessageHandlerFactory handlerFactory, final AuthenticationHandlerFactory authHandlerFact) {
 		this(handlerFactory, authHandlerFact, null);
 	}
 
@@ -153,9 +154,9 @@ public class SMTPServer {
 	 *                        SMTPServer itself stops. If null, a default one is
 	 *                        created by {@link Executors#newCachedThreadPool()}.
 	 */
-	public SMTPServer(final MessageHandlerFactory msgHandlerFact,
-			final AuthenticationHandlerFactory authHandlerFact,
-			final ExecutorService executorService) {
+	public BaseSmtpServer(final MessageHandlerFactory msgHandlerFact,
+						  final AuthenticationHandlerFactory authHandlerFact,
+						  final ExecutorService executorService) {
 		this.messageHandlerFactory = msgHandlerFact;
 		this.authenticationHandlerFactory = authHandlerFact;
 
@@ -261,6 +262,7 @@ public class SMTPServer {
 	 * <p>
 	 * An SMTPServer which has been shut down, must not be reused.
 	 */
+	@Override
 	public synchronized void start() {
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("SMTP server {} starting", getDisplayableLocalSocketAddress());
@@ -288,6 +290,7 @@ public class SMTPServer {
 	/**
 	 * Shut things down gracefully.
 	 */
+	@Override
 	public synchronized void stop() {
 		LOGGER.info("SMTP server {} stopping...", getDisplayableLocalSocketAddress());
 		if (this.serverThread == null) {
@@ -300,13 +303,7 @@ public class SMTPServer {
 		LOGGER.info("SMTP server {} stopped", getDisplayableLocalSocketAddress());
 	}
 
-	/**
-	 * Override this method if you want to create your own server sockets. You must
-	 * return a bound ServerSocket instance
-	 *
-	 * @throws IOException on IO error
-	 */
-	protected ServerSocket createServerSocket() throws IOException {
+	private ServerSocket createServerSocket() throws IOException {
 		InetSocketAddress isa;
 
 		if (this.bindAddress == null) {

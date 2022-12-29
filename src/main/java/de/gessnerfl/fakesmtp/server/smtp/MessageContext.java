@@ -3,7 +3,7 @@ package de.gessnerfl.fakesmtp.server.smtp;
 import java.net.SocketAddress;
 import java.security.cert.Certificate;
 
-import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.server.BaseSmtpServer;
 
 /**
  * Interface which provides context to the message handlers.
@@ -12,7 +12,7 @@ public interface MessageContext {
 	/**
 	 * @return the SMTPServer object.
 	 */
-	SMTPServer getSMTPServer();
+	BaseSmtpServer getSMTPServer();
 
 	/**
 	 * @return the IP address of the remote server.
@@ -39,7 +39,7 @@ public interface MessageContext {
 	 *
 	 * <p>
 	 * In order to get this information, override
-	 * {@link SMTPServer#createSSLSocket(java.net.Socket)} and call
+	 * {@link BaseSmtpServer#createSSLSocket(java.net.Socket)} and call
 	 * {@link javax.net.ssl.SSLSocket#setNeedClientAuth(boolean)
 	 * setNeedClientAuth(true)} on the created socket.
 	 *

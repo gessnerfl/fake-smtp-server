@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.helper.SimpleMessageListener;
 import de.gessnerfl.fakesmtp.server.smtp.helper.SimpleMessageListenerAdapter;
-import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.server.BaseSmtpServer;
 
 /**
  * Wiser is a tool for unit testing applications that send mail. Your unit tests
@@ -32,7 +32,7 @@ import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
 public class Wiser implements SimpleMessageListener {
 	private final static Logger log = LoggerFactory.getLogger(Wiser.class);
 
-	SMTPServer server;
+	BaseSmtpServer server;
 
 	protected List<WiserMessage> messages = Collections.synchronizedList(new ArrayList<WiserMessage>());
 
@@ -41,7 +41,7 @@ public class Wiser implements SimpleMessageListener {
 	 * 25. Call setPort()/setHostname() before calling start().
 	 */
 	public Wiser() {
-		this.server = new SMTPServer(new SimpleMessageListenerAdapter(this));
+		this.server = new BaseSmtpServer(new SimpleMessageListenerAdapter(this));
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class Wiser implements SimpleMessageListener {
 	 *
 	 * @return the server implementation
 	 */
-	public SMTPServer getServer() {
+	public BaseSmtpServer getServer() {
 		return this.server;
 	}
 

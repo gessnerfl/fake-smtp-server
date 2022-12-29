@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import de.gessnerfl.fakesmtp.server.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.server.smtp.auth.EasyAuthenticationHandlerFactory;
-import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.server.BaseSmtpServer;
 
 import java.net.InetAddress;
 
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SmtpServerConfiguratorTest {
+class BaseSmtpServerConfiguratorTest {
 
     @Mock
     private FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
@@ -30,7 +30,7 @@ class SmtpServerConfiguratorTest {
     private Logger logger;
 
     @InjectMocks
-    private SmtpServerConfigurator sut;
+    private BaseSmtpServerConfigurator sut;
 
     @Test
     void shouldConfigureBasicParameters(){
@@ -39,7 +39,7 @@ class SmtpServerConfiguratorTest {
         when(fakeSmtpConfigurationProperties.getPort()).thenReturn(port);
         when(fakeSmtpConfigurationProperties.getBindAddress()).thenReturn(bindingAddress);
 
-        var smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(BaseSmtpServer.class);
 
         sut.configure(smtpServer);
 
@@ -57,7 +57,7 @@ class SmtpServerConfiguratorTest {
         when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(BaseSmtpServer.class);
 
         sut.configure(smtpServer);
 
@@ -78,7 +78,7 @@ class SmtpServerConfiguratorTest {
         when(authentication.getUsername()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(BaseSmtpServer.class);
 
         sut.configure(smtpServer);
 
@@ -92,7 +92,7 @@ class SmtpServerConfiguratorTest {
         when(authentication.getUsername()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(BaseSmtpServer.class);
 
         sut.configure(smtpServer);
 
@@ -108,7 +108,7 @@ class SmtpServerConfiguratorTest {
         when(authentication.getPassword()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(BaseSmtpServer.class);
 
         sut.configure(smtpServer);
 
@@ -124,7 +124,7 @@ class SmtpServerConfiguratorTest {
         when(authentication.getPassword()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(SMTPServer.class);
+        var smtpServer = mock(BaseSmtpServer.class);
 
         sut.configure(smtpServer);
 

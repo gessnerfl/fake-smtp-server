@@ -36,13 +36,13 @@ class MessageHandlerTest {
 	@Mock
 	private MessageHandler messageHandler2;
 
-	private SMTPServer smtpServer;
+	private BaseSmtpServer smtpServer;
 
 	@BeforeEach
 	public void setup() {
 		MockitoAnnotations.openMocks(this);
 		int randomPort = RandomUtils.nextInt(1024,65536);
-		smtpServer = new SMTPServer(messageHandlerFactory);
+		smtpServer = new BaseSmtpServer(messageHandlerFactory);
 		smtpServer.setPort(randomPort);
 		smtpServer.start();
 	}

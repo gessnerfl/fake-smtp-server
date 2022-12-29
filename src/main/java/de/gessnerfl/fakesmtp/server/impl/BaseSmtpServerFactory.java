@@ -6,17 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import de.gessnerfl.fakesmtp.server.smtp.helper.SimpleMessageListenerAdapter;
-import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.server.BaseSmtpServer;
 
 @Profile("default")
 @Service
-public class SmtpServerFactoryImpl implements SmtpServerFactory {
+public class BaseSmtpServerFactory implements SmtpServerFactory {
 
     private final MessageListener messageListener;
-    private final SmtpServerConfigurator configurator;
+    private final BaseSmtpServerConfigurator configurator;
 
     @Autowired
-    public SmtpServerFactoryImpl(MessageListener messageListener, SmtpServerConfigurator configurator) {
+    public BaseSmtpServerFactory(MessageListener messageListener, BaseSmtpServerConfigurator configurator) {
         this.messageListener = messageListener;
         this.configurator = configurator;
     }
@@ -24,8 +24,8 @@ public class SmtpServerFactoryImpl implements SmtpServerFactory {
     @Override
     public SmtpServer create() {
         var simpleMessageListenerAdapter = new SimpleMessageListenerAdapter(messageListener);
-        var smtpServer = new SMTPServer(simpleMessageListenerAdapter);
+        var smtpServer = new BaseSmtpServer(simpleMessageListenerAdapter);
         configurator.configure(smtpServer);
-        return new SmtpServerImpl(smtpServer);
+        return smtpServer;
     }
 }

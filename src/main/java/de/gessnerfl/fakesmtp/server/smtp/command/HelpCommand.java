@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import de.gessnerfl.fakesmtp.server.smtp.server.BaseCommand;
 import de.gessnerfl.fakesmtp.server.smtp.server.CommandException;
-import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.server.BaseSmtpServer;
 import de.gessnerfl.fakesmtp.server.smtp.server.Session;
 
 /**
@@ -32,7 +32,7 @@ public class HelpCommand extends BaseCommand {
 		}
 	}
 
-	private String getCommandMessage(final SMTPServer server) {
+	private String getCommandMessage(final BaseSmtpServer server) {
 		return "214-"
 				+ server.getSoftwareName()
 				+ " on "
@@ -44,7 +44,7 @@ public class HelpCommand extends BaseCommand {
 				+ "214 End of HELP info";
 	}
 
-	protected String getFormattedTopicList(final SMTPServer server) {
+	protected String getFormattedTopicList(final BaseSmtpServer server) {
 		final StringBuilder sb = new StringBuilder();
 		for (final String key : server.getCommandHandler().getVerbs()) {
 			sb.append("214-     " + key + "\r\n");

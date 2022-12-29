@@ -20,7 +20,7 @@ import org.slf4j.MDC;
 class ServerThread extends Thread {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServerThread.class);
 
-	private final SMTPServer server;
+	private final BaseSmtpServer server;
 
 	private final ServerSocket serverSocket;
 
@@ -43,7 +43,7 @@ class ServerThread extends Thread {
 
 	private boolean updateThreadName = true;
 
-	public ServerThread(final SMTPServer server, final ServerSocket serverSocket) {
+	public ServerThread(final BaseSmtpServer server, final ServerSocket serverSocket) {
 		super(ServerThread.class.getName() + " " + server.getDisplayableLocalSocketAddress());
 		this.server = server;
 		this.serverSocket = serverSocket;

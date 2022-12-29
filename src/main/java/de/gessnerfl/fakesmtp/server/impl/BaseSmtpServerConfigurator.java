@@ -6,23 +6,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import de.gessnerfl.fakesmtp.server.smtp.auth.EasyAuthenticationHandlerFactory;
-import de.gessnerfl.fakesmtp.server.smtp.server.SMTPServer;
+import de.gessnerfl.fakesmtp.server.smtp.server.BaseSmtpServer;
 
 @Service
-public class SmtpServerConfigurator {
+public class BaseSmtpServerConfigurator {
 
     private final FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
     private final BasicUsernamePasswordValidator basicUsernamePasswordValidator;
     private final Logger logger;
 
     @Autowired
-    public SmtpServerConfigurator(FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties, BasicUsernamePasswordValidator basicUsernamePasswordValidator, Logger logger) {
+    public BaseSmtpServerConfigurator(FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties, BasicUsernamePasswordValidator basicUsernamePasswordValidator, Logger logger) {
         this.fakeSmtpConfigurationProperties = fakeSmtpConfigurationProperties;
         this.basicUsernamePasswordValidator = basicUsernamePasswordValidator;
         this.logger = logger;
     }
 
-    public void configure(SMTPServer smtpServer) {
+    public void configure(BaseSmtpServer smtpServer) {
         smtpServer.setPort(fakeSmtpConfigurationProperties.getPort());
         smtpServer.setBindAddress(fakeSmtpConfigurationProperties.getBindAddress());
         if (fakeSmtpConfigurationProperties.getAuthentication() != null) {
@@ -30,7 +30,7 @@ public class SmtpServerConfigurator {
         }
     }
 
-    private void configureAuthentication(SMTPServer smtpServer, FakeSmtpConfigurationProperties.Authentication authentication) {
+    private void configureAuthentication(BaseSmtpServer smtpServer, FakeSmtpConfigurationProperties.Authentication authentication) {
         if (!StringUtils.hasText(authentication.getUsername())) {
             logger.error("Username is missing; skip configuration of authentication");
         } else if (!StringUtils.hasText(authentication.getPassword())) {
