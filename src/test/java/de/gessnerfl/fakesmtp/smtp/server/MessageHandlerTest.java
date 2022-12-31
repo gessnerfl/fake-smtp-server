@@ -42,7 +42,7 @@ class MessageHandlerTest {
 	public void setup() {
 		MockitoAnnotations.openMocks(this);
 		int randomPort = RandomUtils.nextInt(1024,65536);
-		smtpServer = new BaseSmtpServer(messageHandlerFactory);
+		smtpServer = new BaseSmtpServer("FakeSMTPServer", messageHandlerFactory);
 		smtpServer.setPort(randomPort);
 		smtpServer.start();
 	}
@@ -132,11 +132,7 @@ class MessageHandlerTest {
 	 * Test for issue 56: rejecting a Mail From causes IllegalStateException in the
 	 * next Mail From attempt.
 	 *
-	 * @see <a href="http://code.google.com/p/subethasmtp/issues/detail?id=56">Issue
-	 *      56</a>
-	 *
 	 * @throws IOException        on IO error
-	 * @throws MessagingException on messaging error
 	 */
 	@Test
 	@Disabled("To be fixed")

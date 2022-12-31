@@ -1,5 +1,6 @@
 server:
   port: 5080
+  shutdown: graceful
 
 management:
   server:

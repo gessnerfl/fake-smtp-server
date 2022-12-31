@@ -26,8 +26,7 @@ import de.gessnerfl.fakesmtp.smtp.server.BaseSmtpServer;
  *
  * Wiser is not intended to be a "real" mail server and is not adequate for that
  * purpose; it simply stores all mail in memory. Use the MessageHandlerFactory
- * interface (optionally with the SimpleMessageListenerAdapter) of SubEthaSMTP
- * instead.
+ * interface (optionally with the SimpleMessageListenerAdapter) instead.
  */
 public class Wiser implements MessageListener {
 	private final static Logger log = LoggerFactory.getLogger(Wiser.class);
@@ -41,7 +40,7 @@ public class Wiser implements MessageListener {
 	 * 25. Call setPort()/setHostname() before calling start().
 	 */
 	public Wiser() {
-		this.server = new BaseSmtpServer(new MessageListenerAdapter(this));
+		this.server = new BaseSmtpServer("FakeSMTPServer", new MessageListenerAdapter(this));
 	}
 
 	/**

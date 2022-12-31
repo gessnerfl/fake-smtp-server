@@ -27,7 +27,7 @@ public interface MessageContext {
 	/**
 	 * @return the host name or address literal the client supplied in the HELO or
 	 *         EHLO command, or null if neither of these commands were received yet.
-	 *         Note that SubEthaSMTP (along with some MTAs, but contrary to RFC
+	 *         Note that FakeSMTPSever (along with some MTAs, but contrary to RFC
 	 *         5321) accept mail transactions without these commands.
 	 */
 	String getHelo();

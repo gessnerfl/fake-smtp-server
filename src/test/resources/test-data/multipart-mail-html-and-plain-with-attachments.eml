@@ -1,6 +1,6 @@
 Received: from 192.168.0.157 (localhost [127.0.0.1])
         by 192.168.0.157
-        with SMTP (SubEthaSMTP 3.1.7) id JMT3KYBE
+        with SMTP (FakeSMTPServer 1.0.0) id JMT3KYBE
         for receiver@exmaple.com;
         Wed, 03 Oct 2018 13:57:44 +0200 (CEST)
 Date: Wed, 3 Oct 2018 13:57:44 +0200 (CEST)

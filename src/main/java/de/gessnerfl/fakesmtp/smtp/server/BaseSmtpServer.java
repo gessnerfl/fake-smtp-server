@@ -13,11 +13,12 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import de.gessnerfl.fakesmtp.smtp.command.CommandHandler;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.gessnerfl.fakesmtp.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.smtp.MessageHandlerFactory;
-import de.gessnerfl.fakesmtp.smtp.Version;
 
 /**
  * Main SMTPServer class. Construct this object, set the hostName, port, and
@@ -50,7 +51,7 @@ public class BaseSmtpServer implements SmtpServer {
 
 	private int backlog = 50;
 
-	private String softwareName = "SubEthaSMTP " + Version.getSpecification();
+	private final String softwareName;
 
 	private MessageHandlerFactory messageHandlerFactory;
 
@@ -124,15 +125,8 @@ public class BaseSmtpServer implements SmtpServer {
 	/**
 	 * Simple constructor.
 	 */
-	public BaseSmtpServer(final MessageHandlerFactory handlerFactory) {
-		this(handlerFactory, null, null);
-	}
-
-	/**
-	 * Constructor with {@link AuthenticationHandlerFactory}.
-	 */
-	public BaseSmtpServer(final MessageHandlerFactory handlerFactory, final AuthenticationHandlerFactory authHandlerFact) {
-		this(handlerFactory, authHandlerFact, null);
+	public BaseSmtpServer(final String softwareName, final MessageHandlerFactory handlerFactory) {
+		this(softwareName, handlerFactory, null, null);
 	}
 
 	/**
@@ -154,9 +148,11 @@ public class BaseSmtpServer implements SmtpServer {
 	 *                        SMTPServer itself stops. If null, a default one is
 	 *                        created by {@link Executors#newCachedThreadPool()}.
 	 */
-	public BaseSmtpServer(final MessageHandlerFactory msgHandlerFact,
+	public BaseSmtpServer(final String softwareName,
+						  final MessageHandlerFactory msgHandlerFact,
 						  final AuthenticationHandlerFactory authHandlerFact,
 						  final ExecutorService executorService) {
+		this.softwareName = softwareName;
 		this.messageHandlerFactory = msgHandlerFact;
 		this.authenticationHandlerFactory = authHandlerFact;
 
@@ -215,13 +211,6 @@ public class BaseSmtpServer implements SmtpServer {
 	}
 
 	/**
-	 * Changes the publicly reported software information.
-	 */
-	public void setSoftwareName(final String value) {
-		this.softwareName = value;
-	}
-
-	/**
 	 * @return the ExecutorService handling client connections
 	 */
 	public ExecutorService getExecutorService() {
@@ -263,10 +252,9 @@ public class BaseSmtpServer implements SmtpServer {
 	 * An SMTPServer which has been shut down, must not be reused.
 	 */
 	@Override
-	public synchronized void start() {
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("SMTP server {} starting", getDisplayableLocalSocketAddress());
-		}
+	@PostConstruct
+	public void start() {
+		LOGGER.info("SMTP server {} starting", getDisplayableLocalSocketAddress());
 
 		if (this.started) {
 			throw new IllegalStateException("SMTPServer can only be started once. "
@@ -291,7 +279,8 @@ public class BaseSmtpServer implements SmtpServer {
 	 * Shut things down gracefully.
 	 */
 	@Override
-	public synchronized void stop() {
+	@PreDestroy
+	public void stop() {
 		LOGGER.info("SMTP server {} stopping...", getDisplayableLocalSocketAddress());
 		if (this.serverThread == null) {
 			return;
@@ -440,11 +429,6 @@ public class BaseSmtpServer implements SmtpServer {
 	 * password.
 	 * </ul>
 	 * <p>
-	 * Up to SubEthaSMTP 3.1.5 the default was true, i.e. TLS was enabled.
-	 *
-	 * @see <a href=
-	 *      "http://blog.jteam.nl/2009/11/10/securing-connections-with-tls/">Securing
-	 *      Connections with TLS</a>
 	 */
 	public void setEnableTLS(final boolean enableTLS) {
 		this.enableTLS = enableTLS;

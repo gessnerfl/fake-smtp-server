@@ -1,16 +1,19 @@
-package de.gessnerfl.fakesmtp.smtp.server;
+package de.gessnerfl.fakesmtp.config;
 
-import de.gessnerfl.fakesmtp.config.FakeSmtpConfigurationProperties;
 import de.gessnerfl.fakesmtp.smtp.auth.BasicUsernamePasswordValidator;
+import de.gessnerfl.fakesmtp.smtp.server.BaseMessageListener;
+import de.gessnerfl.fakesmtp.smtp.server.BaseSmtpServer;
+import de.gessnerfl.fakesmtp.smtp.server.MessageListenerAdapter;
+import de.gessnerfl.fakesmtp.smtp.server.SmtpServer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import de.gessnerfl.fakesmtp.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.smtp.auth.EasyAuthenticationHandlerFactory;
+import org.springframework.boot.info.BuildProperties;
 
 import java.net.InetAddress;
 
@@ -19,18 +22,29 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class BaseSmtpServerConfiguratorTest {
+class BaseSmtpServerConfigTest {
 
+    @Mock
+    private BuildProperties buildProperties;
+    @Mock
+    private BaseMessageListener baseMessageListener;
     @Mock
     private FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
     @Mock
     private BasicUsernamePasswordValidator basicUsernamePasswordValidator;
     @Mock
+    private BaseSmtpServer smtpServer;
+    @Mock
     private Logger logger;
 
-    @InjectMocks
-    private BaseSmtpServerConfigurator sut;
+    private BaseSmtpServerConfig sut;
+
+    @BeforeEach
+    public void init(){
+        MockitoAnnotations.openMocks(this);
+        sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, baseMessageListener, basicUsernamePasswordValidator, logger));
+        when(sut.createBaseSmtpServerFor(any(MessageListenerAdapter.class))).thenReturn(smtpServer);
+    }
 
     @Test
     void shouldConfigureBasicParameters(){
@@ -39,10 +53,9 @@ class BaseSmtpServerConfiguratorTest {
         when(fakeSmtpConfigurationProperties.getPort()).thenReturn(port);
         when(fakeSmtpConfigurationProperties.getBindAddress()).thenReturn(bindingAddress);
 
-        var smtpServer = mock(BaseSmtpServer.class);
+        SmtpServer result = sut.smtpServer();
 
-        sut.configure(smtpServer);
-
+        assertSame(smtpServer, result);
         verify(smtpServer).setPort(port);
         verify(smtpServer).setBindAddress(bindingAddress);
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
@@ -57,9 +70,9 @@ class BaseSmtpServerConfiguratorTest {
         when(authentication.getPassword()).thenReturn(password);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(BaseSmtpServer.class);
+        SmtpServer result = sut.smtpServer();
 
-        sut.configure(smtpServer);
+        assertSame(smtpServer, result);
 
         var argumentCaptor = ArgumentCaptor.forClass(AuthenticationHandlerFactory.class);
         verify(smtpServer).setAuthenticationHandlerFactory(argumentCaptor.capture());
@@ -78,9 +91,9 @@ class BaseSmtpServerConfiguratorTest {
         when(authentication.getUsername()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(BaseSmtpServer.class);
+        SmtpServer result = sut.smtpServer();
 
-        sut.configure(smtpServer);
+        assertSame(smtpServer, result);
 
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
         verify(logger).error(startsWith("Username"));
@@ -92,9 +105,9 @@ class BaseSmtpServerConfiguratorTest {
         when(authentication.getUsername()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(BaseSmtpServer.class);
+        SmtpServer result = sut.smtpServer();
 
-        sut.configure(smtpServer);
+        assertSame(smtpServer, result);
 
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
         verify(logger).error(startsWith("Username"));
@@ -108,9 +121,9 @@ class BaseSmtpServerConfiguratorTest {
         when(authentication.getPassword()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(BaseSmtpServer.class);
+        SmtpServer result = sut.smtpServer();
 
-        sut.configure(smtpServer);
+        assertSame(smtpServer, result);
 
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
         verify(logger).error(startsWith("Password"));
@@ -124,9 +137,9 @@ class BaseSmtpServerConfiguratorTest {
         when(authentication.getPassword()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
 
-        var smtpServer = mock(BaseSmtpServer.class);
+        SmtpServer result = sut.smtpServer();
 
-        sut.configure(smtpServer);
+        assertSame(smtpServer, result);
 
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
         verify(logger).error(startsWith("Password"));
