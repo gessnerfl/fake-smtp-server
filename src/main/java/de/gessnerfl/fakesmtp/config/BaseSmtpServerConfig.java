@@ -61,6 +61,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
         } else {
             logger.info("Setup simple username and password authentication for SMTP server");
             smtpServer.setAuthenticationHandlerFactory(new EasyAuthenticationHandlerFactory(basicUsernamePasswordValidator));
+            smtpServer.setRequireAuth(true);
         }
     }
 

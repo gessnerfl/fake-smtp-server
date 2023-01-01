@@ -1,104 +1,111 @@
 package de.gessnerfl.fakesmtp.smtp.server;
 
-import de.gessnerfl.fakesmtp.smtp.auth.EasyAuthenticationHandlerFactory;
-import de.gessnerfl.fakesmtp.smtp.auth.LoginFailedException;
-import de.gessnerfl.fakesmtp.smtp.auth.UsernamePasswordValidator;
+import de.gessnerfl.fakesmtp.smtp.StoringMessageListener;
+import de.gessnerfl.fakesmtp.smtp.util.Client;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import de.gessnerfl.fakesmtp.smtp.util.ServerTestCase;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.Base64Utils;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-class RequireAuthTest extends ServerTestCase {
-    static final String REQUIRED_USERNAME = "myUserName";
+@Transactional
+@ActiveProfiles({"auth_integrationtest", "default"})
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+class RequireAuthTest {
+    static final String REQUIRED_USERNAME = "myUsername";
 
-    static final String REQUIRED_PASSWORD = "mySecret01";
-
-    static class RequiredUsernamePasswordValidator implements UsernamePasswordValidator {
-        @Override
-        public void login(final String username, final String password) throws LoginFailedException {
-            if (!username.equals(REQUIRED_USERNAME) || !password.equals(REQUIRED_PASSWORD)) {
-                throw new LoginFailedException();
-            }
-        }
+    static final String REQUIRED_PASSWORD = "myPassword";
+    
+    @Autowired
+    private SmtpServer smtpServer;
+    @Autowired
+    private StoringMessageListener storingMessageListener;
+    private Client c;
+    
+    @BeforeEach
+    void init() throws IOException {
+        c = new Client("localhost", smtpServer.getPort());
+        storingMessageListener.reset();
     }
-
-    @Override
-    protected TestWiser createTestWiser(int serverPort) {
-        var validator = new RequiredUsernamePasswordValidator();
-        var fact = new EasyAuthenticationHandlerFactory(validator);
-        var wiser = new TestWiser();
-        wiser.setHostname("localhost");
-        wiser.setPort(serverPort);
-        wiser.getServer().setAuthenticationHandlerFactory(fact);
-        wiser.getServer().setRequireAuth(true);
-        return wiser;
+    
+    @AfterEach
+    void cleanup(){
+        storingMessageListener.reset();
     }
 
     @Test
     void testAuthRequired() throws Exception {
-        this.expect("220");
+        c.expect("220");
 
-        this.send("HELO foo.com");
-        this.expect("250");
+        c.send("HELO foo.com");
+        c.expect("250");
 
-        this.send("EHLO foo.com");
-        this.expect("250");
+        c.send("EHLO foo.com");
+        c.expect("250");
 
-        this.send("NOOP");
-        this.expect("250");
+        c.send("NOOP");
+        c.expect("250");
 
-        this.send("RSET");
-        this.expect("250");
+        c.send("RSET");
+        c.expect("250");
 
-        this.send("MAIL FROM: test@example.com");
-        this.expect("530 5.7.0  Authentication required");
+        c.send("MAIL FROM: test@example.com");
+        c.expect("530 5.7.0  Authentication required");
 
-        this.send("RCPT TO: test@example.com");
-        this.expect("530 5.7.0  Authentication required");
+        c.send("RCPT TO: test@example.com");
+        c.expect("530 5.7.0  Authentication required");
 
-        this.send("DATA");
-        this.expect("530 5.7.0  Authentication required");
+        c.send("DATA");
+        c.expect("530 5.7.0  Authentication required");
 
-        this.send("STARTTLS");
-        this.expect("454 TLS not supported");
+        c.send("STARTTLS");
+        c.expect("454 TLS not supported");
 
-        this.send("QUIT");
-        this.expect("221 Bye");
+        c.send("QUIT");
+        c.expect("221 Bye");
     }
 
     @Test
     void testAuthSuccess() throws Exception {
-        this.expect("220");
+        c.expect("220");
 
-        this.send("HELO foo.com");
-        this.expect("250");
+        c.send("HELO foo.com");
+        c.expect("250");
 
-        this.send("AUTH LOGIN");
-        this.expect("334");
+        c.send("AUTH LOGIN");
+        c.expect("334");
 
         final String enc_username = Base64Utils.encodeToString(REQUIRED_USERNAME.getBytes(StandardCharsets.US_ASCII));
 
-        this.send(enc_username);
-        this.expect("334");
+        c.send(enc_username);
+        c.expect("334");
 
         final String enc_pwd = Base64Utils.encodeToString(REQUIRED_PASSWORD.getBytes(StandardCharsets.US_ASCII));
-        this.send(enc_pwd);
-        this.expect("235");
+        c.send(enc_pwd);
+        c.expect("235");
 
-        this.send("MAIL FROM: test@example.com");
-        this.expect("250");
+        c.send("MAIL FROM: test@example.com");
+        c.expect("250");
 
-        this.send("RCPT TO: test@example.com");
-        this.expect("250");
+        c.send("RCPT TO: test@example.com");
+        c.expect("250");
 
-        this.send("DATA");
-        this.expect("354");
+        c.send("DATA");
+        c.expect("354");
 
-        this.send("\r\n.");
-        this.expect("250");
+        c.send("\r\n.");
+        c.expect("250");
 
-        this.send("QUIT");
-        this.expect("221 Bye");
+        c.send("QUIT");
+        c.expect("221 Bye");
     }
 }

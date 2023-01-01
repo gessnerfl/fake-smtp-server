@@ -60,6 +60,7 @@ class BaseSmtpServerConfigTest {
         verify(smtpServer).setPort(port);
         verify(smtpServer).setBindAddress(bindingAddress);
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
+        verify(smtpServer, never()).setRequireAuth(true);
     }
 
     @Test
@@ -77,6 +78,7 @@ class BaseSmtpServerConfigTest {
 
         var argumentCaptor = ArgumentCaptor.forClass(AuthenticationHandlerFactory.class);
         verify(smtpServer).setAuthenticationHandlerFactory(argumentCaptor.capture());
+        verify(smtpServer).setRequireAuth(true);
 
         var authenticationHandlerFactory = argumentCaptor.getValue();
         assertNotNull(authenticationHandlerFactory);
@@ -97,6 +99,7 @@ class BaseSmtpServerConfigTest {
         assertSame(smtpServer, result);
 
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
+        verify(smtpServer, never()).setRequireAuth(true);
         verify(logger).error(startsWith("Username"));
     }
 
@@ -111,6 +114,7 @@ class BaseSmtpServerConfigTest {
         assertSame(smtpServer, result);
 
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
+        verify(smtpServer, never()).setRequireAuth(true);
         verify(logger).error(startsWith("Username"));
     }
 
@@ -127,6 +131,7 @@ class BaseSmtpServerConfigTest {
         assertSame(smtpServer, result);
 
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
+        verify(smtpServer, never()).setRequireAuth(true);
         verify(logger).error(startsWith("Password"));
     }
 
@@ -143,6 +148,7 @@ class BaseSmtpServerConfigTest {
         assertSame(smtpServer, result);
 
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
+        verify(smtpServer, never()).setRequireAuth(true);
         verify(logger).error(startsWith("Password"));
     }
 
