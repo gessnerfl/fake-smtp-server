@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +21,8 @@ class ServerThread extends Thread {
 	private final BaseSmtpServer server;
 
 	private final ServerSocket serverSocket;
+
+	private final ExecutorService executorService;
 
 	/**
 	 * A semaphore which is used to prevent accepting new connections by blocking
@@ -52,6 +52,7 @@ class ServerThread extends Thread {
 		final int countOfConnectionPermits = server.getMaxConnections() + 10;
 		this.connectionPermits = new Semaphore(countOfConnectionPermits);
 		this.sessionThreads = new HashSet<>(countOfConnectionPermits * 4 / 3 + 1);
+		this.executorService = Executors.newCachedThreadPool();
 	}
 
 	/**
@@ -145,7 +146,7 @@ class ServerThread extends Thread {
 
 	private void executeSocketSession(SocketSession socketSession){
 		try {
-			server.getExecutorService().execute(socketSession.session);
+			executorService.execute(socketSession.session);
 		} catch (final RejectedExecutionException e) {
 			connectionPermits.release();
 			synchronized (this) {
@@ -207,9 +208,9 @@ class ServerThread extends Thread {
 			sessionThread.quit();
 		}
 
-		server.getExecutorService().shutdown();
+		executorService.shutdown();
 		try {
-			server.getExecutorService().awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (final InterruptedException e) {
 			LOGGER.warn("Interrupted waiting for termination of session threads", e);
 			Thread.currentThread().interrupt();
