@@ -192,6 +192,7 @@ public class BaseSmtpServer implements SmtpServer {
         this.bindAddress = bindAddress;
     }
 
+    @Override
     public int getPort() {
         return this.port;
     }

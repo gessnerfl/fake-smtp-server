@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class StoringMessageListener implements MessageListener {
     private final static Logger LOGGER = LoggerFactory.getLogger(StoringMessageListener.class);
-    protected List<StoredMessage> messages = Collections.synchronizedList(new ArrayList<>());
+    private List<StoredMessage> messages = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public boolean accept(String from, String recipient) {
@@ -30,5 +30,13 @@ public class StoringMessageListener implements MessageListener {
         final var bytes = IOUtils.toByteArray(data);
         LOGGER.debug("Creating message from data with " + bytes.length + " bytes");
         this.messages.add(new StoredMessage(from, recipient, bytes));
+    }
+
+    public List<StoredMessage> getMessages(){
+        return messages;
+    }
+
+    public void reset(){
+        this.messages.clear();
     }
 }

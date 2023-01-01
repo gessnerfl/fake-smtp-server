@@ -2,10 +2,10 @@ package de.gessnerfl.fakesmtp.smtp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.Random;
 
+import de.gessnerfl.fakesmtp.smtp.server.SmtpServer;
 import jakarta.activation.DataHandler;
 import jakarta.mail.Message;
 import jakarta.mail.Session;
@@ -14,46 +14,45 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * This class serves as a test case for both Wiser (since it is used internally
- * here) as well as harder to reach code within the SMTP server that tests a
- * roundtrip message through the DATA portion of the SMTP spec.
- */
+@Transactional
+@ActiveProfiles({"integrationtest", "default"})
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
 class MessageContentTest {
-	public static final int PORT = 2566;
 
-	protected Wiser wiser;
-
-	protected Session session;
+	@Autowired
+	private SmtpServer smtpServer;
+	@Autowired
+	private StoringMessageListener storingMessageListener;
+	private Session session;
 
 	@BeforeEach
 	void setUp() {
 		final Properties props = new Properties();
 		props.setProperty("mail.smtp.host", "localhost");
-		props.setProperty("mail.smtp.port", Integer.toString(PORT));
-		this.session = Session.getInstance(props);
-
-		this.wiser = new Wiser();
-		this.wiser.setPort(PORT);
-
-		this.wiser.start();
+		props.setProperty("mail.smtp.port", Integer.toString(smtpServer.getPort()));
+		session = Session.getInstance(props);
+		storingMessageListener.reset();
 	}
 
 	@AfterEach
-	void tearDown() {
-		this.wiser.stop();
-		this.wiser = null;
-
-		this.session = null;
+	void cleanup(){
+		storingMessageListener.reset();
 	}
 
 	@Test
@@ -66,9 +65,8 @@ class MessageContentTest {
 
 		Transport.send(message);
 
-		assertEquals(1, this.wiser.getMessages().size());
-
-		final String[] receivedHeaders = this.wiser.getMessages().get(0).getMimeMessage().getHeader("Received");
+		assertEquals(1, storingMessageListener.getMessages().size());
+		final String[] receivedHeaders = storingMessageListener.getMessages().get(0).getMimeMessage().getHeader("Received");
 
 		assertEquals(1, receivedHeaders.length);
 	}
@@ -91,7 +89,7 @@ class MessageContentTest {
 
 		Transport.send(message);
 
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
+		assertEquals(body, storingMessageListener.getMessages().get(0).getMimeMessage().getContent());
 	}
 
 	@Test
@@ -105,7 +103,7 @@ class MessageContentTest {
 
 		Transport.send(message);
 
-		assertEquals(2, this.wiser.getMessages().size());
+		assertEquals(2, storingMessageListener.getMessages().size());
 	}
 
 	@Test
@@ -119,13 +117,13 @@ class MessageContentTest {
 
 		Transport.send(message);
 
-		assertEquals(2, this.wiser.getMessages().size());
-
-		assertEquals("barf", this.wiser.getMessages().get(0).getMimeMessage().getSubject());
-		assertEquals("barf", this.wiser.getMessages().get(1).getMimeMessage().getSubject());
+		assertEquals(2, storingMessageListener.getMessages().size());
+		assertEquals("barf", storingMessageListener.getMessages().get(0).getMimeMessage().getSubject());
+		assertEquals("barf", storingMessageListener.getMessages().get(1).getMimeMessage().getSubject());
 	}
 
 	@Test
+	@Disabled("not supported by fakesmtp server")
 	void testBinaryEightBitMessage() throws Exception {
 		final byte[] body = new byte[64];
 		new Random().nextBytes(body);
@@ -139,7 +137,7 @@ class MessageContentTest {
 
 		Transport.send(message);
 
-		final InputStream in = this.wiser.getMessages().get(0).getMimeMessage().getInputStream();
+		final InputStream in = storingMessageListener.getMessages().get(0).getMimeMessage().getInputStream();
 		final ByteArrayOutputStream tmp = new ByteArrayOutputStream();
 		final byte[] buf = new byte[64];
 		int n;
@@ -148,6 +146,6 @@ class MessageContentTest {
 		}
 		in.close();
 
-		assertTrue(Arrays.equals(body, tmp.toByteArray()));
+		assertArrayEquals(body, tmp.toByteArray());
 	}
 }

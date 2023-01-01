@@ -42,16 +42,6 @@ public class Wiser implements MessageListener {
 	}
 
 	/**
-	 * Convenience constructor
-	 *
-	 * @param port the port to listen on
-	 */
-	public Wiser(final int port) {
-		this();
-		this.setPort(port);
-	}
-
-	/**
 	 * The port that the server should listen on.
 	 *
 	 * @param port the port to listen on
@@ -77,17 +67,6 @@ public class Wiser implements MessageListener {
 	/** Stops the SMTP Server */
 	public void stop() {
 		this.server.stop();
-	}
-
-	/**
-	 * A main() for this class. Starts up the server.
-	 *
-	 * @param args command line arguments
-	 * @throws Exception on error
-	 */
-	public static void main(final String[] args) throws Exception {
-		final Wiser wiser = new Wiser();
-		wiser.start();
 	}
 
 	/** Always accept everything */
