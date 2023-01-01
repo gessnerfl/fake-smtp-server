@@ -11,7 +11,7 @@ import java.net.InetAddress;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles({"integrationtest","config_integrationtest"})
+@ActiveProfiles({"mockserver","config_mockserver"})
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 class FakeSmtpConfigurationPropertiesIntegrationTest {

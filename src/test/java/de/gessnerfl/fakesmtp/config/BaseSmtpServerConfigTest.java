@@ -16,6 +16,7 @@ import de.gessnerfl.fakesmtp.smtp.auth.EasyAuthenticationHandlerFactory;
 import org.springframework.boot.info.BuildProperties;
 
 import java.net.InetAddress;
+import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.instanceOf;
@@ -40,14 +41,14 @@ class BaseSmtpServerConfigTest {
     private BaseSmtpServerConfig sut;
 
     @BeforeEach
-    public void init(){
+    public void init() {
         MockitoAnnotations.openMocks(this);
-        sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, baseMessageListener, basicUsernamePasswordValidator, logger));
+        sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, Collections.singletonList(baseMessageListener), basicUsernamePasswordValidator, logger));
         when(sut.createBaseSmtpServerFor(any(MessageListenerAdapter.class))).thenReturn(smtpServer);
     }
 
     @Test
-    void shouldConfigureBasicParameters(){
+    void shouldConfigureBasicParameters() {
         var port = 1234;
         var bindingAddress = mock(InetAddress.class);
         when(fakeSmtpConfigurationProperties.getPort()).thenReturn(port);
@@ -62,7 +63,7 @@ class BaseSmtpServerConfigTest {
     }
 
     @Test
-    void shouldConfigureAuthenticationWhenAuthenticationIsConfiguredProperly(){
+    void shouldConfigureAuthenticationWhenAuthenticationIsConfiguredProperly() {
         var username = "username";
         var password = "password";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
@@ -81,12 +82,12 @@ class BaseSmtpServerConfigTest {
         assertNotNull(authenticationHandlerFactory);
         assertThat(authenticationHandlerFactory, instanceOf(EasyAuthenticationHandlerFactory.class));
 
-        var easyAuthenticationHandlerFactory = (EasyAuthenticationHandlerFactory)authenticationHandlerFactory;
+        var easyAuthenticationHandlerFactory = (EasyAuthenticationHandlerFactory) authenticationHandlerFactory;
         assertSame(basicUsernamePasswordValidator, easyAuthenticationHandlerFactory.getValidator());
     }
 
     @Test
-    void shouldSkipConfigurationOfAuthenticationWhenUsernameIsNull(){
+    void shouldSkipConfigurationOfAuthenticationWhenUsernameIsNull() {
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(null);
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
@@ -100,7 +101,7 @@ class BaseSmtpServerConfigTest {
     }
 
     @Test
-    void shouldSkipConfigurationOfAuthenticationWhenUsernameIsEmptyString(){
+    void shouldSkipConfigurationOfAuthenticationWhenUsernameIsEmptyString() {
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn("");
         when(fakeSmtpConfigurationProperties.getAuthentication()).thenReturn(authentication);
@@ -114,7 +115,7 @@ class BaseSmtpServerConfigTest {
     }
 
     @Test
-    void shouldSkipConfigurationOfAuthenticationWhenPasswordIsNull(){
+    void shouldSkipConfigurationOfAuthenticationWhenPasswordIsNull() {
         var username = "username";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);
@@ -130,7 +131,7 @@ class BaseSmtpServerConfigTest {
     }
 
     @Test
-    void shouldSkipConfigurationOfAuthenticationWhenPasswordIsEmptyString(){
+    void shouldSkipConfigurationOfAuthenticationWhenPasswordIsEmptyString() {
         var username = "username";
         var authentication = mock(FakeSmtpConfigurationProperties.Authentication.class);
         when(authentication.getUsername()).thenReturn(username);

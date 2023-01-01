@@ -2,10 +2,7 @@ package de.gessnerfl.fakesmtp.config;
 
 import de.gessnerfl.fakesmtp.smtp.auth.BasicUsernamePasswordValidator;
 import de.gessnerfl.fakesmtp.smtp.auth.EasyAuthenticationHandlerFactory;
-import de.gessnerfl.fakesmtp.smtp.server.BaseMessageListener;
-import de.gessnerfl.fakesmtp.smtp.server.BaseSmtpServer;
-import de.gessnerfl.fakesmtp.smtp.server.MessageListenerAdapter;
-import de.gessnerfl.fakesmtp.smtp.server.SmtpServer;
+import de.gessnerfl.fakesmtp.smtp.server.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
@@ -14,24 +11,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 @Profile("default")
 @Configuration
 public class BaseSmtpServerConfig implements SmtpServerConfig {
 
     private final BuildProperties buildProperties;
     private final FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
-    private final BaseMessageListener baseMessageListener;
+    private final List<MessageListener> messageListeners;
     private final BasicUsernamePasswordValidator basicUsernamePasswordValidator;
     private final Logger logger;
 
     @Autowired
-    public BaseSmtpServerConfig(BuildProperties buildProperties, FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties,
-                                BaseMessageListener baseMessageListener,
+    public BaseSmtpServerConfig(BuildProperties buildProperties,
+                                FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties,
+                                List<MessageListener> messageListeners,
                                 BasicUsernamePasswordValidator basicUsernamePasswordValidator,
                                 Logger logger) {
         this.buildProperties = buildProperties;
         this.fakeSmtpConfigurationProperties = fakeSmtpConfigurationProperties;
-        this.baseMessageListener = baseMessageListener;
+        this.messageListeners = messageListeners;
         this.basicUsernamePasswordValidator = basicUsernamePasswordValidator;
         this.logger = logger;
     }
@@ -39,7 +39,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
     @Override
     @Bean
     public SmtpServer smtpServer() {
-        BaseSmtpServer smtpServer = createBaseSmtpServerFor(new MessageListenerAdapter(baseMessageListener));
+        BaseSmtpServer smtpServer = createBaseSmtpServerFor(new MessageListenerAdapter(messageListeners));
         smtpServer.setPort(fakeSmtpConfigurationProperties.getPort());
         smtpServer.setBindAddress(fakeSmtpConfigurationProperties.getBindAddress());
         if (fakeSmtpConfigurationProperties.getAuthentication() != null) {

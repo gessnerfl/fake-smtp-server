@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile;
 import static org.mockito.Mockito.mock;
 
 @Configuration
-@Profile("integrationtest")
+@Profile("mockserver")
 public class MockSmtpServerConfig implements SmtpServerConfig {
     @Override
     public SmtpServer smtpServer() {

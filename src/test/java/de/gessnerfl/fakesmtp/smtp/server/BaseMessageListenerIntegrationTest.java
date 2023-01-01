@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@ActiveProfiles("integrationtest")
+@ActiveProfiles("mockserver")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 class BaseMessageListenerIntegrationTest {
