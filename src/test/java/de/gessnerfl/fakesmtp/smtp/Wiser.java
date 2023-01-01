@@ -8,10 +8,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import jakarta.mail.MessagingException;
-import jakarta.mail.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,7 @@ public class Wiser implements MessageListener {
 
 	BaseSmtpServer server;
 
-	protected List<WiserMessage> messages = Collections.synchronizedList(new ArrayList<WiserMessage>());
+	protected List<StoredMessage> messages = Collections.synchronizedList(new ArrayList<StoredMessage>());
 
 	/**
 	 * Create a new SMTP server with this class as the listener. The default port is
@@ -126,16 +124,7 @@ public class Wiser implements MessageListener {
 		}
 
 		// create a new WiserMessage.
-		this.messages.add(new WiserMessage(this, from, recipient, bytes));
-	}
-
-	/**
-	 * Creates the JavaMail Session object for use in WiserMessage
-	 *
-	 * @return the JavaMail session
-	 */
-	protected Session getSession() {
-		return Session.getDefaultInstance(new Properties());
+		this.messages.add(new StoredMessage(from, recipient, bytes));
 	}
 
 	/**
@@ -149,7 +138,7 @@ public class Wiser implements MessageListener {
 	 *
 	 * @return the list of WiserMessages
 	 */
-	public List<WiserMessage> getMessages() {
+	public List<StoredMessage> getMessages() {
 		return this.messages;
 	}
 
@@ -160,22 +149,5 @@ public class Wiser implements MessageListener {
 	 */
 	public BaseSmtpServer getServer() {
 		return this.server;
-	}
-
-	/**
-	 * For debugging purposes, dumps a rough outline of the messages to the output
-	 * stream.
-	 *
-	 * @param out the output PrintStream
-	 * @throws MessagingException on dump error
-	 */
-	public void dumpMessages(final PrintStream out) throws MessagingException {
-		out.println("----- Start printing messages -----");
-
-		for (final WiserMessage wmsg : this.getMessages()) {
-			wmsg.dumpMessage(out);
-		}
-
-		out.println("----- End printing messages -----");
 	}
 }

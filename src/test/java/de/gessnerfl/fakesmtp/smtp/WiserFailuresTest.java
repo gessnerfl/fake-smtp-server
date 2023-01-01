@@ -101,8 +101,8 @@ class WiserFailuresTest {
 		this.sendQuit();
 
 		assertEquals(1, this.server.getMessages().size());
-		final Iterator<WiserMessage> emailIter = this.server.getMessages().iterator();
-		final WiserMessage email = emailIter.next();
+		final Iterator<StoredMessage> emailIter = this.server.getMessages().iterator();
+		final StoredMessage email = emailIter.next();
 		assertEquals("Body" + "\r\n", email.getMimeMessage().getContent().toString());
 	}
 
@@ -127,8 +127,8 @@ class WiserFailuresTest {
 		this.sendQuit();
 
 		assertEquals(1, this.server.getMessages().size());
-		final Iterator<WiserMessage> emailIter = this.server.getMessages().iterator();
-		final WiserMessage email = emailIter.next();
+		final Iterator<StoredMessage> emailIter = this.server.getMessages().iterator();
+		final StoredMessage email = emailIter.next();
 		assertEquals("Body" + "\r\n", email.getMimeMessage().getContent().toString());
 	}
 
@@ -150,8 +150,8 @@ class WiserFailuresTest {
 		}
 
 		assertEquals(1, this.server.getMessages().size());
-		final Iterator<WiserMessage> emailIter = this.server.getMessages().iterator();
-		final WiserMessage email = emailIter.next();
+		final Iterator<StoredMessage> emailIter = this.server.getMessages().iterator();
+		final StoredMessage email = emailIter.next();
 		assertEquals(body + "\r\n", email.getMimeMessage().getContent().toString());
 	}
 
@@ -166,8 +166,8 @@ class WiserFailuresTest {
 		}
 
 		assertEquals(1, this.server.getMessages().size());
-		final Iterator<WiserMessage> emailIter = this.server.getMessages().iterator();
-		final WiserMessage email = emailIter.next();
+		final Iterator<StoredMessage> emailIter = this.server.getMessages().iterator();
+		final StoredMessage email = emailIter.next();
 		assertEquals(email.getMimeMessage().getContent().toString(), bodyWithCR);
 	}
 
@@ -239,8 +239,8 @@ class WiserFailuresTest {
 			e.printStackTrace();
 		}
 
-		final Iterator<WiserMessage> emailIter = this.server.getMessages().iterator();
-		final WiserMessage email = emailIter.next();
+		final Iterator<StoredMessage> emailIter = this.server.getMessages().iterator();
+		final StoredMessage email = emailIter.next();
 		final MimeMessage mime = email.getMimeMessage();
 		assertEquals("Test", mime.getHeader("Subject")[0]);
 		assertEquals("Test Body" + "\r\n", mime.getContent().toString());
