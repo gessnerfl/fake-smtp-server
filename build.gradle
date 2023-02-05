@@ -23,7 +23,7 @@ description = """Fake SMTP Server :: Simple SMTP Server which stores emails in m
 project.version = project.findProperty("projectVersion") ?: scmVersion.version
 project.archivesBaseName = "fake-smtp-server"
 
-ext.bootstrapVersion = "5.2.2"
+ext.bootstrapVersion = "5.2.3"
 ext.scmUrl = "git@github.com:gessnerfl/fake-smtp-server.git"
 ext.projectUrl = "https://github.com/gessnerfl/fake-smtp-server"
 
@@ -45,7 +45,7 @@ dependencies {
     implementation('org.flywaydb:flyway-core')
     implementation("org.jsoup:jsoup:1.15.3")
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.1")
-    implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0')
+    implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2')
 
     implementation("org.webjars:bootstrap:$bootstrapVersion")
     implementation("org.webjars:material-design-icons:4.0.0")
