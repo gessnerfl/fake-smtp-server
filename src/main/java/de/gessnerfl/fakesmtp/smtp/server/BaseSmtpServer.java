@@ -245,7 +245,6 @@ public class BaseSmtpServer implements SmtpServer {
      */
     @Override
     @PostConstruct
-    @SuppressWarnings("java:S2095")
     public synchronized void start() {
         LOGGER.info("SMTP server {} starting", getDisplayableLocalSocketAddress());
         if (this.started) {
@@ -280,6 +279,7 @@ public class BaseSmtpServer implements SmtpServer {
         }
     }
 
+    @SuppressWarnings("java:S2095")
     private ServerSocket createServerSocket() throws IOException {
         InetSocketAddress isa;
 
