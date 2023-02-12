@@ -21,7 +21,7 @@ public abstract class ServerTestCase {
 	public static class TestWiser extends Wiser {
 		@Override
 		public boolean accept(final String from, final String recipient) {
-			return !recipient.equals("failure@subethamail.org");
+			return !recipient.equals("failure@example.com");
 		}
 	}
 

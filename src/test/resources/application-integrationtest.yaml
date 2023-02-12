@@ -7,3 +7,5 @@ management:
 
 fakesmtp:
   port: ${random.int[1024,65536]}
+  blockedRecipientAddresses:
+    - blocked@example.com

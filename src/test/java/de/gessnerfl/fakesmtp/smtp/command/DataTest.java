@@ -1,9 +1,8 @@
 package de.gessnerfl.fakesmtp.smtp.command;
 
 import org.junit.jupiter.api.Test;
-import de.gessnerfl.fakesmtp.smtp.util.ServerTestCase;
 
-class DataTest extends ServerTestCase {
+class DataTest extends AbstractCommandIntegrationTest {
 
 	@Test
 	void testNeedMail() throws Exception {
@@ -23,7 +22,7 @@ class DataTest extends ServerTestCase {
 		this.send("HELO foo.com");
 		this.expect("250");
 
-		this.send("MAIL FROM: success@subethamail.org");
+		this.send("MAIL FROM: success@example.com");
 		this.expect("250");
 
 		this.send("DATA");
@@ -37,10 +36,10 @@ class DataTest extends ServerTestCase {
 		this.send("HELO foo.com");
 		this.expect("250");
 
-		this.send("MAIL FROM: success@subethamail.org");
+		this.send("MAIL FROM: success@example.com");
 		this.expect("250");
 
-		this.send("RCPT TO: success@subethamail.org");
+		this.send("RCPT TO: success@example.com");
 		this.expect("250");
 
 		this.send("DATA");
@@ -54,10 +53,10 @@ class DataTest extends ServerTestCase {
 		this.send("HELO foo.com");
 		this.expect("250");
 
-		this.send("MAIL FROM: success@subethamail.org");
+		this.send("MAIL FROM: success@example.com");
 		this.expect("250");
 
-		this.send("RCPT TO: success@subethamail.org");
+		this.send("RCPT TO: success@example.com");
 		this.expect("250");
 
 		this.send("DATA");

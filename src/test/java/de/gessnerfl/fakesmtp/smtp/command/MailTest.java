@@ -35,7 +35,7 @@ class MailTest extends ServerTestCase {
 			"MAIL, 501 Syntax: MAIL FROM: <address>  Error in parameters:",
 			"MAIL FROM: <>, 250",
 			"MAIL FROM:, 501 Syntax: MAIL FROM: <address>",
-			"MAIL FROM:<validuser@subethamail.org>, 250 Ok"
+			"MAIL FROM:<validuser@example.com>, 250 Ok"
 	})
 	void testMailCommands(final String command, final String expectedResponse) throws Exception {
 		this.expect("220");
@@ -51,9 +51,9 @@ class MailTest extends ServerTestCase {
 
 	@ParameterizedTest
 	@CsvSource({
-			"MAIL FROM:<validuser@subethamail.org> SIZE=100, 250 Ok",
-			"MAIL FROM:<validuser@subethamail.org>, 250 Ok",
-			"MAIL FROM:<validuser@subethamail.org> SIZE=1001, 552"
+			"MAIL FROM:<validuser@example.com> SIZE=100, 250 Ok",
+			"MAIL FROM:<validuser@example.com>, 250 Ok",
+			"MAIL FROM:<validuser@example.com> SIZE=1001, 552"
 	})
 	void testSizes(final String command, final String expectedResponse) throws Exception {
 		this.wiser.getServer().setMaxMessageSize(1000);

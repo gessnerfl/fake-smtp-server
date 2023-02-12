@@ -30,7 +30,7 @@ import de.gessnerfl.fakesmtp.smtp.MessageHandlerFactory;
  * To use this class, construct a server with your implementation of the
  * MessageHandlerFactory. This provides low-level callbacks at various phases of
  * the SMTP exchange. For a higher-level but more limited interface, you can
- * pass in a org.subethamail.smtp.helper.SimpleMessageListenerAdapter.
+ * pass in a SimpleMessageListenerAdapter.
  * <p>
  * By default, no authentication methods are offered. To use authentication, set
  * an AuthenticationHandlerFactory.

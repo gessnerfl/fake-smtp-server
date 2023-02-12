@@ -46,12 +46,6 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 		super(new BetterByteArrayOutputStream(INITIAL_BUF_SIZE), transitionSize);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.subethamail.common.io.ThresholdingOutputStream#thresholdReached(int,
-	 * int)
-	 */
 	@Override
 	protected void thresholdReached(final int current, final int predicted) throws IOException {
 		// Open a temp file, write the byte array version, and swap the
@@ -85,11 +79,6 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 		return new BufferedInputStream(new FileInputStream(this.outFile));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.subethamail.common.io.ThresholdingOutputStream#close()
-	 */
 	@Override
 	public void close() throws IOException {
 		if (!this.closed) {

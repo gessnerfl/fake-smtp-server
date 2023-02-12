@@ -13,12 +13,6 @@ public class MailCommand extends BaseCommand {
 		super("MAIL", "Specifies the sender.", "FROM: <sender> [ <parameters> ]");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.subethamail.smtp.server.BaseCommand#execute(java.lang.String,
-	 * org.subethamail.smtp.server.Session)
-	 */
 	@Override
 	public void execute(final String commandString, final Session sess) throws IOException, DropConnectionException {
 		if (sess.isMailTransactionInProgress()) {

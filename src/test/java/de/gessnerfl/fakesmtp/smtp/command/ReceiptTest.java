@@ -1,9 +1,8 @@
 package de.gessnerfl.fakesmtp.smtp.command;
 
 import org.junit.jupiter.api.Test;
-import de.gessnerfl.fakesmtp.smtp.util.ServerTestCase;
 
-class ReceiptTest extends ServerTestCase {
+class ReceiptTest extends AbstractCommandIntegrationTest {
 
 	@Test
 	void testReceiptBeforeMail() throws Exception {
@@ -23,7 +22,7 @@ class ReceiptTest extends ServerTestCase {
 		this.send("HELO foo.com");
 		this.expect("250");
 
-		this.send("MAIL FROM: success@subethamail.org");
+		this.send("MAIL FROM: success@example.com");
 		this.expect("250 Ok");
 
 		this.send("RCPT");
@@ -37,13 +36,13 @@ class ReceiptTest extends ServerTestCase {
 		this.send("HELO foo.com");
 		this.expect("250");
 
-		this.send("MAIL FROM: success@subethamail.org");
+		this.send("MAIL FROM: success@example.com");
 		this.expect("250 Ok");
 
-		this.send("RCPT TO: failure@subethamail.org");
-		this.expect("553 <failure@subethamail.org> address unknown.");
+		this.send("RCPT TO: blocked@example.com");
+		this.expect("553 <blocked@example.com> address unknown.");
 
-		this.send("RCPT TO: success@subethamail.org");
+		this.send("RCPT TO: success@example.com");
 		this.expect("250 Ok");
 	}
 
@@ -54,10 +53,10 @@ class ReceiptTest extends ServerTestCase {
 		this.send("HELO foo.com");
 		this.expect("250");
 
-		this.send("MAIL FROM: success@subethamail.org");
+		this.send("MAIL FROM: success@example.com");
 		this.expect("250 Ok");
 
-		this.send("RCPT TO:success@subethamail.org");
+		this.send("RCPT TO:success@example.com");
 		this.expect("250 Ok");
 	}
 }

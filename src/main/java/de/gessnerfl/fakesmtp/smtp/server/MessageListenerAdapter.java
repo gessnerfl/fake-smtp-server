@@ -57,12 +57,6 @@ public class MessageListenerAdapter implements MessageHandlerFactory {
 		this.dataDeferredSize = dataDeferredSize;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.subethamail.smtp.MessageHandlerFactory#create(org.subethamail.smtp.
-	 * MessageContext)
-	 */
 	@Override
 	public MessageHandler create(final MessageContext ctx) {
 		return new Handler(ctx);

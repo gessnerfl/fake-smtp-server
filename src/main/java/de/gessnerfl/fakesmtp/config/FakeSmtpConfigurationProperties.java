@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import jakarta.validation.constraints.NotNull;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @ConfigurationProperties(prefix = "fakesmtp")
@@ -16,6 +18,7 @@ public class FakeSmtpConfigurationProperties {
     private Integer port = DEFAULT_PORT;
     private InetAddress bindAddress;
     private Authentication authentication;
+    private List<String> blockedRecipientAddresses = new ArrayList<>();
     private String filteredEmailRegexList;
     private boolean forwardEmails = false;
 
@@ -52,6 +55,14 @@ public class FakeSmtpConfigurationProperties {
 
     public void setPersistence(Persistence persistence) {
         this.persistence = persistence;
+    }
+
+    public List<String> getBlockedRecipientAddresses() {
+        return blockedRecipientAddresses;
+    }
+
+    public void setBlockedRecipientAddresses(List<String> blockedRecipientAddresses) {
+        this.blockedRecipientAddresses = blockedRecipientAddresses;
     }
 
     public String getFilteredEmailRegexList() {

@@ -10,9 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class tests a bug in ReceivedHeaderStream which has since been fixed.
- *
- * @see <a href=
- *      "http://www.subethamail.org/se/archive_msg.jsp?msgId=59719">http://www.subethamail.org/se/archive_msg.jsp?msgId=59719</a>
  */
 class ReceivedHeaderStreamTest {
 	@Test

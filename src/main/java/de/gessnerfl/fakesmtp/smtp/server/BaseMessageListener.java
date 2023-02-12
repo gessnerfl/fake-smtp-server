@@ -14,6 +14,7 @@ import java.io.InputStream;
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = IOException.class)
 public class BaseMessageListener implements MessageListener {
+    private final BlockedRecipientAddresses blockedRecipientAddresses;
     private final EmailFactory emailFactory;
     private final EmailFilter emailFilter;
     private final EmailRepository emailRepository;
@@ -21,7 +22,13 @@ public class BaseMessageListener implements MessageListener {
     private final Logger logger;
 
     @Autowired
-    public BaseMessageListener(EmailFactory emailFactory, EmailFilter emailFilter, EmailRepository emailRepository, MessageForwarder messageForwarder, Logger logger) {
+    public BaseMessageListener(BlockedRecipientAddresses blockedRecipientAddresses,
+                               EmailFactory emailFactory,
+                               EmailFilter emailFilter,
+                               EmailRepository emailRepository,
+                               MessageForwarder messageForwarder,
+                               Logger logger) {
+        this.blockedRecipientAddresses = blockedRecipientAddresses;
         this.emailFactory = emailFactory;
         this.emailFilter = emailFilter;
         this.emailRepository = emailRepository;
@@ -31,12 +38,12 @@ public class BaseMessageListener implements MessageListener {
 
     @Override
     public boolean accept(String from, String recipient) {
-        return true;
+        return !blockedRecipientAddresses.isBlocked(recipient);
     }
 
     @Override
     public void deliver(String sender, String recipient, InputStream data) throws IOException {
-        logger.info("Received email from {} for {}", sender, recipient);
+        logger.debug("Received email from {} for {}", sender, recipient);
 
         var rawData = new RawData(sender, recipient, IOUtils.toByteArray(data));
 

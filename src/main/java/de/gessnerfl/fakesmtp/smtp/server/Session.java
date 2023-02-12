@@ -352,21 +352,11 @@ public class Session implements Runnable, MessageContext {
         return sessionId;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.subethamail.smtp.MessageContext#getRemoteAddress()
-     */
     @Override
     public InetSocketAddress getRemoteAddress() {
         return (InetSocketAddress) this.socket.getRemoteSocketAddress();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.subethamail.smtp.MessageContext#getSMTPServer()
-     */
     @Override
     public BaseSmtpServer getSMTPServer() {
         return this.server;

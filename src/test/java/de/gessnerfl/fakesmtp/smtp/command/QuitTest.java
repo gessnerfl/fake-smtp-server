@@ -1,9 +1,8 @@
 package de.gessnerfl.fakesmtp.smtp.command;
 
 import org.junit.jupiter.api.Test;
-import de.gessnerfl.fakesmtp.smtp.util.ServerTestCase;
 
-class QuitTest extends ServerTestCase {
+class QuitTest extends AbstractCommandIntegrationTest {
 
 	@Test
 	void testQuit() throws Exception {

@@ -1,9 +1,8 @@
 package de.gessnerfl.fakesmtp.smtp.command;
 
 import org.junit.jupiter.api.Test;
-import de.gessnerfl.fakesmtp.smtp.util.ServerTestCase;
 
-class CommandTest extends ServerTestCase {
+class CommandTest extends AbstractCommandIntegrationTest {
 
 	@Test
 	void testCommandHandling() throws Exception {

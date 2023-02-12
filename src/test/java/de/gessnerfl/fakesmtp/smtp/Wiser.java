@@ -4,9 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +24,6 @@ public class Wiser implements MessageListener {
 	private final static Logger log = LoggerFactory.getLogger(Wiser.class);
 
 	BaseSmtpServer server;
-
-	protected List<StoredMessage> messages = Collections.synchronizedList(new ArrayList<StoredMessage>());
 
 	/**
 	 * Create a new SMTP server with this class as the listener. The default port is
@@ -92,30 +87,6 @@ public class Wiser implements MessageListener {
 		while ((current = data.read()) >= 0) {
 			out.write(current);
 		}
-
-		final byte[] bytes = out.toByteArray();
-
-		if (log.isDebugEnabled()) {
-			log.debug("Creating message from data with " + bytes.length + " bytes");
-		}
-
-		// create a new WiserMessage.
-		this.messages.add(new StoredMessage(from, recipient, bytes));
-	}
-
-	/**
-	 * Returns the list of WiserMessages.
-	 *
-	 * <p>
-	 * The number of mail transactions and the number of mails may be different. If
-	 * a message is received with multiple recipients in a single mail transaction,
-	 * then the list will contain more WiserMessage instances, one for each
-	 * recipient.
-	 *
-	 * @return the list of WiserMessages
-	 */
-	public List<StoredMessage> getMessages() {
-		return this.messages;
 	}
 
 	/**

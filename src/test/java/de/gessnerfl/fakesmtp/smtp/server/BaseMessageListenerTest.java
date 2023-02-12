@@ -29,14 +29,32 @@ class BaseMessageListenerTest {
     @Mock
     private MessageForwarder messageForwarder;
     @Mock
+    private BlockedRecipientAddresses blockedRecipientAddresses;
+    @Mock
     private Logger logger;
 
     @InjectMocks
     private BaseMessageListener sut;
 
     @Test
-    void shouldAcceptAllMails(){
-        assertTrue(sut.accept("foo", "bar"));
+    void shouldAcceptMailsWhenRecipientIsNotBlocked(){
+        final var recipient = "bar";
+        when(blockedRecipientAddresses.isBlocked(recipient)).thenReturn(false);
+
+        assertTrue(sut.accept("foo", recipient));
+
+        verify(blockedRecipientAddresses).isBlocked(recipient);
+    }
+
+
+    @Test
+    void shouldNotAcceptMailsOfBlockedRecipients(){
+        final var recipient = "bar";
+        when(blockedRecipientAddresses.isBlocked(recipient)).thenReturn(true);
+
+        assertFalse(sut.accept("foo", recipient));
+
+        verify(blockedRecipientAddresses).isBlocked(recipient);
     }
 
     @Test
