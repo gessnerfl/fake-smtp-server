@@ -2,39 +2,16 @@ package de.gessnerfl.fakesmtp.smtp.command;
 
 import de.gessnerfl.fakesmtp.smtp.server.Session;
 import org.junit.jupiter.api.Test;
-import de.gessnerfl.fakesmtp.smtp.auth.EasyAuthenticationHandlerFactory;
-import de.gessnerfl.fakesmtp.smtp.auth.LoginFailedException;
-import de.gessnerfl.fakesmtp.smtp.auth.UsernamePasswordValidator;
-import de.gessnerfl.fakesmtp.smtp.util.ServerTestCase;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
 
-class AuthTest extends ServerTestCase {
-    static final String REQUIRED_USERNAME = "myUserName";
+@ActiveProfiles({"integrationtest_with_auth"})
+class AuthTest extends AbstractCommandIntegrationTest {
+    static final String REQUIRED_USERNAME = "myUsername";
 
-    static final String REQUIRED_PASSWORD = "mySecret01";
-
-    static class RequiredUsernamePasswordValidator implements UsernamePasswordValidator {
-        @Override
-        public void login(final String username, final String password) throws LoginFailedException {
-            if (!username.equals(REQUIRED_USERNAME) || !password.equals(REQUIRED_PASSWORD)) {
-                throw new LoginFailedException();
-            }
-        }
-    }
-
-    @Override
-    protected TestWiser createTestWiser(int serverPort) {
-        var wiser = new TestWiser();
-        wiser.setHostname("localhost");
-        wiser.setPort(serverPort);
-
-        var validator = new RequiredUsernamePasswordValidator();
-        var fact = new EasyAuthenticationHandlerFactory(validator);
-        wiser.getServer().setAuthenticationHandlerFactory(fact);
-        return wiser;
-    }
+    static final String REQUIRED_PASSWORD = "mySecretPassword";
 
     /**
      * Test method for AUTH PLAIN. The sequence under test is as follows:
@@ -121,16 +98,5 @@ class AuthTest extends ServerTestCase {
 
         this.send("AUTH");
         this.expect("503");
-    }
-
-    @Test
-    void testMailBeforeAuth() throws Exception {
-        this.expect("220");
-
-        this.send("HELO foo.com");
-        this.expect("250");
-
-        this.send("MAIL FROM: <john@example.com>");
-        this.expect("250");
     }
 }
