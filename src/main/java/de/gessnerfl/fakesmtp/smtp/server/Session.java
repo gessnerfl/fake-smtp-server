@@ -100,7 +100,7 @@ public class Session implements Runnable, MessageContext {
      * If the client told us the size of the message, this is the value. If they
      * didn't, the value will be 0.
      */
-    private int declaredMessageSize = 0;
+    private long declaredMessageSizeInBytes = 0;
 
     /**
      * Some more state information
@@ -419,15 +419,15 @@ public class Session implements Runnable, MessageContext {
     /**
      * @return the maxMessageSize
      */
-    public int getDeclaredMessageSize() {
-        return this.declaredMessageSize;
+    public long getDeclaredMessageSizeInBytes() {
+        return this.declaredMessageSizeInBytes;
     }
 
     /**
-     * @param declaredMessageSize the size that the client says the message will be
+     * @param declaredMessageSizeInBytes the size that the client says the message will be
      */
-    public void setDeclaredMessageSize(final int declaredMessageSize) {
-        this.declaredMessageSize = declaredMessageSize;
+    public void setDeclaredMessageSizeInBytes(final long declaredMessageSizeInBytes) {
+        this.declaredMessageSizeInBytes = declaredMessageSizeInBytes;
     }
 
     /**
@@ -465,7 +465,7 @@ public class Session implements Runnable, MessageContext {
         this.messageHandler = null;
         this.recipientCount = 0;
         this.singleRecipient = null;
-        this.declaredMessageSize = 0;
+        this.declaredMessageSizeInBytes = 0;
     }
 
     /**

@@ -45,6 +45,9 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
         if (fakeSmtpConfigurationProperties.getAuthentication() != null) {
             configureAuthentication(smtpServer, fakeSmtpConfigurationProperties.getAuthentication());
         }
+        if (fakeSmtpConfigurationProperties.getMaxMessageSize() != null){
+            smtpServer.setMaxMessageSizeInBytes(fakeSmtpConfigurationProperties.getMaxMessageSize().toBytes());
+        }
         return smtpServer;
     }
 

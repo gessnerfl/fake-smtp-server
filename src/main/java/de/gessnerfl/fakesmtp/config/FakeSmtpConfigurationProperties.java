@@ -4,6 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import jakarta.validation.constraints.NotNull;
+import org.springframework.util.unit.DataSize;
+
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,8 @@ public class FakeSmtpConfigurationProperties {
     private Authentication authentication;
     private List<String> blockedRecipientAddresses = new ArrayList<>();
     private String filteredEmailRegexList;
+
+    private DataSize maxMessageSize;
     private boolean forwardEmails = false;
 
     @NotNull
@@ -71,6 +75,14 @@ public class FakeSmtpConfigurationProperties {
 
     public void setFilteredEmailRegexList(String filteredEmailRegexList) {
         this.filteredEmailRegexList = filteredEmailRegexList;
+    }
+
+    public DataSize getMaxMessageSize() {
+        return maxMessageSize;
+    }
+
+    public void setMaxMessageSize(DataSize maxMessageSize) {
+        this.maxMessageSize = maxMessageSize;
     }
 
     public boolean isForwardEmails() {

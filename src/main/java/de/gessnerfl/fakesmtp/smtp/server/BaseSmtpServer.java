@@ -126,7 +126,7 @@ public class BaseSmtpServer implements SmtpServer {
      * limits on the message being read; you must do that yourself when reading
      * data.
      */
-    private int maxMessageSize = 0;
+    private long maxMessageSizeInBytes = 0;
 
     private SessionIdFactory sessionIdFactory = new TimeBasedSessionIdFactory();
 
@@ -461,15 +461,15 @@ public class BaseSmtpServer implements SmtpServer {
     /**
      * @return the maxMessageSize
      */
-    public int getMaxMessageSize() {
-        return maxMessageSize;
+    public long getMaxMessageSizeInBytes() {
+        return maxMessageSizeInBytes;
     }
 
     /**
-     * @param maxMessageSize the maxMessageSize to set
+     * @param maxMessageSizeInBytes the maxMessageSize to set
      */
-    public void setMaxMessageSize(final int maxMessageSize) {
-        this.maxMessageSize = maxMessageSize;
+    public void setMaxMessageSizeInBytes(final long maxMessageSizeInBytes) {
+        this.maxMessageSizeInBytes = maxMessageSizeInBytes;
     }
 
     public boolean getDisableReceivedHeaders() {

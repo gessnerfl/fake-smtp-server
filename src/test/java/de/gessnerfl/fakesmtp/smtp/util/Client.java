@@ -1,5 +1,8 @@
 package de.gessnerfl.fakesmtp.smtp.util;
 
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -53,9 +56,7 @@ public class Client {
 	 */
 	public void expect(final String expect) throws Exception {
 		final String response = this.readResponse();
-		if (!response.startsWith(expect)) {
-			throw new Exception("Got: " + response + " Expected: " + expect);
-		}
+		MatcherAssert.assertThat(response, Matchers.startsWith(expect));
 	}
 
 	/**
@@ -66,9 +67,7 @@ public class Client {
 	 */
 	public void expectContains(final String expect) throws Exception {
 		final String response = this.readResponse();
-		if (!response.contains(expect)) {
-			throw new Exception("Got: " + response + " Expected to contain: " + expect);
-		}
+		MatcherAssert.assertThat(response, Matchers.containsString(expect));
 	}
 
 	/**

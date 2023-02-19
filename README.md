@@ -61,28 +61,33 @@ The following snippet shows the configuration of a fake smtp server with its def
 
 ```yaml
 fakesmtp:
-    #The SMTP Server Port used by the Fake SMTP Server
-    port: 5025
-    
-    #The binding address of the Fake SMTP Server; Bound to all interfaces by default / no value
-    bindAddress: 127.0.0.1
-    
-    persistence:
-      #The maximum number of emails which should be stored in the database; Defualts to 100
-      maxNumberEmails: 100  
+  #The SMTP Server Port used by the Fake SMTP Server
+  port: 5025
 
-    #List of recipient addresses which should be blocked/rejected
-    blockedRecipientAddresses:
-      - blocked@example.com
-      - foo@eample.com
-    
-    #List of sender email addresses to ignore, as a comma-separated list of regex expressions.
-    filteredEmailRegexList: john@doe\\.com,.*@google\\.com ; empty by default
-    
-    #When set to true emails will be forwarded to a configured target email system. Therefore
-    #the spring boot mail system needs to be configured. See also 
-    # https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-email
-    forwardEmails: false
+  #The binding address of the Fake SMTP Server; Bound to all interfaces by default / no value
+  bindAddress: 127.0.0.1
+
+  persistence:
+    #The maximum number of emails which should be stored in the database; Defualts to 100
+    maxNumberEmails: 100
+
+  #List of recipient addresses which should be blocked/rejected
+  blockedRecipientAddresses:
+    - blocked@example.com
+    - foo@eample.com
+
+  #List of sender email addresses to ignore, as a comma-separated list of regex expressions.
+  filteredEmailRegexList: john@doe\\.com,.*@google\\.com ; empty by default
+
+  #Optional configuration option to specify the maximum allowed message size. The size can be 
+  #defined using Spring Boot DataSize value type - https://docs.spring.io/spring-boot/docs/2.1.9.RELEASE/reference/html/boot-features-external-config.html#boot-features-external-config-conversion-datasize.
+  #Default: no limit
+  maxMessageSize: 10MB
+
+  #When set to true emails will be forwarded to a configured target email system. Therefore
+  #the spring boot mail system needs to be configured. See also 
+  # https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-email
+  forwardEmails: false
 ```
     
 ### Authentication

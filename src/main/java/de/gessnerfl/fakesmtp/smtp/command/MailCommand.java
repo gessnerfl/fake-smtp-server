@@ -41,24 +41,24 @@ public class MailCommand extends BaseCommand {
 
 		// extract SIZE argument from MAIL FROM command.
 		// disregard unknown parameters
-		int size = 0;
+		long size = 0;
 		final var largs = args.toLowerCase(Locale.ENGLISH);
 		final var sizec = largs.indexOf(" size=");
 		if (sizec > -1) {
 			// disregard non-numeric values.
 			final var ssize = largs.substring(sizec + 6).trim();
 			if (ssize.length() > 0 && ssize.matches("\\d+")) {
-				size = Integer.parseInt(ssize);
+				size = Long.parseLong(ssize);
 			}
 		}
 		// Reject the message if the size supplied by the client
 		// is larger than what we advertised in EHLO answer.
-		if (size > sess.getServer().getMaxMessageSize()) {
+		if (size > sess.getServer().getMaxMessageSizeInBytes()) {
 			sess.sendResponse("552 5.3.4 Message size exceeds fixed limit");
 			return;
 		}
 
-		sess.setDeclaredMessageSize(size);
+		sess.setDeclaredMessageSizeInBytes(size);
 		sess.startMailTransaction();
 
 		try {

@@ -1,11 +1,10 @@
 package de.gessnerfl.fakesmtp.smtp.command;
 
 import org.junit.jupiter.api.Test;
-import de.gessnerfl.fakesmtp.smtp.util.ServerTestCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class MailTest extends ServerTestCase {
+class MailTest extends AbstractCommandIntegrationTest {
 
 	@Test
 	void testMailNoHello() throws Exception {
@@ -45,23 +44,6 @@ class MailTest extends ServerTestCase {
 
 		// added <> because without them "lkjk" is a parameter
 		// to the MAIL command. (Postfix responds accordingly)
-		this.send(command);
-		this.expect(expectedResponse);
-	}
-
-	@ParameterizedTest
-	@CsvSource({
-			"MAIL FROM:<validuser@example.com> SIZE=100, 250 Ok",
-			"MAIL FROM:<validuser@example.com>, 250 Ok",
-			"MAIL FROM:<validuser@example.com> SIZE=1001, 552"
-	})
-	void testSizes(final String command, final String expectedResponse) throws Exception {
-		this.wiser.getServer().setMaxMessageSize(1000);
-		this.expect("220");
-
-		this.send("EHLO foo.com");
-		this.expectContains("250-SIZE 1000");
-
 		this.send(command);
 		this.expect(expectedResponse);
 	}

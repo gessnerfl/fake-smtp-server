@@ -40,7 +40,7 @@ public class EhloCommand extends BaseCommand {
         response.append(sess.getServer().getHostName());
         response.append("\r\n" + "250-8BITMIME");
 
-        final int maxSize = sess.getServer().getMaxMessageSize();
+        final long maxSize = sess.getServer().getMaxMessageSizeInBytes();
         if (maxSize > 0) {
             response.append("\r\n" + "250-SIZE ");
             response.append(maxSize);
