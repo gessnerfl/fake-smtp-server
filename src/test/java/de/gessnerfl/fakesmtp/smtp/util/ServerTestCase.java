@@ -1,6 +1,7 @@
 package de.gessnerfl.fakesmtp.smtp.util;
 
 import de.gessnerfl.fakesmtp.smtp.Wiser;
+import de.gessnerfl.fakesmtp.smtp.client.Client;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

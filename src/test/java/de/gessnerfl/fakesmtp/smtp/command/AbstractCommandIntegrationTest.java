@@ -1,7 +1,7 @@
 package de.gessnerfl.fakesmtp.smtp.command;
 
 import de.gessnerfl.fakesmtp.config.SmtpServerConfig;
-import de.gessnerfl.fakesmtp.smtp.util.Client;
+import de.gessnerfl.fakesmtp.smtp.client.Client;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

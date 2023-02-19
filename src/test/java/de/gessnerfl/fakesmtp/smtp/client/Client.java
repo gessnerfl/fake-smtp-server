@@ -1,4 +1,4 @@
-package de.gessnerfl.fakesmtp.smtp.util;
+package de.gessnerfl.fakesmtp.smtp.client;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
