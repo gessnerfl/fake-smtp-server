@@ -32,12 +32,12 @@ public class EmailFactory {
             var messageContent = mimeMessage.getContent();
 
             switch (contentType) {
-                case HTML, PLAIN:
+                case HTML, PLAIN, OCTET_STREAM:
                     return createPlainOrHtmlMail(rawData, subject, contentType, messageContent);
                 case MULTIPART_ALTERNATIVE, MULTIPART_MIXED, MULTIPART_RELATED:
                     return createMultipartMail(rawData, subject, (Multipart) messageContent);
                 default:
-                    throw new IllegalStateException("Unsupported e-mail content type " + contentType.name());
+                    throw new IllegalStateException("Unsupported e-mail content type " + mimeMessage.getContentType());
             }
         } catch (MessagingException e) {
             return buildFallbackEmail(rawData);
@@ -107,8 +107,7 @@ public class EmailFactory {
     }
 
     private Optional<EmailContent> createEmailContent(RawData rawData, ContentType contentType, Object messageContent) {
-        var data = Optional.ofNullable(Objects.toString(messageContent, null))
-                .map(this::normalizeContent).orElseGet(() -> normalizeContent(rawData.getContentAsString()));
+        var data = getMessageContentAsString(messageContent).map(this::normalizeContent).orElseGet(() -> normalizeContent(rawData.getContentAsString()));
         if (data == null) {
             return Optional.empty();
         }
@@ -121,8 +120,7 @@ public class EmailFactory {
     private Optional<InlineImage> createInlineImage(final BodyPart part) throws MessagingException, IOException {
         var contentType = part.getContentType();
         Object rawContent = part.getContent();
-        var content = rawContent instanceof BASE64DecoderStream stream ? readBase64EncodedData(stream) : Objects.toString(rawContent, null);
-        var data = Optional.ofNullable(content);
+        Optional<String> data = getMessageContentAsString(rawContent);
         return extractContentId(part).flatMap(contentId ->
             data.map(d -> {
                 var img = new InlineImage();
@@ -131,6 +129,12 @@ public class EmailFactory {
                 img.setData(d);
                 return img;
             }));
+    }
+
+    private Optional<String> getMessageContentAsString(Object rawContent) {
+        var content = rawContent instanceof BASE64DecoderStream stream ? readBase64EncodedData(stream) : Objects.toString(rawContent, null);
+        var data = Optional.ofNullable(content);
+        return data;
     }
 
     private String readBase64EncodedData(BASE64DecoderStream stream){
