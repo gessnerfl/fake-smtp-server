@@ -2,11 +2,13 @@ package de.gessnerfl.fakesmtp.smtp.command;
 
 import de.gessnerfl.fakesmtp.smtp.server.Session;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
 
+@DirtiesContext
 @ActiveProfiles({"integrationtest_with_auth"})
 class AuthTest extends AbstractCommandIntegrationTest {
     static final String REQUIRED_USERNAME = "myUsername";

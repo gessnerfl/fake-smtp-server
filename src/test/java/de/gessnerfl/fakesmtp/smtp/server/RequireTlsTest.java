@@ -1,19 +1,13 @@
 package de.gessnerfl.fakesmtp.smtp.server;
 
+import de.gessnerfl.fakesmtp.smtp.command.AbstractCommandIntegrationTest;
 import org.junit.jupiter.api.Test;
-import de.gessnerfl.fakesmtp.smtp.util.ServerTestCase;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
-class RequireTlsTest extends ServerTestCase {
-
-    @Override
-    protected TestWiser createTestWiser(int serverPort) {
-        var wiser = new TestWiser();
-        wiser.setHostname("localhost");
-        wiser.setPort(serverPort);
-        wiser.getServer().setRequireTLS(true);
-        return wiser;
-    }
-
+@DirtiesContext
+@ActiveProfiles("integrationtest_with_tls_required")
+class RequireTlsTest extends AbstractCommandIntegrationTest {
     @Test
     void testNeedSTARTTLS() throws Exception {
         this.expect("220");

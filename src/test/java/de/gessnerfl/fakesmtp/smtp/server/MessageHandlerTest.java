@@ -3,12 +3,12 @@ package de.gessnerfl.fakesmtp.smtp.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import de.gessnerfl.fakesmtp.smtp.client.SMTPException;
 import de.gessnerfl.fakesmtp.smtp.client.SmartClient;
-import jakarta.mail.MessagingException;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -39,9 +39,9 @@ class MessageHandlerTest {
 	private BaseSmtpServer smtpServer;
 
 	@BeforeEach
-	public void setup() {
+	public void setup() throws NoSuchAlgorithmException {
 		MockitoAnnotations.openMocks(this);
-		int randomPort = RandomUtils.nextInt(1024,65536);
+		int randomPort = SecureRandom.getInstanceStrong().nextInt(1024,65536);
 		smtpServer = new BaseSmtpServer("FakeSMTPServer", messageHandlerFactory);
 		smtpServer.setPort(randomPort);
 		smtpServer.start();

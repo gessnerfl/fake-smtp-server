@@ -84,6 +84,9 @@ fakesmtp:
   #Default: no limit
   maxMessageSize: 10MB
 
+  #Configure if TLS is required to connect to the SMTP server. Defaults to false
+  requireTLS: false
+
   #When set to true emails will be forwarded to a configured target email system. Therefore
   #the spring boot mail system needs to be configured. See also 
   # https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-email

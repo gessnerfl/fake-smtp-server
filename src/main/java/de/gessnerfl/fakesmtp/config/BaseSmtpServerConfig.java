@@ -48,6 +48,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
         if (fakeSmtpConfigurationProperties.getMaxMessageSize() != null){
             smtpServer.setMaxMessageSizeInBytes(fakeSmtpConfigurationProperties.getMaxMessageSize().toBytes());
         }
+        smtpServer.setRequireTLS(fakeSmtpConfigurationProperties.isRequireTLS());
         return smtpServer;
     }
 

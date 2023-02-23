@@ -2,10 +2,12 @@ package de.gessnerfl.fakesmtp.smtp.command;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.unit.DataSize;
 import org.springframework.util.unit.DataUnit;
 
+@DirtiesContext
 @ActiveProfiles({"integrationtest_with_max_size"})
 class MailWithMaxMessageSizeTest extends AbstractCommandIntegrationTest {
 

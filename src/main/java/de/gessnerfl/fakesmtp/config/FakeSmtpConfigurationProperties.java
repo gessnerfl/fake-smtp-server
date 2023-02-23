@@ -24,6 +24,7 @@ public class FakeSmtpConfigurationProperties {
     private String filteredEmailRegexList;
 
     private DataSize maxMessageSize;
+    private boolean requireTLS = false;
     private boolean forwardEmails = false;
 
     @NotNull
@@ -83,6 +84,14 @@ public class FakeSmtpConfigurationProperties {
 
     public void setMaxMessageSize(DataSize maxMessageSize) {
         this.maxMessageSize = maxMessageSize;
+    }
+
+    public boolean isRequireTLS() {
+        return requireTLS;
+    }
+
+    public void setRequireTLS(boolean requireTLS) {
+        this.requireTLS = requireTLS;
     }
 
     public boolean isForwardEmails() {
