@@ -6,12 +6,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import de.gessnerfl.fakesmtp.smtp.RejectException;
 import de.gessnerfl.fakesmtp.smtp.client.SMTPException;
 import de.gessnerfl.fakesmtp.smtp.client.SmartClient;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import de.gessnerfl.fakesmtp.smtp.MessageContext;
@@ -19,7 +19,7 @@ import de.gessnerfl.fakesmtp.smtp.MessageHandler;
 import de.gessnerfl.fakesmtp.smtp.MessageHandlerFactory;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 /**
@@ -135,19 +135,18 @@ class MessageHandlerTest {
 	 * @throws IOException        on IO error
 	 */
 	@Test
-	@Disabled("To be fixed")
 	void testMailFromRejectedFirst() throws IOException {
 		when(messageHandlerFactory.create(any(MessageContext.class))).thenReturn(messageHandler, messageHandler2);
+		doThrow(new RejectException("Test MAIL from rejected")).when(messageHandler).from(anyString());
 
 		final SmartClient client = new SmartClient("localhost", smtpServer.getPort(), "localhost");
 
-		boolean expectedRejectReceived = false;
 		try {
 			client.from("john1@example.com");
+			fail();
 		} catch (final SMTPException e) {
-			expectedRejectReceived = true;
+			//expected to receive error
 		}
-		assertTrue(expectedRejectReceived);
 
 		client.from("john2@example.com");
 		client.quit();
