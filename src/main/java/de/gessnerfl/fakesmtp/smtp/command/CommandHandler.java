@@ -29,14 +29,8 @@ public class CommandHandler {
 		}
 	}
 
-	/**
-	 * Adds or replaces the specified command.
-	 */
-	public void addCommand(final Command command) {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Added command: {}", command.getName());
-		}
-
+	private void addCommand(final Command command) {
+		LOGGER.debug("Added command: {}", command.getName());
 		this.commandMap.put(command.getName(), command);
 	}
 
