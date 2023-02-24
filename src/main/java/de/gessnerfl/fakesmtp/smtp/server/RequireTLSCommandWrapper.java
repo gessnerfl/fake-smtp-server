@@ -2,7 +2,6 @@ package de.gessnerfl.fakesmtp.smtp.server;
 
 import java.io.IOException;
 
-import de.gessnerfl.fakesmtp.smtp.DropConnectionException;
 import de.gessnerfl.fakesmtp.smtp.command.Command;
 import de.gessnerfl.fakesmtp.smtp.command.CommandException;
 
@@ -21,7 +20,7 @@ public class RequireTLSCommandWrapper implements Command {
 	}
 
 	@Override
-	public void execute(final String commandString, final Session sess) throws IOException, DropConnectionException {
+	public void execute(final String commandString, final Session sess) throws IOException {
 		if (!sess.getServer().getRequireTLS() || sess.isTLSStarted()) {
 			wrapped.execute(commandString, sess);
 		} else {

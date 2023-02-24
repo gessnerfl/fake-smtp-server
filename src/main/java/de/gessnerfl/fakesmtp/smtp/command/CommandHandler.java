@@ -13,7 +13,6 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 import de.gessnerfl.fakesmtp.smtp.server.UnknownCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.gessnerfl.fakesmtp.smtp.DropConnectionException;
 
 public class CommandHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
@@ -45,7 +44,7 @@ public class CommandHandler {
 		return this.commandMap.keySet();
 	}
 
-	public void handleCommand(final Session context, final String commandString) throws IOException, DropConnectionException {
+	public void handleCommand(final Session context, final String commandString) throws IOException {
 		try {
 			final Command command = this.getCommandFromString(commandString);
 			command.execute(commandString, context);

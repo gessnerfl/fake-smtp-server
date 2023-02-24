@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.gessnerfl.fakesmtp.smtp.DropConnectionException;
 import de.gessnerfl.fakesmtp.smtp.RejectException;
 import de.gessnerfl.fakesmtp.smtp.io.DotTerminatedInputStream;
 import de.gessnerfl.fakesmtp.smtp.io.DotUnstuffingInputStream;
@@ -19,7 +18,7 @@ public class DataCommand extends BaseCommand {
 	}
 
 	@Override
-	public void execute(final String commandString, final Session sess) throws IOException, DropConnectionException {
+	public void execute(final String commandString, final Session sess) throws IOException {
 		if (!sess.isMailTransactionInProgress()) {
 			sess.sendResponse("503 5.5.1 Error: need MAIL command");
 			return;
@@ -53,8 +52,6 @@ public class DataCommand extends BaseCommand {
 				// throw an exception, but this seems an arbitrary part of the contract that
 				// we might as well relax.
 			}
-		} catch (final DropConnectionException ex) {
-			throw ex; // Propagate this
 		} catch (final RejectException ex) {
 			sess.sendResponse(ex.getErrorResponse());
 			return;

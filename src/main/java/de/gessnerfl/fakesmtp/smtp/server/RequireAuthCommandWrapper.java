@@ -2,7 +2,6 @@ package de.gessnerfl.fakesmtp.smtp.server;
 
 import java.io.IOException;
 
-import de.gessnerfl.fakesmtp.smtp.DropConnectionException;
 import de.gessnerfl.fakesmtp.smtp.command.Command;
 import de.gessnerfl.fakesmtp.smtp.command.CommandException;
 
@@ -24,7 +23,7 @@ public class RequireAuthCommandWrapper implements Command {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void execute(final String commandString, final Session sess) throws IOException, DropConnectionException {
+	public void execute(final String commandString, final Session sess) throws IOException {
 		if (!sess.getServer().getRequireAuth() || sess.isAuthenticated()) {
 			wrapped.execute(commandString, sess);
 		} else {

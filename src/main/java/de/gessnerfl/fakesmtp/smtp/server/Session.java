@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import de.gessnerfl.fakesmtp.smtp.AuthenticationHandler;
-import de.gessnerfl.fakesmtp.smtp.DropConnectionException;
 import de.gessnerfl.fakesmtp.smtp.MessageContext;
 import de.gessnerfl.fakesmtp.smtp.MessageHandler;
 import de.gessnerfl.fakesmtp.smtp.io.CRLFTerminatedReader;
@@ -236,8 +235,6 @@ public class Session implements Runnable, MessageContext {
             } else {
                 LOGGER.debug("no more lines from client");
             }
-        } catch (final DropConnectionException ex) {
-            this.sendResponse(ex.getErrorResponse());
         } catch (final SocketTimeoutException ex) {
             this.sendResponse("421 Timeout waiting for data from client.");
         } catch (final CRLFTerminatedReader.TerminationException te) {

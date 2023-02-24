@@ -3,7 +3,6 @@ package de.gessnerfl.fakesmtp.smtp.command;
 import java.io.IOException;
 import java.util.Locale;
 
-import de.gessnerfl.fakesmtp.smtp.DropConnectionException;
 import de.gessnerfl.fakesmtp.smtp.RejectException;
 import de.gessnerfl.fakesmtp.smtp.server.Session;
 import de.gessnerfl.fakesmtp.smtp.util.EmailUtils;
@@ -14,7 +13,7 @@ public class MailCommand extends BaseCommand {
 	}
 
 	@Override
-	public void execute(final String commandString, final Session sess) throws IOException, DropConnectionException {
+	public void execute(final String commandString, final Session sess) throws IOException {
 		if (sess.isMailTransactionInProgress()) {
 			sess.sendResponse("503 5.5.1 Sender already specified.");
 			return;
@@ -63,10 +62,6 @@ public class MailCommand extends BaseCommand {
 
 		try {
 			sess.getMessageHandler().from(emailAddress);
-		} catch (final DropConnectionException ex) {
-			// roll back the start of the transaction
-			sess.resetMailTransaction();
-			throw ex; // Propagate this
 		} catch (final RejectException ex) {
 			// roll back the start of the transaction
 			sess.resetMailTransaction();
