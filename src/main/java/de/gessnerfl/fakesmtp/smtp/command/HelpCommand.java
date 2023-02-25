@@ -37,12 +37,12 @@ public class HelpCommand extends BaseCommand {
 				+ server.getHostName()
 				+ "\r\n"
 				+ "214-Topics:\r\n"
-				+ this.getFormattedTopicList(server)
+				+ this.getFormattedTopicList()
 				+ "214-For more info use \"HELP <topic>\".\r\n"
 				+ "214 End of HELP info";
 	}
 
-	protected String getFormattedTopicList(final BaseSmtpServer server) {
+	private String getFormattedTopicList() {
 		final StringBuilder sb = new StringBuilder();
 		for (final CommandVerb key : CommandVerb.values()) {
 			sb.append("214-     ").append(key.name()).append("\r\n");

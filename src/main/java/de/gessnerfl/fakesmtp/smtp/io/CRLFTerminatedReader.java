@@ -64,6 +64,78 @@ public class CRLFTerminatedReader extends FilterReader {
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public String readLine() throws IOException {
+		final var state = new ReadState();
+		while (true) {
+			final int inChar = this.read();
+
+			processCharacter(state, inChar);
+			if (state.isPrematureEol){
+				return null;
+			}
+			if (state.isComplete){
+				return state.lineBuilder.toString();
+			}
+			if (state.lineBuilder.length() >= MAX_LINE_LENGTH) {
+				throw new MaxLineLengthException("Input line length is too long!");
+			}
+		}
+	}
+
+	private static void processCharacter(ReadState state, int inChar) throws TerminationException {
+		if (!state.crJustReceived) {
+			processCharacterBeforeCarriageReturn(state, inChar);
+		} else {
+			processCharacterAfterCarriageReturn(state, inChar);
+		}
+	}
+
+	private static void processCharacterBeforeCarriageReturn(ReadState state, int inChar) {
+		// the most common case, somewhere before the end of a line
+		switch (inChar) {
+		case CR:
+			state.crJustReceived = true;
+			break;
+		case EOF:
+			state.isPrematureEol = true;
+		case LF: // the normal ending of a line
+			if (state.tainted == -1) {
+				state.tainted = state.lineBuilder.length();
+			}
+			// intentional fall-through
+		default:
+			state.lineBuilder.append((char) inChar);
+		}
+	}
+
+	private static void processCharacterAfterCarriageReturn(ReadState state, int inChar) throws TerminationException {
+		switch (inChar) {
+			case LF -> { // LF without a preceding CR
+				if (state.tainted != -1) {
+					throw new TerminationException("\"bare\" CR or LF in data stream", state.tainted);
+				}
+				state.isComplete = true;
+			}
+			case EOF -> {
+				state.isPrematureEol = true;
+			}
+			case CR -> { // we got two (or more) CRs in a row
+				if (state.tainted == -1) {
+					state.tainted = state.lineBuilder.length();
+				}
+				state.lineBuilder.append(CR);
+			}
+			default -> { // we got some other character following a CR
+				if (state.tainted == -1) {
+					state.tainted = state.lineBuilder.length();
+				}
+				state.lineBuilder.append(CR);
+				state.lineBuilder.append((char) inChar);
+				state.crJustReceived = false;
+			}
+		}
+	}
+
+	private final class ReadState {
 		/*
 		 * This boolean tells which state we are in, depending upon whether we
 		 * got a CR in the preceding read().
@@ -72,58 +144,7 @@ public class CRLFTerminatedReader extends FilterReader {
 		/* If not -1 this int tells us where the first "wrong" line break is */
 		int tainted = -1;
 		final StringBuilder lineBuilder = new StringBuilder();
-
-		while (true) {
-			final int inChar = this.read();
-
-			if (!crJustReceived) {
-				// the most common case, somewhere before the end of a line
-				switch (inChar) {
-				case CR:
-					crJustReceived = true;
-					break;
-				case EOF:
-					return null; // premature EOF -- discards data(?)
-				case LF: // the normal ending of a line
-					if (tainted == -1) {
-						tainted = lineBuilder.length();
-					}
-					// intentional fall-through
-				default:
-					lineBuilder.append((char) inChar);
-				}
-			} else {
-				// CR has been received, we may be at end of line
-				switch (inChar) {
-					case LF -> { // LF without a preceding CR
-						if (tainted != -1) {
-							throw new TerminationException("\"bare\" CR or LF in data stream", tainted);
-						}
-						return lineBuilder.toString();
-					}
-					case EOF -> {
-						return null; // premature EOF -- discards data(?)
-					}
-					case CR -> { // we got two (or more) CRs in a row
-						if (tainted == -1) {
-							tainted = lineBuilder.length();
-						}
-						lineBuilder.append(CR);
-					}
-					default -> { // we got some other character following a CR
-						if (tainted == -1) {
-							tainted = lineBuilder.length();
-						}
-						lineBuilder.append(CR);
-						lineBuilder.append((char) inChar);
-						crJustReceived = false;
-					}
-				}
-			}
-			if (lineBuilder.length() >= MAX_LINE_LENGTH) {
-				throw new MaxLineLengthException("Input line length is too long!");
-			}
-		}
+		boolean isPrematureEol = false;
+		boolean isComplete = false;
 	}
-
 }
