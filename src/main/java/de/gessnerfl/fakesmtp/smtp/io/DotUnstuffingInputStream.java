@@ -1,17 +1,3 @@
-/***********************************************************************
- * Copyright (c) 2000-2006 The Apache Software Foundation. * All rights
- * reserved. *
- * ------------------------------------------------------------------- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you * may not
- * use this file except in compliance with the License. You * may obtain a copy
- * of the License at: * * http://www.apache.org/licenses/LICENSE-2.0 * * Unless
- * required by applicable law or agreed to in writing, software * distributed
- * under the License is distributed on an "AS IS" BASIS, * WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or * implied. See the License for the
- * specific language governing * permissions and limitations under the License.
- * *
- ***********************************************************************/
-
 package de.gessnerfl.fakesmtp.smtp.io;
 
 import java.io.FilterInputStream;
@@ -22,12 +8,9 @@ import java.io.InputStream;
  * Removes the dot-stuffing happening during the NNTP and SMTP message transfer
  */
 public class DotUnstuffingInputStream extends FilterInputStream {
-	/**
-	 * An array to hold the last two bytes read off the stream. This allows the
-	 * stream to detect '\r\n' sequences even when they occur across read
-	 * boundaries.
-	 */
-	protected int[] last = { -1, -1 };
+
+	private int secondLastByteRead = -1;
+	private int lastByteRead = -1;
 
 	public DotUnstuffingInputStream(final InputStream in) {
 		super(in);
@@ -41,12 +24,12 @@ public class DotUnstuffingInputStream extends FilterInputStream {
 	@Override
 	public int read() throws IOException {
 		int b = this.in.read();
-		if (b == '.' && this.last[0] == '\r' && this.last[1] == '\n') {
+		if (b == '.' && secondLastByteRead == '\r' && lastByteRead == '\n') {
 			// skip this '.' because it should have been stuffed
 			b = this.in.read();
 		}
-		this.last[0] = this.last[1];
-		this.last[1] = b;
+		secondLastByteRead = lastByteRead;
+		lastByteRead = b;
 		return b;
 	}
 
@@ -87,12 +70,5 @@ public class DotUnstuffingInputStream extends FilterInputStream {
 		}
 
 		return i;
-	}
-
-	/**
-	 * Provide access to the base input stream.
-	 */
-	public InputStream getBaseStream() {
-		return this.in;
 	}
 }
