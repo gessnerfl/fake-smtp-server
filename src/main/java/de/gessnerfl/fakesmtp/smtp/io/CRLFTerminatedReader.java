@@ -97,6 +97,7 @@ public class CRLFTerminatedReader extends FilterReader {
 			break;
 		case EOF:
 			state.isPrematureEol = true;
+			break;
 		case LF: // the normal ending of a line
 			if (state.tainted == -1) {
 				state.tainted = state.lineBuilder.length();
@@ -115,9 +116,7 @@ public class CRLFTerminatedReader extends FilterReader {
 				}
 				state.isComplete = true;
 			}
-			case EOF -> {
-				state.isPrematureEol = true;
-			}
+			case EOF -> state.isPrematureEol = true;
 			case CR -> { // we got two (or more) CRs in a row
 				if (state.tainted == -1) {
 					state.tainted = state.lineBuilder.length();
@@ -135,7 +134,7 @@ public class CRLFTerminatedReader extends FilterReader {
 		}
 	}
 
-	private final class ReadState {
+	private static final class ReadState {
 		/*
 		 * This boolean tells which state we are in, depending upon whether we
 		 * got a CR in the preceding read().
