@@ -9,17 +9,17 @@ import java.util.List;
 @Service
 public class BlockedRecipientAddresses {
 
-    final List<String> blockedRecipientAddresses;
+    final List<String> blockedAddresses;
 
     @Autowired
     public BlockedRecipientAddresses(FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties) {
-        this.blockedRecipientAddresses = fakeSmtpConfigurationProperties.getBlockedRecipientAddresses()
+        this.blockedAddresses = fakeSmtpConfigurationProperties.getBlockedRecipientAddresses()
                 .stream()
                 .map(String::toLowerCase)
                 .toList();
     }
 
     public boolean isBlocked(String recipient){
-        return recipient != null && blockedRecipientAddresses.contains(recipient.toLowerCase());
+        return recipient != null && blockedAddresses.contains(recipient.toLowerCase());
     }
 }

@@ -133,8 +133,7 @@ public class EmailFactory {
 
     private Optional<String> getMessageContentAsString(Object rawContent) {
         var content = rawContent instanceof BASE64DecoderStream stream ? readBase64EncodedData(stream) : Objects.toString(rawContent, null);
-        var data = Optional.ofNullable(content);
-        return data;
+        return Optional.ofNullable(content);
     }
 
     private String readBase64EncodedData(BASE64DecoderStream stream){

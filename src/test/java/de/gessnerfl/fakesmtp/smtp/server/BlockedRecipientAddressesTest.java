@@ -26,23 +26,23 @@ class BlockedRecipientAddressesTest {
     }
 
     @Test
-    public void shouldNormalizeEmailsToLowerCaseOnInit(){
-        MatcherAssert.assertThat(sut.blockedRecipientAddresses, Matchers.contains("blocked@example.com"));
+    void shouldNormalizeEmailsToLowerCaseOnInit(){
+        MatcherAssert.assertThat(sut.blockedAddresses, Matchers.contains("blocked@example.com"));
     }
 
     @Test
-    public void shouldReturnTrueWhenRecipientIsBlockedCaseInsensitive(){
+    void shouldReturnTrueWhenRecipientIsBlockedCaseInsensitive(){
         assertTrue(sut.isBlocked("Blocked@Example.Com"));
         assertTrue(sut.isBlocked("blocked@example.Com"));
     }
 
     @Test
-    public void shouldReturnFalseWehnRecipientIsNull(){
+    void shouldReturnFalseWhenRecipientIsNull(){
         assertFalse(sut.isBlocked(null));
     }
 
     @Test
-    public void shouldReturnFalseWehnRecipientIsNotBlocked(){
+    void shouldReturnFalseWhenRecipientIsNotBlocked(){
         assertFalse(sut.isBlocked("valid@example.com"));
     }
 }

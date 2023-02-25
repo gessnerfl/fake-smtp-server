@@ -14,7 +14,7 @@ class CRLFOutputStreamTest {
     public static final byte[] EXPECTED_RESULT_STRING_BYTES = "this is a test\r\nstring\r\nwhich should be normalized".getBytes(StandardCharsets.UTF_8);
 
     @Test
-    public void shouldNormalizeIsolatedCarriageReturnOrLineFeed() throws IOException {
+    void shouldNormalizeIsolatedCarriageReturnOrLineFeed() throws IOException {
         var baos = new ByteArrayOutputStream();
         var sut = new CRLFOutputStream(baos);
 
@@ -26,7 +26,7 @@ class CRLFOutputStreamTest {
     }
 
     @Test
-    public void shouldNormalizeIsolatedCarriageReturnOrLineFeedIntoArray() throws IOException {
+    void shouldNormalizeIsolatedCarriageReturnOrLineFeedIntoArray() throws IOException {
         var baos = new ByteArrayOutputStream();
         var sut = new CRLFOutputStream(baos);
 

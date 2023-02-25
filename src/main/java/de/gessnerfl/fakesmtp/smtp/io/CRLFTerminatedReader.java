@@ -1,21 +1,6 @@
 package de.gessnerfl.fakesmtp.smtp.io;
 
 import java.io.FilterReader;
-
-/***********************************************************************
- * Copyright (c) 2000-2006 The Apache Software Foundation. * All rights
- * reserved. *
- * ------------------------------------------------------------------- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you * may not
- * use this file except in compliance with the License. You * may obtain a copy
- * of the License at: * * http://www.apache.org/licenses/LICENSE-2.0 * * Unless
- * required by applicable law or agreed to in writing, software * distributed
- * under the License is distributed on an "AS IS" BASIS, * WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or * implied. See the License for the
- * specific language governing * permissions and limitations under the License.
- * *
- ***********************************************************************/
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,8 +11,7 @@ import java.nio.charset.Charset;
  * CRLF. Extends Reader and overrides its readLine() method. The Reader
  * readLine() method cannot serve for SMTP because it ends lines with either CR
  * or LF alone.
- *
- * JSS: The readline() method of this class has been 'enchanced' from the Apache
+ * JSS: The readline() method of this class has been 'enhanced' from the Apache
  * JAMES version to throw an IOException if the line is greater than or equal to
  * MAX_LINE_LENGTH (998) which is defined in
  * <a href="http://rfc.net/rfc2822.html#s2.1.1.">RFC 2822</a>.
@@ -81,7 +65,7 @@ public class CRLFTerminatedReader extends FilterReader {
 	 */
 	public String readLine() throws IOException {
 		/*
-		 * This boolean tells which state we are in, depending upon whether or not we
+		 * This boolean tells which state we are in, depending upon whether we
 		 * got a CR in the preceding read().
 		 */
 		boolean crJustReceived = false;
@@ -111,26 +95,29 @@ public class CRLFTerminatedReader extends FilterReader {
 			} else {
 				// CR has been received, we may be at end of line
 				switch (inChar) {
-				case LF: // LF without a preceding CR
-					if (tainted != -1) {
-						throw new TerminationException("\"bare\" CR or LF in data stream", tainted);
+					case LF -> { // LF without a preceding CR
+						if (tainted != -1) {
+							throw new TerminationException("\"bare\" CR or LF in data stream", tainted);
+						}
+						return lineBuilder.toString();
 					}
-					return lineBuilder.toString();
-				case EOF:
-					return null; // premature EOF -- discards data(?)
-				case CR: // we got two (or more) CRs in a row
-					if (tainted == -1) {
-						tainted = lineBuilder.length();
+					case EOF -> {
+						return null; // premature EOF -- discards data(?)
 					}
-					lineBuilder.append(CR);
-					break;
-				default: // we got some other character following a CR
-					if (tainted == -1) {
-						tainted = lineBuilder.length();
+					case CR -> { // we got two (or more) CRs in a row
+						if (tainted == -1) {
+							tainted = lineBuilder.length();
+						}
+						lineBuilder.append(CR);
 					}
-					lineBuilder.append(CR);
-					lineBuilder.append((char) inChar);
-					crJustReceived = false;
+					default -> { // we got some other character following a CR
+						if (tainted == -1) {
+							tainted = lineBuilder.length();
+						}
+						lineBuilder.append(CR);
+						lineBuilder.append((char) inChar);
+						crJustReceived = false;
+					}
 				}
 			}
 			if (lineBuilder.length() >= MAX_LINE_LENGTH) {
