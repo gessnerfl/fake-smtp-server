@@ -1,39 +1,47 @@
 package de.gessnerfl.fakesmtp.smtp.command;
 
-import de.gessnerfl.fakesmtp.smtp.server.RequireAuthCommandWrapper;
-import de.gessnerfl.fakesmtp.smtp.server.RequireTLSCommandWrapper;
+import de.gessnerfl.fakesmtp.smtp.server.InvalidCommandNameException;
+import de.gessnerfl.fakesmtp.smtp.server.UnknownCommandException;
 
-public enum CommandRegistry {
-	AUTH(new AuthCommand(), true, false),
-	DATA(new DataCommand(), true, true),
-	EHLO(new EhloCommand(), false, false),
-	HELO(new HelloCommand(), true, false),
-	HELP(new HelpCommand(), true, true),
-	MAIL(new MailCommand(), true, true),
-	NOOP(new NoopCommand(), false, false),
-	QUIT(new QuitCommand(), false, false),
-	RCPT(new ReceiptCommand(), true, true),
-	RSET(new ResetCommand(), true, false),
-	STARTTLS(new StartTLSCommand(), false, false),
-	VRFY(new VerifyCommand(), true, true),
-	EXPN(new ExpandCommand(), true, true);
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-	private Command command;
+public class CommandRegistry {
 
-	CommandRegistry(final Command cmd,
-			final boolean checkForStartedTLSWhenRequired,
-			final boolean checkForAuthIfRequired) {
-		if (checkForStartedTLSWhenRequired) {
-			this.command = new RequireTLSCommandWrapper(cmd);
-		} else {
-			this.command = cmd;
-		}
-		if (checkForAuthIfRequired) {
-			this.command = new RequireAuthCommandWrapper(this.command);
-		}
-	}
+    private final Map<CommandVerb, Command> commands;
 
-	public Command getCommand() {
-		return this.command;
-	}
+    public CommandRegistry(final Command... commands) {
+        this.commands = Stream.of(commands).collect(Collectors.toMap(Command::getVerb, Function.identity()));
+    }
+
+    public Command getCommandFromString(final String commandString) throws UnknownCommandException, InvalidCommandNameException {
+        final var verb = getVerbByCommand(commandString);
+        final var command = commands.get(verb);
+        if (command == null) {
+            throw new UnknownCommandException("Error: command not implemented");
+        }
+        return command;
+    }
+
+    private CommandVerb getVerbByCommand(final String commandString) throws InvalidCommandNameException, UnknownCommandException {
+        if (commandString == null || commandString.length() < 4) {
+            throw new InvalidCommandNameException("Error: bad syntax");
+        }
+
+        final var commandStringUpperCase = commandString.toUpperCase(Locale.ENGLISH);
+        try {
+            return CommandVerb.valueOf(commandStringUpperCase);
+        } catch (IllegalArgumentException e1) {
+            final StringTokenizer stringTokenizer = new StringTokenizer(commandStringUpperCase);
+            try {
+                return CommandVerb.valueOf(stringTokenizer.nextToken());
+            } catch (IllegalArgumentException e2) {
+                throw new UnknownCommandException("Error: command not implemented");
+            }
+        }
+    }
 }

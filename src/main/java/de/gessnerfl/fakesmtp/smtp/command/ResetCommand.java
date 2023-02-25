@@ -6,7 +6,7 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 
 public class ResetCommand extends BaseCommand {
 	public ResetCommand() {
-		super("RSET", "Resets the system.");
+		super(CommandVerb.RSET, "Resets the system.");
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import de.gessnerfl.fakesmtp.smtp.util.EmailUtils;
 
 public class MailCommand extends BaseCommand {
 	public MailCommand() {
-		super("MAIL", "Specifies the sender.", "FROM: <sender> [ <parameters> ]");
+		super(CommandVerb.MAIL, "Specifies the sender.", "FROM: <sender> [ <parameters> ]");
 	}
 
 	@Override

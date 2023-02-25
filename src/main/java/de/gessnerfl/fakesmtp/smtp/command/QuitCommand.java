@@ -6,7 +6,7 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 
 public class QuitCommand extends BaseCommand {
 	public QuitCommand() {
-		super("QUIT", "Exit the SMTP session.");
+		super(CommandVerb.QUIT, "Exit the SMTP session.");
 	}
 
 	@Override

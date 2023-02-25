@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import de.gessnerfl.fakesmtp.smtp.command.Command;
 import de.gessnerfl.fakesmtp.smtp.command.CommandException;
+import de.gessnerfl.fakesmtp.smtp.command.CommandVerb;
 
 /**
  * Verifies the presence of a TLS connection if TLS is required. The wrapped
@@ -34,7 +35,7 @@ public class RequireTLSCommandWrapper implements Command {
 	}
 
 	@Override
-	public String getName() {
-		return wrapped.getName();
+	public CommandVerb getVerb() {
+		return wrapped.getVerb();
 	}
 }

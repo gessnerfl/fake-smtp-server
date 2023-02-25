@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import de.gessnerfl.fakesmtp.smtp.command.Command;
 import de.gessnerfl.fakesmtp.smtp.command.CommandException;
+import de.gessnerfl.fakesmtp.smtp.command.CommandVerb;
 
 /**
  * Thin wrapper around any command to make sure authentication has been
@@ -43,7 +44,7 @@ public class RequireAuthCommandWrapper implements Command {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getName() {
-		return wrapped.getName();
+	public CommandVerb getVerb() {
+		return wrapped.getVerb();
 	}
 }

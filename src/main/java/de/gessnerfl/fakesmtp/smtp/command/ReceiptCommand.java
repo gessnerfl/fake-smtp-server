@@ -9,7 +9,7 @@ import de.gessnerfl.fakesmtp.smtp.util.EmailUtils;
 
 public class ReceiptCommand extends BaseCommand {
 	public ReceiptCommand() {
-		super("RCPT", "Specifies the recipient. Can be used any number of times.", "TO: <recipient> [ <parameters> ]");
+		super(CommandVerb.RCPT, "Specifies the recipient. Can be used any number of times.", "TO: <recipient> [ <parameters> ]");
 	}
 
 	@Override

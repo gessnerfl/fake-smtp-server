@@ -6,7 +6,7 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 
 public class NoopCommand extends BaseCommand {
 	public NoopCommand() {
-		super("NOOP", "The noop command");
+		super(CommandVerb.NOOP, "The noop command");
 	}
 
 	@Override

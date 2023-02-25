@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import de.gessnerfl.fakesmtp.config.SmtpCommandConfig;
 import de.gessnerfl.fakesmtp.smtp.RejectException;
 import de.gessnerfl.fakesmtp.smtp.client.SMTPException;
 import de.gessnerfl.fakesmtp.smtp.client.SmartClient;
@@ -29,10 +30,8 @@ import static org.mockito.Mockito.*;
 class MessageHandlerTest {
 	@Mock
 	private MessageHandlerFactory messageHandlerFactory;
-
 	@Mock
 	private MessageHandler messageHandler;
-
 	@Mock
 	private MessageHandler messageHandler2;
 
@@ -42,7 +41,7 @@ class MessageHandlerTest {
 	public void setup() throws NoSuchAlgorithmException {
 		MockitoAnnotations.openMocks(this);
 		int randomPort = SecureRandom.getInstanceStrong().nextInt(1024,65536);
-		smtpServer = new BaseSmtpServer("FakeSMTPServer", messageHandlerFactory);
+		smtpServer = new BaseSmtpServer("FakeSMTPServer", messageHandlerFactory, new SmtpCommandConfig().commandHandler());
 		smtpServer.setPort(randomPort);
 		smtpServer.start();
 	}
@@ -70,6 +69,7 @@ class MessageHandlerTest {
 		verify(messageHandler).recipient(anyString());
 		verify(messageHandler).data(any(InputStream.class));
 		verify(messageHandler).done();
+		verifyNoMoreInteractions(messageHandlerFactory, messageHandler, messageHandler2);
 	}
 
 	@Test
@@ -78,7 +78,7 @@ class MessageHandlerTest {
 		client.quit();
 		smtpServer.stop(); // wait for the server to catch up
 
-		verifyNoInteractions(messageHandlerFactory);
+		verifyNoInteractions(messageHandlerFactory, messageHandler, messageHandler2);
 	}
 
 	@Test
@@ -93,6 +93,7 @@ class MessageHandlerTest {
 		verify(messageHandlerFactory).create(any(MessageContext.class));
 		verify(messageHandler).from(anyString());
 		verify(messageHandler).done();
+		verifyNoMoreInteractions(messageHandlerFactory, messageHandler, messageHandler2);
 	}
 
 	@Test
@@ -126,6 +127,7 @@ class MessageHandlerTest {
 		verify(messageHandler2).recipient(anyString());
 		verify(messageHandler2).data(any(InputStream.class));
 		verify(messageHandler2).done();
+		verifyNoMoreInteractions(messageHandlerFactory, messageHandler, messageHandler2);
 	}
 
 	/**
@@ -158,5 +160,6 @@ class MessageHandlerTest {
 		verify(messageHandler).done();
 		verify(messageHandler2).from(anyString());
 		verify(messageHandler2).done();
+		verifyNoMoreInteractions(messageHandlerFactory, messageHandler, messageHandler2);
 	}
 }

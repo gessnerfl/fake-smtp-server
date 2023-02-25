@@ -1,10 +1,12 @@
 package de.gessnerfl.fakesmtp.smtp.server;
 
+import de.gessnerfl.fakesmtp.smtp.command.CommandVerb;
+
 import java.util.Objects;
 import java.util.StringTokenizer;
 
 public class HelpMessage {
-	private final String commandName;
+	private final CommandVerb commandVerb;
 
 	private final String argumentDescription;
 
@@ -12,19 +14,19 @@ public class HelpMessage {
 
 	private String outputString;
 
-	public HelpMessage(final String commandName, final String helpMessageText, final String argumentDescription) {
-		this.commandName = commandName;
+	public HelpMessage(final CommandVerb commandVerb, final String helpMessageText, final String argumentDescription) {
+		this.commandVerb = commandVerb;
 		this.argumentDescription = argumentDescription == null ? "" : " " + argumentDescription;
 		this.helpMessageText = helpMessageText;
 		this.buildOutputString();
 	}
 
-	public HelpMessage(final String commandName, final String helpMessageText) {
-		this(commandName, helpMessageText, null);
+	public HelpMessage(final CommandVerb commandVerb, final String helpMessageText) {
+		this(commandVerb, helpMessageText, null);
 	}
 
-	public String getName() {
-		return this.commandName;
+	public CommandVerb getName() {
+		return this.commandVerb;
 	}
 
 	public String toOutputString() {
@@ -34,12 +36,12 @@ public class HelpMessage {
 	private void buildOutputString() {
 		final StringTokenizer stringTokenizer = new StringTokenizer(this.helpMessageText, "\n");
 		final StringBuilder stringBuilder
-				= new StringBuilder().append("214-").append(this.commandName).append(this.argumentDescription);
+				= new StringBuilder().append("214-").append(this.commandVerb).append(this.argumentDescription);
 		while (stringTokenizer.hasMoreTokens()) {
 			stringBuilder.append("\n214-    ").append(stringTokenizer.nextToken());
 		}
 
-		stringBuilder.append("\n214 End of ").append(this.commandName).append(" info");
+		stringBuilder.append("\n214 End of ").append(this.commandVerb).append(" info");
 		this.outputString = stringBuilder.toString();
 	}
 
@@ -53,14 +55,14 @@ public class HelpMessage {
 		}
 		final HelpMessage that = (HelpMessage) o;
 		return (Objects.equals(this.argumentDescription, that.argumentDescription))
-				&& (Objects.equals(this.commandName, that.commandName))
+				&& (Objects.equals(this.commandVerb, that.commandVerb))
 				&& (Objects.equals(this.helpMessageText, that.helpMessageText));
 	}
 
 	@Override
 	public int hashCode() {
 		int result;
-		result = this.commandName != null ? this.commandName.hashCode() : 0;
+		result = this.commandVerb != null ? this.commandVerb.hashCode() : 0;
 		result = 29 * result + (this.argumentDescription != null ? this.argumentDescription.hashCode() : 0);
 		result = 29 * result + (this.helpMessageText != null ? this.helpMessageText.hashCode() : 0);
 		return result;

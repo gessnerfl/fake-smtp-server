@@ -6,7 +6,7 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 
 public class ExpandCommand extends BaseCommand {
 	public ExpandCommand() {
-		super("EXPN", "The expn command.");
+		super(CommandVerb.EXPN, "The expn command.");
 	}
 
 	@Override

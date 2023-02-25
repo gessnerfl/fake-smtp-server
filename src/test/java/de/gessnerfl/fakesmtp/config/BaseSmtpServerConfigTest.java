@@ -1,6 +1,7 @@
 package de.gessnerfl.fakesmtp.config;
 
 import de.gessnerfl.fakesmtp.smtp.auth.BasicUsernamePasswordValidator;
+import de.gessnerfl.fakesmtp.smtp.command.CommandHandler;
 import de.gessnerfl.fakesmtp.smtp.server.BaseMessageListener;
 import de.gessnerfl.fakesmtp.smtp.server.BaseSmtpServer;
 import de.gessnerfl.fakesmtp.smtp.server.MessageListenerAdapter;
@@ -30,6 +31,8 @@ class BaseSmtpServerConfigTest {
     @Mock
     private BaseMessageListener baseMessageListener;
     @Mock
+    private CommandHandler commandHandler;
+    @Mock
     private FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
     @Mock
     private BasicUsernamePasswordValidator basicUsernamePasswordValidator;
@@ -43,7 +46,7 @@ class BaseSmtpServerConfigTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, Collections.singletonList(baseMessageListener), basicUsernamePasswordValidator, logger));
+        sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, Collections.singletonList(baseMessageListener), basicUsernamePasswordValidator, commandHandler, logger));
         when(sut.createBaseSmtpServerFor(any(MessageListenerAdapter.class))).thenReturn(smtpServer);
     }
 

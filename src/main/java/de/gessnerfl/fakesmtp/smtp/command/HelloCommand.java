@@ -6,7 +6,7 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 
 public class HelloCommand extends BaseCommand {
 	public HelloCommand() {
-		super("HELO", "Introduce yourself.", "<hostname>");
+		super(CommandVerb.HELO, "Introduce yourself.", "<hostname>");
 	}
 
 	@Override

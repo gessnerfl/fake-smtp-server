@@ -133,8 +133,10 @@ public class BaseSmtpServer implements SmtpServer {
     /**
      * Simple constructor.
      */
-    public BaseSmtpServer(final String softwareName, final MessageHandlerFactory handlerFactory) {
-        this(softwareName, handlerFactory, null);
+    public BaseSmtpServer(final String softwareName,
+                          final MessageHandlerFactory handlerFactory,
+                          CommandHandler commandHandler) {
+        this(softwareName, handlerFactory, commandHandler, null);
     }
 
     /**
@@ -151,11 +153,12 @@ public class BaseSmtpServer implements SmtpServer {
      */
     public BaseSmtpServer(final String softwareName,
                           final MessageHandlerFactory msgHandlerFact,
+                          final CommandHandler commandHandler,
                           final AuthenticationHandlerFactory authHandlerFact) {
         this.softwareName = softwareName;
         this.messageHandlerFactory = msgHandlerFact;
         this.authenticationHandlerFactory = authHandlerFact;
-        this.commandHandler = new CommandHandler();
+        this.commandHandler = commandHandler;
 
         try {
             this.hostName = InetAddress.getLocalHost().getCanonicalHostName();

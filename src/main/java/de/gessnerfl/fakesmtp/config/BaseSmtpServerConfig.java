@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.config;
 
 import de.gessnerfl.fakesmtp.smtp.auth.BasicUsernamePasswordValidator;
 import de.gessnerfl.fakesmtp.smtp.auth.EasyAuthenticationHandlerFactory;
+import de.gessnerfl.fakesmtp.smtp.command.CommandHandler;
 import de.gessnerfl.fakesmtp.smtp.server.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
     private final FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
     private final List<MessageListener> messageListeners;
     private final BasicUsernamePasswordValidator basicUsernamePasswordValidator;
+    private final CommandHandler commandHandler;
     private final Logger logger;
 
     @Autowired
@@ -28,11 +30,13 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
                                 FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties,
                                 List<MessageListener> messageListeners,
                                 BasicUsernamePasswordValidator basicUsernamePasswordValidator,
+                                CommandHandler commandHandler,
                                 Logger logger) {
         this.buildProperties = buildProperties;
         this.fakeSmtpConfigurationProperties = fakeSmtpConfigurationProperties;
         this.messageListeners = messageListeners;
         this.basicUsernamePasswordValidator = basicUsernamePasswordValidator;
+        this.commandHandler = commandHandler;
         this.logger = logger;
     }
 
@@ -55,7 +59,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
 
     BaseSmtpServer createBaseSmtpServerFor(MessageListenerAdapter messageListenerAdapter){
         final var softwareName = "FakeSMTPServer " + buildProperties.getVersion();
-        return new BaseSmtpServer(softwareName, messageListenerAdapter);
+        return new BaseSmtpServer(softwareName, messageListenerAdapter, commandHandler);
     }
 
     private void configureAuthentication(BaseSmtpServer smtpServer, FakeSmtpConfigurationProperties.Authentication authentication) {

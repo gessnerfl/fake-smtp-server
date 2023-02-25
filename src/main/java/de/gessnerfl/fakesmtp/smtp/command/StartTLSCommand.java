@@ -15,12 +15,12 @@ public class StartTLSCommand extends BaseCommand {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StartTLSCommand.class);
 
 	public StartTLSCommand() {
-		super("STARTTLS", "The starttls command");
+		super(CommandVerb.STARTTLS, "The starttls command");
 	}
 
 	@Override
 	public void execute(final String commandString, final Session sess) throws IOException {
-		if (!commandString.trim().toUpperCase(Locale.ENGLISH).equals(this.getName())) {
+		if (!commandString.trim().toUpperCase(Locale.ENGLISH).equals(this.getVerb().name())) {
 			sess.sendResponse("501 Syntax error (no parameters allowed)");
 			return;
 		}

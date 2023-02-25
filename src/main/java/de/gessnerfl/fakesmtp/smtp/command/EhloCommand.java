@@ -8,7 +8,7 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 
 public class EhloCommand extends BaseCommand {
     public EhloCommand() {
-        super("EHLO", "Introduce yourself.", "<hostname>");
+        super(CommandVerb.EHLO, "Introduce yourself.", "<hostname>");
     }
 
     @Override
@@ -36,19 +36,19 @@ public class EhloCommand extends BaseCommand {
 
         final StringBuilder response = new StringBuilder();
 
-        response.append("250-");
-        response.append(sess.getServer().getHostName());
-        response.append("\r\n" + "250-8BITMIME");
+        response.append("250-")
+                .append(sess.getServer().getHostName())
+                .append("\r\n")
+                .append("250-8BITMIME");
 
         final long maxSize = sess.getServer().getMaxMessageSizeInBytes();
         if (maxSize > 0) {
-            response.append("\r\n" + "250-SIZE ");
-            response.append(maxSize);
+            response.append("\r\n").append("250-SIZE ").append(maxSize);
         }
 
         // Enabling / Hiding TLS is a server setting
         if (sess.getServer().getEnableTLS() && !sess.getServer().getHideTLS()) {
-            response.append("\r\n" + "250-STARTTLS");
+            response.append("\r\n").append("250-STARTTLS");
         }
 
         // Check to see if we support authentication
@@ -56,12 +56,15 @@ public class EhloCommand extends BaseCommand {
         if (authFact != null) {
             final List<String> supportedMechanisms = authFact.getAuthenticationMechanisms();
             if (!supportedMechanisms.isEmpty()) {
-                response.append("\r\n" + "250-" + AuthCommand.VERB + " ");
-                response.append(String.join(" ", supportedMechanisms));
+                response.append("\r\n")
+                        .append("250-")
+                        .append(CommandVerb.AUTH.name())
+                        .append(" ")
+                        .append(String.join(" ", supportedMechanisms));
             }
         }
 
-        response.append("\r\n" + "250 Ok");
+        response.append("\r\n").append("250 Ok");
 
         sess.sendResponse(response.toString());
     }

@@ -10,7 +10,7 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
  */
 public class HelpCommand extends BaseCommand {
 	public HelpCommand() {
-		super("HELP",
+		super(CommandVerb.HELP,
 				"The HELP command gives help info about the topic specified.\n"
 						+ "For a list of topics, type HELP by itself.",
 				"[ <topic> ]");
@@ -44,8 +44,8 @@ public class HelpCommand extends BaseCommand {
 
 	protected String getFormattedTopicList(final BaseSmtpServer server) {
 		final StringBuilder sb = new StringBuilder();
-		for (final String key : server.getCommandHandler().getVerbs()) {
-			sb.append("214-     " + key + "\r\n");
+		for (final CommandVerb key : CommandVerb.values()) {
+			sb.append("214-     ").append(key.name()).append("\r\n");
 		}
 		return sb.toString();
 	}

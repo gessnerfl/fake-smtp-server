@@ -13,5 +13,5 @@ public interface Command {
 	/**
 	 * Returns the name of the command in upper case. For example "QUIT".
 	 */
-	String getName();
+	CommandVerb getVerb();
 }

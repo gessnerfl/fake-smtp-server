@@ -6,7 +6,7 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 
 public class VerifyCommand extends BaseCommand {
 	public VerifyCommand() {
-		super("VRFY", "The vrfy command.");
+		super(CommandVerb.VRFY, "The vrfy command.");
 	}
 
 	@Override

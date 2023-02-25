@@ -16,9 +16,9 @@ public class AuthCommand extends BaseCommand {
 
 	/** Creates a new instance of AuthCommand */
 	public AuthCommand() {
-		super(VERB,
+		super(CommandVerb.AUTH,
 				"Authentication service",
-				VERB
+				CommandVerb.AUTH.name()
 						+ " <mechanism> [initial-response] \n"
 						+ "\t mechanism = a string identifying a SASL authentication mechanism,\n"
 						+ "\t an optional base64-encoded response");
@@ -43,7 +43,7 @@ public class AuthCommand extends BaseCommand {
 		final String[] args = this.getArgs(commandString);
 		// Let's check the command syntax
 		if (args.length < 2) {
-			sess.sendResponse("501 Syntax: " + VERB + " mechanism [initial-response]");
+			sess.sendResponse("501 Syntax: " + CommandVerb.AUTH.name() + " mechanism [initial-response]");
 			return;
 		}
 
