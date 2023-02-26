@@ -18,8 +18,8 @@ class CRLFOutputStreamTest {
         var baos = new ByteArrayOutputStream();
         var sut = new CRLFOutputStream(baos);
 
-        for(int i = 0; i < TEST_STRING_BYTES.length; i++){
-            sut.write(TEST_STRING_BYTES[i]);
+        for (byte testStringByte : TEST_STRING_BYTES) {
+            sut.write(testStringByte);
         }
 
         assertArrayEquals(EXPECTED_RESULT_STRING_BYTES, baos.toByteArray());
