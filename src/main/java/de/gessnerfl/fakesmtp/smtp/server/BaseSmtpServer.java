@@ -42,26 +42,15 @@ public class BaseSmtpServer implements SmtpServer {
      * Hostname used if we can't find one
      */
     private static final String UNKNOWN_HOSTNAME = "localhost";
+    private static final int BACKLOG = 50;
 
     private InetAddress bindAddress = null; // default to all interfaces
-
     private int port = 25; // default to 25
-
     private String hostName; // defaults to a lookup of the local address
-
-    private final static int BACKLOG = 50;
-
     private final String softwareName;
-
     private final MessageHandlerFactory messageHandlerFactory;
-
     private AuthenticationHandlerFactory authenticationHandlerFactory;
-
     private final CommandHandler commandHandler;
-
-    /**
-     * The thread listening on the server socket.
-     */
     private ServerThread serverThread;
 
     /**

@@ -12,12 +12,12 @@ public abstract class ThresholdingOutputStream extends OutputStream {
 	protected OutputStream output;
 
 	/** When to trigger */
-	int threshold;
+	private final int threshold;
 
 	/** Number of bytes written so far */
-	int written = 0;
+	private int written = 0;
 
-	boolean thresholdReached = false;
+	private boolean thresholdReached = false;
 
 	/**
 	 */
@@ -97,13 +97,6 @@ public abstract class ThresholdingOutputStream extends OutputStream {
 			this.thresholdReached(this.written, predicted);
 			this.thresholdReached = true;
 		}
-	}
-
-	/**
-	 * @return the current threshold value.
-	 */
-	public int getThreshold() {
-		return this.threshold;
 	}
 
 	/**

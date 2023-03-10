@@ -71,8 +71,8 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 			return os.getInputStream();
 		}
 		if (!this.closed) {
-			this.output.flush();
-			this.output.close();
+			super.flush();
+			super.close();
 			this.closed = true;
 		}
 
@@ -82,8 +82,8 @@ public class DeferredFileOutputStream extends ThresholdingOutputStream {
 	@Override
 	public void close() throws IOException {
 		if (!this.closed) {
-			this.output.flush();
-			this.output.close();
+			super.flush();
+			super.close();
 			this.closed = true;
 		}
 
