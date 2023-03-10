@@ -141,7 +141,7 @@ public class EmailFactory {
             var byteArray = IOUtils.toByteArray(stream);
             return Base64.getEncoder().encodeToString(byteArray);
         } catch (IOException e) {
-            throw new EmailProcessingException("Failed to read inline image", e);
+            throw new EmailProcessingException("Failed to read message content", e);
         }
     }
 

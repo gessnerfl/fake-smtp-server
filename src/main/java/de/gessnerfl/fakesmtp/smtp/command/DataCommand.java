@@ -34,15 +34,13 @@ public class DataCommand extends BaseCommand {
 		stream = new BufferedInputStream(stream, BUFFER_SIZE);
 		stream = new DotTerminatedInputStream(stream);
 		stream = new DotUnstuffingInputStream(stream);
-		if (!sess.getServer().getDisableReceivedHeaders()) {
-			stream = new ReceivedHeaderStream(stream,
-					sess.getHelo(),
-					sess.getRemoteAddress().getAddress(),
-					sess.getServer().getHostName(),
-					sess.getServer().getSoftwareName(),
-					sess.getSessionId(),
-					sess.getSingleRecipient());
-		}
+		stream = new ReceivedHeaderStream(stream,
+				sess.getHelo(),
+				sess.getRemoteAddress().getAddress(),
+				sess.getServer().getHostName(),
+				sess.getServer().getSoftwareName(),
+				sess.getSessionId(),
+				sess.getSingleRecipient());
 
 		try {
 			sess.getMessageHandler().data(stream);

@@ -18,6 +18,13 @@ import org.slf4j.MDC;
 class ServerThread extends Thread {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServerThread.class);
 
+	/**
+	 * set a hard limit on the maximum number of connections this server will accept
+	 * once we reach this limit, the server will gracefully reject new connections.
+	 * Default is 1000.
+	 */
+	private static final int MAX_CONNECTIONS = 1000;
+
 	private final BaseSmtpServer server;
 
 	private final ServerSocket serverSocket;
@@ -49,7 +56,7 @@ class ServerThread extends Thread {
 		this.serverSocket = serverSocket;
 		// reserve a few places for graceful disconnects with informative
 		// messages
-		final int countOfConnectionPermits = server.getMaxConnections() + 10;
+		final int countOfConnectionPermits = MAX_CONNECTIONS + 10;
 		this.connectionPermits = new Semaphore(countOfConnectionPermits);
 		this.sessionThreads = new HashSet<>(countOfConnectionPermits * 4 / 3 + 1);
 		this.executorService = Executors.newCachedThreadPool();
@@ -218,7 +225,7 @@ class ServerThread extends Thread {
 	}
 
 	public synchronized boolean hasTooManyConnections() {
-		return sessionThreads.size() > server.getMaxConnections();
+		return sessionThreads.size() > MAX_CONNECTIONS;
 	}
 
 	public synchronized int getNumberOfConnections() {

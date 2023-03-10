@@ -18,11 +18,6 @@ public class ReceiptCommand extends BaseCommand {
 			sess.sendResponse("503 5.5.1 Error: need MAIL command");
 			return;
 		}
-		if (sess.getServer().getMaxRecipients() >= 0
-				&& sess.getRecipientCount() >= sess.getServer().getMaxRecipients()) {
-			sess.sendResponse("452 Error: too many recipients");
-			return;
-		}
 
 		final String args = this.getArgPredicate(commandString);
 		if (!args.toUpperCase(Locale.ENGLISH).startsWith("TO:")) {

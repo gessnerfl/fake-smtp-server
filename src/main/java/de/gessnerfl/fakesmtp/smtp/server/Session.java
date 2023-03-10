@@ -28,6 +28,10 @@ import de.gessnerfl.fakesmtp.smtp.io.CRLFTerminatedReader;
  */
 public class Session implements Runnable, MessageContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(Session.class);
+    /**
+     * The timeout for waiting for data on a connection is one minute: 1000 * 60 * 1
+     */
+    private static final int CONNECTION_TIMEOUT = 1000 * 60 * 1;
 
     /**
      * A link to our parent server
@@ -294,7 +298,7 @@ public class Session implements Runnable, MessageContext {
         this.reader = new CRLFTerminatedReader(this.input, StandardCharsets.US_ASCII);
         this.writer = new PrintWriter(new OutputStreamWriter(this.socket.getOutputStream(), StandardCharsets.US_ASCII));
 
-        this.socket.setSoTimeout(this.server.getConnectionTimeout());
+        this.socket.setSoTimeout(CONNECTION_TIMEOUT);
     }
 
     /**

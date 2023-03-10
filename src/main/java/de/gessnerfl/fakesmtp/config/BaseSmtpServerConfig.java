@@ -43,7 +43,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
     @Override
     @Bean
     public SmtpServer smtpServer() {
-        BaseSmtpServer smtpServer = createBaseSmtpServerFor(new MessageListenerAdapter(messageListeners));
+        BaseSmtpServer smtpServer = createBaseSmtpServerFor(new MessageListenerAdapter(messageListeners), sessionIdFactory());
         smtpServer.setPort(fakeSmtpConfigurationProperties.getPort());
         smtpServer.setBindAddress(fakeSmtpConfigurationProperties.getBindAddress());
         if (fakeSmtpConfigurationProperties.getAuthentication() != null) {
@@ -57,9 +57,14 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
         return smtpServer;
     }
 
-    BaseSmtpServer createBaseSmtpServerFor(MessageListenerAdapter messageListenerAdapter){
+    @Bean
+    public SessionIdFactory sessionIdFactory(){
+        return new TimeBasedSessionIdFactory();
+    }
+
+    BaseSmtpServer createBaseSmtpServerFor(MessageListenerAdapter messageListenerAdapter, SessionIdFactory sessionIdFactory){
         final var softwareName = "FakeSMTPServer " + buildProperties.getVersion();
-        return new BaseSmtpServer(softwareName, messageListenerAdapter, commandHandler);
+        return new BaseSmtpServer(softwareName, messageListenerAdapter, commandHandler, sessionIdFactory);
     }
 
     private void configureAuthentication(BaseSmtpServer smtpServer, FakeSmtpConfigurationProperties.Authentication authentication) {

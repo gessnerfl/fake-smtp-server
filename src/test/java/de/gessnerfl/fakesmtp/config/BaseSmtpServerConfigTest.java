@@ -2,10 +2,7 @@ package de.gessnerfl.fakesmtp.config;
 
 import de.gessnerfl.fakesmtp.smtp.auth.BasicUsernamePasswordValidator;
 import de.gessnerfl.fakesmtp.smtp.command.CommandHandler;
-import de.gessnerfl.fakesmtp.smtp.server.BaseMessageListener;
-import de.gessnerfl.fakesmtp.smtp.server.BaseSmtpServer;
-import de.gessnerfl.fakesmtp.smtp.server.MessageListenerAdapter;
-import de.gessnerfl.fakesmtp.smtp.server.SmtpServer;
+import de.gessnerfl.fakesmtp.smtp.server.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,7 +44,7 @@ class BaseSmtpServerConfigTest {
     public void init() {
         MockitoAnnotations.openMocks(this);
         sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, Collections.singletonList(baseMessageListener), basicUsernamePasswordValidator, commandHandler, logger));
-        when(sut.createBaseSmtpServerFor(any(MessageListenerAdapter.class))).thenReturn(smtpServer);
+        when(sut.createBaseSmtpServerFor(any(MessageListenerAdapter.class), any(SessionIdFactory.class))).thenReturn(smtpServer);
     }
 
     @Test

@@ -41,7 +41,7 @@ class MessageHandlerTest {
 	public void setup() throws NoSuchAlgorithmException {
 		MockitoAnnotations.openMocks(this);
 		int randomPort = SecureRandom.getInstanceStrong().nextInt(1024,65536);
-		smtpServer = new BaseSmtpServer("FakeSMTPServer", messageHandlerFactory, new SmtpCommandConfig().commandHandler());
+		smtpServer = new BaseSmtpServer("FakeSMTPServer", messageHandlerFactory, new SmtpCommandConfig().commandHandler(), new TimeBasedSessionIdFactory());
 		smtpServer.setPort(randomPort);
 		smtpServer.start();
 	}

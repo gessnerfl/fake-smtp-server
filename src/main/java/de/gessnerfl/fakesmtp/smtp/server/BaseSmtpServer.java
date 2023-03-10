@@ -49,11 +49,11 @@ public class BaseSmtpServer implements SmtpServer {
 
     private String hostName; // defaults to a lookup of the local address
 
-    private int backlog = 50;
+    private final static int BACKLOG = 50;
 
     private final String softwareName;
 
-    private MessageHandlerFactory messageHandlerFactory;
+    private final MessageHandlerFactory messageHandlerFactory;
 
     private AuthenticationHandlerFactory authenticationHandlerFactory;
 
@@ -63,8 +63,6 @@ public class BaseSmtpServer implements SmtpServer {
      * The thread listening on the server socket.
      */
     private ServerThread serverThread;
-
-    private boolean updateThreadName = true;
 
     /**
      * True if this SMTPServer was started. It remains true even if the SMTPServer
@@ -80,11 +78,6 @@ public class BaseSmtpServer implements SmtpServer {
     private boolean enableTLS = false;
 
     /**
-     * If true, TLS is not announced; ignored if enableTLS=false
-     */
-    private boolean hideTLS = false;
-
-    /**
      * If true, a TLS handshake is required; ignored if enableTLS=false
      */
     private boolean requireTLS = false;
@@ -96,29 +89,6 @@ public class BaseSmtpServer implements SmtpServer {
     private boolean requireAuth = false;
 
     /**
-     * If true, no Received headers will be inserted
-     */
-    private boolean disableReceivedHeaders = false;
-
-    /**
-     * set a hard limit on the maximum number of connections this server will accept
-     * once we reach this limit, the server will gracefully reject new connections.
-     * Default is 1000.
-     */
-    private int maxConnections = 1000;
-
-    /**
-     * The timeout for waiting for data on a connection is one minute: 1000 * 60 * 1
-     */
-    private int connectionTimeout = 1000 * 60 * 1;
-
-    /**
-     * The maximal number of recipients that this server accepts per message
-     * delivery request.
-     */
-    private int maxRecipients = 1000;
-
-    /**
      * The maximum size of a message that the server will accept. This value is
      * advertised during the EHLO phase if it is larger than 0. If the message size
      * specified by the client during the MAIL phase, the message will be rejected
@@ -128,15 +98,16 @@ public class BaseSmtpServer implements SmtpServer {
      */
     private long maxMessageSizeInBytes = 0;
 
-    private SessionIdFactory sessionIdFactory = new TimeBasedSessionIdFactory();
+    private final SessionIdFactory sessionIdFactory;
 
     /**
      * Simple constructor.
      */
     public BaseSmtpServer(final String softwareName,
                           final MessageHandlerFactory handlerFactory,
-                          CommandHandler commandHandler) {
-        this(softwareName, handlerFactory, commandHandler, null);
+                          final CommandHandler commandHandler,
+                          final SessionIdFactory sessionIdFactory) {
+        this(softwareName, handlerFactory, commandHandler, sessionIdFactory, null);
     }
 
     /**
@@ -154,11 +125,13 @@ public class BaseSmtpServer implements SmtpServer {
     public BaseSmtpServer(final String softwareName,
                           final MessageHandlerFactory msgHandlerFact,
                           final CommandHandler commandHandler,
+                          final SessionIdFactory sessionIdFactory,
                           final AuthenticationHandlerFactory authHandlerFact) {
         this.softwareName = softwareName;
         this.messageHandlerFactory = msgHandlerFact;
         this.authenticationHandlerFactory = authHandlerFact;
         this.commandHandler = commandHandler;
+        this.sessionIdFactory = sessionIdFactory;
 
         try {
             this.hostName = InetAddress.getLocalHost().getCanonicalHostName();
@@ -172,20 +145,6 @@ public class BaseSmtpServer implements SmtpServer {
      */
     public String getHostName() {
         return this.hostName == null ? UNKNOWN_HOSTNAME : this.hostName;
-    }
-
-    /**
-     * The host name that will be reported to SMTP clients
-     */
-    public void setHostName(final String hostName) {
-        this.hostName = hostName;
-    }
-
-    /**
-     * null means all interfaces
-     */
-    public InetAddress getBindAddress() {
-        return this.bindAddress;
     }
 
     /**
@@ -213,35 +172,6 @@ public class BaseSmtpServer implements SmtpServer {
     }
 
     /**
-     * Is the server running after start() has been called?
-     */
-    public synchronized boolean isRunning() {
-        return this.serverThread != null;
-    }
-
-    /**
-     * The backlog is the Socket backlog.
-     * <p>
-     * The backlog argument must be a positive value greater than 0. If the value
-     * passed if equal or less than 0, then the default value will be assumed.
-     *
-     * @return the backlog
-     */
-    public int getBacklog() {
-        return this.backlog;
-    }
-
-    /**
-     * The backlog is the Socket backlog.
-     * <p>
-     * The backlog argument must be a positive value greater than 0. If the value
-     * passed if equal or less than 0, then the default value will be assumed.
-     */
-    public void setBacklog(final int backlog) {
-        this.backlog = backlog;
-    }
-
-    /**
      * Call this method to get things rolling after instantiating the SMTPServer.
      * <p>
      * An SMTPServer which has been shut down, must not be reused.
@@ -263,7 +193,7 @@ public class BaseSmtpServer implements SmtpServer {
         }
 
         this.serverThread = new ServerThread(this, serverSocket);
-        this.serverThread.setUpdateThreadName(isUpdateThreadName());
+        this.serverThread.setUpdateThreadName(true);
         this.serverThread.start();
         this.started = true;
     }
@@ -293,7 +223,7 @@ public class BaseSmtpServer implements SmtpServer {
         }
 
         final ServerSocket serverSocket = new ServerSocket();
-        serverSocket.bind(isa, this.backlog);
+        serverSocket.bind(isa, BACKLOG);
 
         if (this.port == 0) {
             this.port = serverSocket.getLocalPort();
@@ -333,10 +263,6 @@ public class BaseSmtpServer implements SmtpServer {
         return this.messageHandlerFactory;
     }
 
-    public void setMessageHandlerFactory(final MessageHandlerFactory fact) {
-        this.messageHandlerFactory = fact;
-    }
-
     /**
      * @return the factory for auth handlers, or null if no such factory has been
      * set.
@@ -359,48 +285,6 @@ public class BaseSmtpServer implements SmtpServer {
         return this.commandHandler;
     }
 
-    public int getMaxConnections() {
-        return this.maxConnections;
-    }
-
-    /**
-     * Set's the maximum number of connections this server instance will accept.
-     *
-     * @param maxConnections the maximum number of connections to accept
-     */
-    public void setMaxConnections(final int maxConnections) {
-        if (this.isRunning()) {
-            throw new ServerAlreadyRunningException("Server is already running. It isn't possible to set the maxConnections. Please stop the server first.");
-        }
-
-        this.maxConnections = maxConnections;
-    }
-
-    public int getConnectionTimeout() {
-        return this.connectionTimeout;
-    }
-
-    /**
-     * Set the number of milliseconds that the server will wait for client input.
-     * Sometime after this period expires, an client will be rejected and the
-     * connection closed.
-     */
-    public void setConnectionTimeout(final int connectionTimeout) {
-        this.connectionTimeout = connectionTimeout;
-    }
-
-    public int getMaxRecipients() {
-        return this.maxRecipients;
-    }
-
-    /**
-     * Set the maximum number of recipients allowed for each message. A value of -1
-     * means "unlimited".
-     */
-    public void setMaxRecipients(final int maxRecipients) {
-        this.maxRecipients = maxRecipients;
-    }
-
     /**
      * If set to true, TLS will be supported.
      * <p>
@@ -420,18 +304,6 @@ public class BaseSmtpServer implements SmtpServer {
 
     public boolean getEnableTLS() {
         return enableTLS;
-    }
-
-    public boolean getHideTLS() {
-        return this.hideTLS;
-    }
-
-    /**
-     * If set to true, TLS will not be advertised in the EHLO string. Default is
-     * false; true implied when disableTLS=true.
-     */
-    public void setHideTLS(final boolean value) {
-        this.hideTLS = value;
     }
 
     public boolean getRequireTLS() {
@@ -475,35 +347,7 @@ public class BaseSmtpServer implements SmtpServer {
         this.maxMessageSizeInBytes = maxMessageSizeInBytes;
     }
 
-    public boolean getDisableReceivedHeaders() {
-        return disableReceivedHeaders;
-    }
-
-    /**
-     * @param disableReceivedHeaders false to include Received headers. Default is
-     *                               false.
-     */
-    public void setDisableReceivedHeaders(final boolean disableReceivedHeaders) {
-        this.disableReceivedHeaders = disableReceivedHeaders;
-    }
-
     public SessionIdFactory getSessionIdFactory() {
         return sessionIdFactory;
-    }
-
-    /**
-     * Sets the {@link SessionIdFactory} which will allocate a unique identifier for
-     * each mail sessions. If not set, a reasonable default will be used.
-     */
-    public void setSessionIdFactory(final SessionIdFactory sessionIdFactory) {
-        this.sessionIdFactory = sessionIdFactory;
-    }
-
-    public boolean isUpdateThreadName() {
-        return updateThreadName;
-    }
-
-    public void setUpdateThreadName(final boolean updateThreadName) {
-        this.updateThreadName = updateThreadName;
     }
 }
