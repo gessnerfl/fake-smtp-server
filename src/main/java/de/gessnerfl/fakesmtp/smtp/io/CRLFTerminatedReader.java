@@ -17,7 +17,7 @@ import java.nio.charset.Charset;
  * <a href="http://rfc.net/rfc2822.html#s2.1.1.">RFC 2822</a>.
  */
 public class CRLFTerminatedReader extends FilterReader {
-	private static final int MAX_LINE_LENGTH = 998;
+	static final int MAX_LINE_LENGTH = 998;
 	private static final int EOF = -1;
 	private static final char CR = 13;
 	private static final char LF = 10;
