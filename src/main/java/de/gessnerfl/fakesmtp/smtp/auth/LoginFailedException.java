@@ -7,11 +7,6 @@ package de.gessnerfl.fakesmtp.smtp.auth;
 @SuppressWarnings("serial")
 public class LoginFailedException extends Exception {
 	/** Creates a new instance of LoginFailedException */
-	public LoginFailedException() {
-		super("Login failed.");
-	}
-
-	/** Creates a new instance of LoginFailedException */
 	public LoginFailedException(final String msg) {
 		super(msg);
 	}

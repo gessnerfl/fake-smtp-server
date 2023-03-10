@@ -4,9 +4,9 @@ import de.gessnerfl.fakesmtp.smtp.server.Session;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @DirtiesContext
 @ActiveProfiles({"integrationtest_with_auth"})
@@ -43,7 +43,7 @@ class AuthTest extends AbstractCommandIntegrationTest {
         final String authString
                 = new String(new byte[]{0}) + REQUIRED_USERNAME + new String(new byte[]{0}) + REQUIRED_PASSWORD;
 
-        final String enc_authString = Base64Utils.encodeToString(authString.getBytes(StandardCharsets.US_ASCII));
+        final String enc_authString = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.US_ASCII));
         this.send(enc_authString);
         this.expect("235");
 
@@ -80,7 +80,7 @@ class AuthTest extends AbstractCommandIntegrationTest {
         this.send("AUTH LOGIN");
         this.expect("334");
 
-        final String enc_username = Base64Utils.encodeToString(REQUIRED_USERNAME.getBytes(StandardCharsets.US_ASCII));
+        final String enc_username = Base64.getEncoder().encodeToString(REQUIRED_USERNAME.getBytes(StandardCharsets.US_ASCII));
 
         this.send(enc_username);
         this.expect("334");
@@ -94,7 +94,7 @@ class AuthTest extends AbstractCommandIntegrationTest {
         this.send(enc_username);
         this.expect("334");
 
-        final String enc_pwd = Base64Utils.encodeToString(REQUIRED_PASSWORD.getBytes(StandardCharsets.US_ASCII));
+        final String enc_pwd = Base64.getEncoder().encodeToString(REQUIRED_PASSWORD.getBytes(StandardCharsets.US_ASCII));
         this.send(enc_pwd);
         this.expect("235");
 

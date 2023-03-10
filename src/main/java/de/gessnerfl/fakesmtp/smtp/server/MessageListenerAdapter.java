@@ -29,15 +29,6 @@ public class MessageListenerAdapter implements MessageHandlerFactory {
 	private final int dataDeferredSize;
 
 	/**
-	 * Initializes this factory with a single listener.
-	 *
-	 * Default data deferred size is 5 megs.
-	 */
-	public MessageListenerAdapter(final MessageListener listener) {
-		this(Collections.singleton(listener), DEFAULT_DATA_DEFERRED_SIZE);
-	}
-
-	/**
 	 * Initializes this factory with the listeners.
 	 *
 	 * Default data deferred size is 5 megs.

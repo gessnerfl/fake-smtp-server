@@ -1,6 +1,7 @@
 package de.gessnerfl.fakesmtp.smtp.auth;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -8,7 +9,6 @@ import java.util.StringTokenizer;
 import de.gessnerfl.fakesmtp.smtp.AuthenticationHandler;
 import de.gessnerfl.fakesmtp.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.smtp.RejectException;
-import org.springframework.util.Base64Utils;
 
 /**
  * Implements the SMTP AUTH LOGIN mechanism.<br>
@@ -64,24 +64,24 @@ public class LoginAuthenticationHandlerFactory implements AuthenticationHandlerF
                 }
 
                 if (!stk.hasMoreTokens()) {
-                    return "334 " + Base64Utils.encodeToString(USERNAME_ASCII_BYTES);
+                    return "334 " + Base64.getEncoder().encodeToString(USERNAME_ASCII_BYTES);
                 }
                 // The client submitted an initial response, which should be
                 // the username.
                 // .Net's built in System.Net.Mail.SmtpClient sends its
                 // authentication this way (and this way only).
-                final var decoded = Base64Utils.decodeFromString(stk.nextToken());
+                final var decoded = Base64.getDecoder().decode(stk.nextToken());
                 username = new String(decoded, StandardCharsets.UTF_8);
-                return "334 " + Base64Utils.encodeToString(PASSWORD_ASCII_BYTES);
+                return "334 " + Base64.getEncoder().encodeToString(PASSWORD_ASCII_BYTES);
             }
 
             if (this.username == null) {
-                final byte[] decoded = Base64Utils.decodeFromString(clientInput);
+                final byte[] decoded = Base64.getDecoder().decode(clientInput);
                 this.username = new String(decoded, StandardCharsets.UTF_8);
-                return "334 " + Base64Utils.encodeToString(PASSWORD_ASCII_BYTES);
+                return "334 " + Base64.getEncoder().encodeToString(PASSWORD_ASCII_BYTES);
             }
 
-            final var decoded = Base64Utils.decodeFromString(clientInput);
+            final var decoded = Base64.getDecoder().decode(clientInput);
             final var password = new String(decoded, StandardCharsets.UTF_8);
             try {
                 LoginAuthenticationHandlerFactory.this.helper.login(this.username, password);

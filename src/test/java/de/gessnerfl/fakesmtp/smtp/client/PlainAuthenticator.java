@@ -4,10 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.springframework.util.Base64Utils;
 
 /**
  * PlainAuthenticator implements the SASL PLAIN mechanism which authenticates
@@ -78,6 +77,6 @@ public class PlainAuthenticator implements Authenticator {
         out.write(user.getBytes(StandardCharsets.UTF_8));
         out.write(0);
         out.write(password.getBytes(StandardCharsets.UTF_8));
-        return Base64Utils.encodeToString(out.toByteArray());
+        return Base64.getEncoder().encodeToString(out.toByteArray());
     }
 }

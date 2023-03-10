@@ -1,5 +1,6 @@
 package de.gessnerfl.fakesmtp.smtp.auth;
 
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -7,7 +8,6 @@ import java.util.StringTokenizer;
 import de.gessnerfl.fakesmtp.smtp.AuthenticationHandler;
 import de.gessnerfl.fakesmtp.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.smtp.RejectException;
-import org.springframework.util.Base64Utils;
 
 /**
  * Implements the SMTP AUTH PLAIN mechanism.<br>
@@ -59,7 +59,7 @@ public class PlainAuthenticationHandlerFactory implements AuthenticationHandlerF
                 secret = stk.nextToken();
             }
 
-            final var decodedSecret = Base64Utils.decodeFromString(secret);
+            final var decodedSecret = Base64.getDecoder().decode(secret);
             /*
              * RFC4616: The client presents the authorization identity (identity to act as),
              * followed by a NUL (U+0000) character, followed by the authentication identity

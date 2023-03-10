@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.Base64Utils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Transactional
 @ActiveProfiles({"auth_integrationtest", "default"})
@@ -84,12 +84,12 @@ class RequireAuthTest {
         c.send("AUTH LOGIN");
         c.expect("334");
 
-        final String enc_username = Base64Utils.encodeToString(REQUIRED_USERNAME.getBytes(StandardCharsets.US_ASCII));
+        final String enc_username = Base64.getEncoder().encodeToString(REQUIRED_USERNAME.getBytes(StandardCharsets.US_ASCII));
 
         c.send(enc_username);
         c.expect("334");
 
-        final String enc_pwd = Base64Utils.encodeToString(REQUIRED_PASSWORD.getBytes(StandardCharsets.US_ASCII));
+        final String enc_pwd = Base64.getEncoder().encodeToString(REQUIRED_PASSWORD.getBytes(StandardCharsets.US_ASCII));
         c.send(enc_pwd);
         c.expect("235");
 
