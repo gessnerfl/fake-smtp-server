@@ -117,17 +117,16 @@ class EmailFactoryTest {
     }
 
     @Test
-    void shouldThrowExeptionWhenInlineImageIsBroken() throws Exception {
+    void shouldThrowExceptionWhenInlineImageIsBroken() throws Exception {
+        var now = new Date();
+        var testFilename = "mail-with-subect-and-content-type-html-with-broken-inline-image.eml";
+        var data = TestResourceUtil.getTestFileContentBytes(testFilename);
+        var rawData = new RawData(SENDER, RECEIVER, data);
+
+        when(timestampProvider.now()).thenReturn(now);
+
         assertThrows(EmailProcessingException.class, () -> {
-            var now = new Date();
-            var testFilename = "mail-with-subect-and-content-type-html-with-broken-inline-image.eml";
-            var data = TestResourceUtil.getTestFileContentBytes(testFilename);
-            var rawData = new RawData(SENDER, RECEIVER, data);
-
-            when(timestampProvider.now()).thenReturn(now);
-
             sut.convert(rawData);
-
             fail();
         });
 
