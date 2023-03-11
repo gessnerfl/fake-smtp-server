@@ -1,0 +1,46 @@
+Date: Tue, 23 Aug 2022 21:17:06 +0200 (CEST)
+From: sender@example.com
+To: receiver@example.com
+Message-ID: <1545242146.3.1661282229344@floriansmbp2019>
+Subject: This is the mail title
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_0_876213901.1661282226112"
+
+------=_Part_0_876213901.1661282226112
+Content-Type: multipart/related;
+	boundary="----=_Part_1_868964689.1661282226122"
+
+------=_Part_1_868964689.1661282226122
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2_90205195.1661282226131"
+
+------=_Part_2_90205195.1661282226131
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+This is the test mail
+------=_Part_2_90205195.1661282226131
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<html><head></head><body>This is the test mail <img src="cid:icon"></img></body>
+------=_Part_2_90205195.1661282226131--
+
+------=_Part_1_868964689.1661282226122
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+Content-ID: <icon>
+
+iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAolBMVEUAAAA0mNs0mNs0mNs0mNs0
+mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0
+mNs0mNs0mNs0mNs0mNs0mNs$%&XX$%&0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0
+mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNs0mNuo1pBsAAAANXRSTlMAAQMEBQYHCQsMDQ4P
+EB0eKi0uOTs8PT5KTGdpa2xzdHuGiKiqq621t7m+xcfO2dze4unt+xTcEm4AAACdSURBVCjPrY/J
+EsFQFAX7IcQ8xDzPhBiT8/+/ZoFQPAtK72533cWBr8lvZMHPsZQVn7M9nBjbw5Dk3uYPKcgE7z7I
+QAPTe/UDQx31DaXDsz6WMV0hBUUSk4efJihsJSRFHaiGVx3WoB3pGqR5GmchSXOH9EyKg8IKeLud
+B5XbK/EiA2BG9zsO2jddt/VYiz7wQ1jb/Yqcb/PrLP/jAkeJUZTlAz/+AAAAAElFTkSuQmCC
+------=_Part_1_868964689.1661282226122--
+
+------=_Part_0_876213901.1661282226112--

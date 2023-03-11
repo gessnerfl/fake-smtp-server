@@ -48,8 +48,6 @@ class ServerThread extends Thread {
 	 */
 	private volatile boolean shuttingDown;
 
-	private boolean updateThreadName = true;
-
 	public ServerThread(final BaseSmtpServer server, final ServerSocket serverSocket) {
 		super(ServerThread.class.getName() + " " + server.getDisplayableLocalSocketAddress());
 		this.server = server;
@@ -128,7 +126,6 @@ class ServerThread extends Thread {
 	private Optional<SocketSession> establishSocketSession(Socket socket){
 		try {
 			var session = new Session(server, this, socket);
-			session.setUpdateThreadName(isUpdateThreadName());
 			return Optional.of(new SocketSession(socket, session));
 		} catch (final IOException e) {
 			connectionPermits.release();
@@ -241,14 +238,6 @@ class ServerThread extends Thread {
 			sessionThreads.remove(session);
 		}
 		connectionPermits.release();
-	}
-
-	public boolean isUpdateThreadName() {
-		return updateThreadName;
-	}
-
-	public void setUpdateThreadName(final boolean updateThreadName) {
-		this.updateThreadName = updateThreadName;
 	}
 
 	private static final class SocketSession {

@@ -182,7 +182,6 @@ public class BaseSmtpServer implements SmtpServer {
         }
 
         this.serverThread = new ServerThread(this, serverSocket);
-        this.serverThread.setUpdateThreadName(true);
         this.serverThread.start();
         this.started = true;
     }

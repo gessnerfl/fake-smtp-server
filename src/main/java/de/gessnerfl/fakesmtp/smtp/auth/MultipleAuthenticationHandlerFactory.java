@@ -1,7 +1,6 @@
 package de.gessnerfl.fakesmtp.smtp.auth;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,12 +30,6 @@ public class MultipleAuthenticationHandlerFactory implements AuthenticationHandl
 
 	public MultipleAuthenticationHandlerFactory() {
 		// Starting with an empty list is ok, let the user add them all
-	}
-
-	public MultipleAuthenticationHandlerFactory(final Collection<AuthenticationHandlerFactory> factories) {
-		for (final AuthenticationHandlerFactory fact : factories) {
-			this.addFactory(fact);
-		}
 	}
 
 	public void addFactory(final AuthenticationHandlerFactory fact) {

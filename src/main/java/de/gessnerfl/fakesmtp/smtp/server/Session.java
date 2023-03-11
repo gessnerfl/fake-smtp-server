@@ -31,7 +31,7 @@ public class Session implements Runnable, MessageContext {
     /**
      * The timeout for waiting for data on a connection is one minute: 1000 * 60 * 1
      */
-    private static final int CONNECTION_TIMEOUT = 1000 * 60 * 1;
+    private static final int CONNECTION_TIMEOUT = 1000 * 60;
 
     /**
      * A link to our parent server
@@ -100,19 +100,11 @@ public class Session implements Runnable, MessageContext {
     private String singleRecipient;
 
     /**
-     * If the client told us the size of the message, this is the value. If they
-     * didn't, the value will be 0.
-     */
-    private long declaredMessageSizeInBytes = 0;
-
-    /**
      * Some more state information
      */
     private boolean tlsStarted;
 
     private Certificate[] tlsPeerCertificates;
-
-    private boolean updateThreadName = true;
 
     /**
      * Creates the Runnable Session object.
@@ -145,13 +137,9 @@ public class Session implements Runnable, MessageContext {
         sessionId = server.getSessionIdFactory().create();
         MDC.put("SessionId", sessionId);
         final String originalName;
-        if (updateThreadName) {
-            originalName = Thread.currentThread().getName();
-            Thread.currentThread()
-                    .setName(Session.class.getName() + "-" + socket.getInetAddress() + ":" + socket.getPort());
-        } else {
-            originalName = null;
-        }
+        originalName = Thread.currentThread().getName();
+        Thread.currentThread()
+                .setName(Session.class.getName() + "-" + socket.getInetAddress() + ":" + socket.getPort());
 
         logDebugDetailsOnRun();
 
@@ -201,9 +189,7 @@ public class Session implements Runnable, MessageContext {
         this.closeConnection();
         this.endMessageHandler();
         serverThread.sessionEnded(this);
-        if (updateThreadName) {
-            Thread.currentThread().setName(originalName);
-        }
+        Thread.currentThread().setName(originalName);
         MDC.clear();
     }
 
@@ -418,20 +404,6 @@ public class Session implements Runnable, MessageContext {
     }
 
     /**
-     * @return the maxMessageSize
-     */
-    public long getDeclaredMessageSizeInBytes() {
-        return this.declaredMessageSizeInBytes;
-    }
-
-    /**
-     * @param declaredMessageSizeInBytes the size that the client says the message will be
-     */
-    public void setDeclaredMessageSizeInBytes(final long declaredMessageSizeInBytes) {
-        this.declaredMessageSizeInBytes = declaredMessageSizeInBytes;
-    }
-
-    /**
      * Starts a mail transaction by creating a new message handler.
      *
      * @throws IllegalStateException if a mail transaction is already in progress
@@ -466,7 +438,6 @@ public class Session implements Runnable, MessageContext {
         this.messageHandler = null;
         this.recipientCount = 0;
         this.singleRecipient = null;
-        this.declaredMessageSizeInBytes = 0;
     }
 
     /**
@@ -523,13 +494,5 @@ public class Session implements Runnable, MessageContext {
     @Override
     public Certificate[] getTlsPeerCertificates() {
         return tlsPeerCertificates;
-    }
-
-    public boolean isUpdateThreadName() {
-        return updateThreadName;
-    }
-
-    public void setUpdateThreadName(final boolean updateThreadName) {
-        this.updateThreadName = updateThreadName;
     }
 }

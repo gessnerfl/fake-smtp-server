@@ -57,7 +57,6 @@ public class MailCommand extends BaseCommand {
 			return;
 		}
 
-		sess.setDeclaredMessageSizeInBytes(size);
 		sess.startMailTransaction();
 
 		try {
