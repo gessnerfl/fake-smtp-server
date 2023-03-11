@@ -1,0 +1,12 @@
+server:
+  port: 0
+
+management:
+  server:
+    port: -1
+
+fakesmtp:
+  port: 1234
+  bindAddress: 127.0.0.1
+  persistence:
+    maxNumberEmails: 5

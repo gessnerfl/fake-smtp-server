@@ -3,8 +3,12 @@ package de.gessnerfl.fakesmtp.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.util.unit.DataSize;
+
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @ConfigurationProperties(prefix = "fakesmtp")
@@ -16,7 +20,11 @@ public class FakeSmtpConfigurationProperties {
     private Integer port = DEFAULT_PORT;
     private InetAddress bindAddress;
     private Authentication authentication;
+    private List<String> blockedRecipientAddresses = new ArrayList<>();
     private String filteredEmailRegexList;
+
+    private DataSize maxMessageSize;
+    private boolean requireTLS = false;
     private boolean forwardEmails = false;
 
     @NotNull
@@ -54,12 +62,36 @@ public class FakeSmtpConfigurationProperties {
         this.persistence = persistence;
     }
 
+    public List<String> getBlockedRecipientAddresses() {
+        return blockedRecipientAddresses;
+    }
+
+    public void setBlockedRecipientAddresses(List<String> blockedRecipientAddresses) {
+        this.blockedRecipientAddresses = blockedRecipientAddresses;
+    }
+
     public String getFilteredEmailRegexList() {
         return filteredEmailRegexList;
     }
 
     public void setFilteredEmailRegexList(String filteredEmailRegexList) {
         this.filteredEmailRegexList = filteredEmailRegexList;
+    }
+
+    public DataSize getMaxMessageSize() {
+        return maxMessageSize;
+    }
+
+    public void setMaxMessageSize(DataSize maxMessageSize) {
+        this.maxMessageSize = maxMessageSize;
+    }
+
+    public boolean isRequireTLS() {
+        return requireTLS;
+    }
+
+    public void setRequireTLS(boolean requireTLS) {
+        this.requireTLS = requireTLS;
     }
 
     public boolean isForwardEmails() {

@@ -1,6 +1,6 @@
 package de.gessnerfl.fakesmtp.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "email_content")

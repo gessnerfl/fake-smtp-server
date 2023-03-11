@@ -13,7 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@ActiveProfiles("integrationtest")
+@ActiveProfiles("mockserver")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 class EmailRepositoryIntegrationTest {

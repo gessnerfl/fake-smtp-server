@@ -56,7 +56,6 @@ public class HtmlContentRenderer {
 
     private String harmonizeHtmlDocument(String html) {
         var doc = Jsoup.parse(html);
-        doc = doc.normalise();
         appendBootstrapCss(doc);
         return doc.html();
     }

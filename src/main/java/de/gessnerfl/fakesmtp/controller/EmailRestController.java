@@ -5,6 +5,7 @@ import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 
+import jakarta.servlet.ServletContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletContext;
 
 @RestController
 @RequestMapping("/api")
@@ -39,7 +39,7 @@ public class EmailRestController {
     }
 
     @GetMapping("/email")
-    public Page<Email> all(@SortDefault.SortDefaults({@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC)}) Pageable pageable) 
+    public Page<Email> all(@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC) Pageable pageable)
     {
         return emailRepository.findAll(pageable);
     }

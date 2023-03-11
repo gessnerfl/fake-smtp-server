@@ -10,7 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.InetAddress;
 
-@ActiveProfiles({"integrationtest","config_with_persistence_integrationtest"})
+@ActiveProfiles({"mockserver","config_with_persistence_mockserver"})
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 class FakeSmtpConfigurationPropertiesWithPersistenceIntegrationTest {

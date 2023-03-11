@@ -1,0 +1,14 @@
+server:
+  port: 0
+
+management:
+  server:
+    port: -1
+
+fakesmtp:
+  port: ${random.int[1024,65536]}
+  blockedRecipientAddresses:
+    - blocked@example.com
+  authentication:
+    username: myUsername
+    password: mySecretPassword
