@@ -1,1 +1,10 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = 'fake-smtp-server'
+
+//include("frontend")
+include("backend")
