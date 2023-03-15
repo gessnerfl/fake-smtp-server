@@ -67,6 +67,13 @@ gradle.projectsEvaluated {
     }
 }
 
+bootJar {
+    dependsOn(":frontend:build")
+    from(project(":frontend").buildDir) {
+        into("BOOT-INF/classes/static/")
+    }
+}
+
 springBoot {
     buildInfo {
         properties {
@@ -92,17 +99,17 @@ test {
 jacocoTestReport {
     dependsOn test
     reports {
-        xml.enabled true
+        xml.required = true
     }
 }
 
-jib{
+jib {
     from {
         image = 'amazoncorretto:11.0.17-al2'
         container {
             ports = ["5080", "5081", "5025"]
-            creationTime='USE_CURRENT_TIMESTAMP'
-            jvmFlags = ['-Djava.security.egd=file:/dev/./urandom','-Dfile.encoding=utf-8']
+            creationTime = 'USE_CURRENT_TIMESTAMP'
+            jvmFlags = ['-Djava.security.egd=file:/dev/./urandom', '-Dfile.encoding=utf-8']
         }
         platforms {
             platform {

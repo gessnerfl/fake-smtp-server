@@ -6,5 +6,5 @@ pluginManagement {
 
 rootProject.name = 'fake-smtp-server'
 
-//include("frontend")
+include("frontend")
 include("backend")
