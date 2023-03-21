@@ -1,0 +1,17 @@
+.MuiToolbar-root{
+    &.blue {
+        background-color: #1a3c64;
+    }
+
+    .MuiButton-root {
+        margin-left: 10px;
+
+        .active {
+            border-color: #fff;
+        }
+
+        &:first-of-type {
+            margin-left: 30px;
+        }
+    }
+}
