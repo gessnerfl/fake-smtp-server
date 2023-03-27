@@ -1,17 +1,14 @@
 import {Page} from "./page";
 
-interface EmailPart {
-    id: number,
-    data: string,
-}
-
-export interface EmailContent extends EmailPart{
+export interface EmailContent {
     contentType: string
+    data: string
 }
 
-export interface InlineImage extends EmailPart{
+export interface InlineImage {
     contentId: string
     contentType: string
+    data: string
 }
 
 export interface EmailAttachment {

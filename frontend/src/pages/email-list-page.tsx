@@ -1,16 +1,21 @@
 import React, {useEffect, useState} from "react";
-import {DataGrid, GridColDef} from '@mui/x-data-grid';
+import {DataGrid, GridColDef, GridRowSelectionModel} from '@mui/x-data-grid';
 import {useGetEmailsQuery} from "../stores/emails-api";
 import {Email} from "../models/email";
 import {useSearchParams} from "react-router-dom";
-
+import Grid from '@mui/material/Unstable_Grid2';
+import EmailDetails from "../components/email-details";
+import {Alert} from "@mui/material";
 
 function EmailListPage() {
+    const pageSize = 10;
     const pageQueryParameter = "page";
+    const noRowSelected = -1;
 
     const [page, setPage] = useState(0)
+    const [selectedRow, setSelectedRow] = useState(noRowSelected)
     const [searchParams, setSearchParams] = useSearchParams()
-    const {data, isLoading, refetch} = useGetEmailsQuery({page: page, pageSize: 15})
+    const {data, isLoading, refetch} = useGetEmailsQuery({page: page, pageSize: pageSize})
     const columns: GridColDef[] = [
         {
             field: 'id',
@@ -84,27 +89,57 @@ function EmailListPage() {
         }
     }, [searchParams, refetch])
 
-    if (data) {
-        return (<div>
-            <DataGrid
-                columns={columns}
-                rows={data.content.map(e => transformEmail(e))}
-                initialState={{
-                    pagination: {
-                        paginationModel: {
-                            pageSize: 15,
-                            page: page
-                        },
+    function toSelectedRow(selection: GridRowSelectionModel) : number {
+        const rowId = selection.pop()
+        return rowId ? parseInt(rowId.toString()) : noRowSelected
+    }
+
+    function renderGrid() {
+        return <DataGrid
+            columns={columns}
+            rows={data!.content.map(e => transformEmail(e))}
+            initialState={{
+                pagination: {
+                    paginationModel: {
+                        pageSize: pageSize,
+                        page: page
                     },
-                }}
-                rowCount={data.totalElements}
-                pageSizeOptions={[15]}
-                loading={isLoading}
-                paginationMode={"server"}
-                autoHeight={true}
-                onPaginationModelChange={(m,_) => navigateTo(m.page)}
-            />
-        </div>)
+                },
+            }}
+            rowSelectionModel={selectedRow > 0 ? [selectedRow] : []}
+            rowCount={data!.totalElements}
+            pageSizeOptions={[pageSize]}
+            loading={isLoading}
+            paginationMode={'server'}
+            autoHeight={true}
+            density={'compact'}
+            onPaginationModelChange={(m, _) => navigateTo(m.page)}
+            onRowSelectionModelChange={(m, _) => setSelectedRow(toSelectedRow(m))}
+        />;
+    }
+
+    function renderEmail(){
+        const email = data && data.content.find(e => e.id === selectedRow)
+        if(email){
+            return <EmailDetails email={email} />
+        }
+        return <Alert severity="error">Email not found!</Alert>
+    }
+
+    function renderSplitView() {
+        return <Grid container spacing={2}>
+            <Grid xs={12} xl={6}>{renderGrid()}</Grid>
+            <Grid xs={12} xl={6}>{renderEmail()}</Grid>
+        </Grid>
+    }
+
+    if (data) {
+        if(selectedRow && selectedRow !== noRowSelected){
+            return renderSplitView()
+        }
+        return (
+            renderGrid()
+        )
     }
     return (<div>Inbox is empty</div>);
 }
