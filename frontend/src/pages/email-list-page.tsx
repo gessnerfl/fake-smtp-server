@@ -4,7 +4,7 @@ import {useGetEmailsQuery} from "../stores/emails-api";
 import {Email} from "../models/email";
 import {useSearchParams} from "react-router-dom";
 import Grid from '@mui/material/Unstable_Grid2';
-import EmailDetails from "../components/email-details";
+import {EmailCard} from "../components/email/email-card";
 import {Alert} from "@mui/material";
 
 function EmailListPage() {
@@ -121,7 +121,7 @@ function EmailListPage() {
     function renderEmail(){
         const email = data && data.content.find(e => e.id === selectedRow)
         if(email){
-            return <EmailDetails email={email} />
+            return <EmailCard email={email} />
         }
         return <Alert severity="error">Email not found!</Alert>
     }
