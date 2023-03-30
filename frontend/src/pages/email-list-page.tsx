@@ -5,7 +5,7 @@ import {Email} from "../models/email";
 import {useSearchParams} from "react-router-dom";
 import Grid from '@mui/material/Unstable_Grid2';
 import {EmailCard} from "../components/email/email-card";
-import {Alert} from "@mui/material";
+import {Alert, Card, CardContent, CardHeader} from "@mui/material";
 
 function EmailListPage() {
     const pageSize = 10;
@@ -75,21 +75,21 @@ function EmailListPage() {
     }
 
     function navigateTo(nextPage: number) {
-        if(page !== nextPage){
+        if (page !== nextPage) {
             setSearchParams(formatPageQueryParam(nextPage))
         }
     }
 
     useEffect(() => {
         const pageString = searchParams.get(pageQueryParameter)
-        if(pageString != null){
+        if (pageString != null) {
             const page = parseInt(pageString)
             setPage(isNaN(page) ? 0 : page)
             refetch()
         }
     }, [searchParams, refetch])
 
-    function toSelectedRow(selection: GridRowSelectionModel) : number {
+    function toSelectedRow(selection: GridRowSelectionModel): number {
         const rowId = selection.pop()
         return rowId ? parseInt(rowId.toString()) : noRowSelected
     }
@@ -118,10 +118,10 @@ function EmailListPage() {
         />;
     }
 
-    function renderEmail(){
+    function renderEmail() {
         const email = data && data.content.find(e => e.id === selectedRow)
-        if(email){
-            return <EmailCard email={email} />
+        if (email) {
+            return <EmailCard email={email}/>
         }
         return <Alert severity="error">Email not found!</Alert>
     }
@@ -133,15 +133,26 @@ function EmailListPage() {
         </Grid>
     }
 
-    if (data) {
-        if(selectedRow && selectedRow !== noRowSelected){
-            return renderSplitView()
+    function renderData() {
+        if (data) {
+            if (selectedRow && selectedRow !== noRowSelected) {
+                return renderSplitView()
+            }
+            return (
+                renderGrid()
+            )
         }
-        return (
-            renderGrid()
-        )
+        return (<div>Inbox is empty</div>);
     }
-    return (<div>Inbox is empty</div>);
+
+    return (
+        <Card>
+            <CardHeader title={"Inbox"}/>
+            <CardContent>
+                {renderData()}
+            </CardContent>
+        </Card>
+    )
 }
 
 export default EmailListPage;

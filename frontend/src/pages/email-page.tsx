@@ -1,9 +1,9 @@
 import React from "react";
-import {Alert, AlertTitle, Card, CardContent, Typography} from "@mui/material";
-import {EmailHeaderPanel} from "../components/email/email-header-panel";
-import {EmailContentPanel} from "../components/email/email-content-panel";
-import {useParams} from "react-router-dom";
+import {Alert, AlertTitle, Card, CardHeader, IconButton} from "@mui/material";
+import {NavLink, useParams} from "react-router-dom";
 import {useGetEmailQuery} from "../stores/emails-api";
+import {EmailCardContent} from "../components/email/email-card-content";
+import CloseIcon from '@mui/icons-material/Close';
 
 export const EmailPage = () => {
     const {id} = useParams<{ id: string }>();
@@ -12,11 +12,12 @@ export const EmailPage = () => {
     if (data) {
         return (
             <Card variant="outlined">
-                <CardContent>
-                    <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>Email {data.id}</Typography>
-                    <EmailHeaderPanel email={data}/>
-                    <EmailContentPanel email={data}/>
-                </CardContent>
+                <CardHeader title={`Email ${data.id}`} action={
+                    <IconButton aria-label="close" component={NavLink} to={`/`}>
+                        <CloseIcon />
+                    </IconButton>
+                }/>
+                <EmailCardContent email={data} />
             </Card>
         );
     } else {

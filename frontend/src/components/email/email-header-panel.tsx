@@ -5,7 +5,7 @@ import formatISO9075 from "date-fns/formatISO9075"
 
 export const EmailHeaderPanel: FunctionComponent<EmailDetailsProperties> = ({email}) => {
     return (
-        <Grid container component='dl' spacing={2}>
+        <Grid container component='dl' spacing={2} className={"email-header"}>
             <Grid xs={6}>
                 <Typography component='dt' variant='subtitle2'>From:</Typography>
                 <Typography component='dd' variant='body1'>{email.fromAddress}</Typography>

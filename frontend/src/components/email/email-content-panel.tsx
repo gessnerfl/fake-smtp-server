@@ -42,7 +42,7 @@ export const EmailContentPanel: FunctionComponent<EmailDetailsProperties> = ({em
     }
 
     return (
-        <Box sx={{width: '100%'}}>
+        <Box sx={{width: '100%'}} className={"email-content"}>
             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
                 <Tabs value={selectedTabId} onChange={handleTabChanged} aria-label="basic tabs example">
                     {htmlContentAvailable &&

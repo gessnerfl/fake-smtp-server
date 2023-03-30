@@ -1,17 +1,19 @@
 import React, {FunctionComponent} from "react";
-import {Card, CardContent, Typography} from "@mui/material";
+import {Card, CardHeader, IconButton} from "@mui/material";
 import {EmailDetailsProperties} from "./email-details-properties";
-import {EmailHeaderPanel} from "./email-header-panel";
-import {EmailContentPanel} from "./email-content-panel";
+import {EmailCardContent} from "./email-card-content";
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import {NavLink} from "react-router-dom";
 
-export const EmailCard: FunctionComponent<EmailDetailsProperties> = (props) => {
+export const EmailCard: FunctionComponent<EmailDetailsProperties> = ({email}) => {
     return (
         <Card variant="outlined">
-            <CardContent>
-                <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>Email {props.email.id}</Typography>
-                <EmailHeaderPanel email={props.email}/>
-                <EmailContentPanel email={props.email}/>
-            </CardContent>
+            <CardHeader title={`Email ${email.id}`} action={
+                <IconButton aria-label="open" component={NavLink} to={`/emails/${email.id}`}>
+                    <OpenInFullIcon />
+                </IconButton>
+            }/>
+            <EmailCardContent email={email} />
         </Card>
     );
 }
