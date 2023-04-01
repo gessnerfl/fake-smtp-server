@@ -91,7 +91,7 @@ public class TestDataCreator {
             helper.addInline("icon1", new ClassPathResource("/static/gfx/app-icon.png"));
             helper.addInline("icon2", new ClassPathResource("/static/gfx/inbox-solid.png"));
             helper.addAttachment("app-icon.png", new ClassPathResource("/static/gfx/app-icon.png"));
-            helper.addAttachment("customizing.css", new ClassPathResource("/static/customizing.css"));
+            helper.addAttachment("inbox-solid.png", new ClassPathResource("/static/gfx/inbox-solid.png"));
             sender.send(message);
         } catch (MessagingException e){
             throw new RuntimeException("Failed to create mail", e);

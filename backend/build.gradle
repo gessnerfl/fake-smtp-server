@@ -37,18 +37,13 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("commons-io:commons-io:2.11.0")
     implementation('org.flywaydb:flyway-core')
-    implementation("org.jsoup:jsoup:1.15.4")
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.2")
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3')
-
-    implementation("org.webjars:bootstrap:$bootstrapVersion")
-    implementation("org.webjars:material-design-icons:4.0.0")
 
     runtimeOnly("com.h2database:h2:2.1.214")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -77,9 +72,7 @@ bootJar {
 
 springBoot {
     buildInfo {
-        properties {
-            additional = ["bootstrap.version": "$bootstrapVersion"]
-        }
+        properties {}
     }
 }
 

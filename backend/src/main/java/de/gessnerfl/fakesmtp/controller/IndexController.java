@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-public class EmailController {
+public class IndexController {
 
     @GetMapping({"/"})
     public String home() {
