@@ -74,7 +74,7 @@ public class EmailRestController {
         emailRepository.flush();
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping()
     public void deleteAllEmails() {
         emailAttachmentRepository.deleteAllInBatch();
         emailRepository.deleteAllInBatch();
