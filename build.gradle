@@ -97,7 +97,7 @@ sonar {
         property "sonar.organization", "gessnerfl-github"
         property "sonar.projectName", "Fake SMTP Server"
         property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
-        property "sonar.sources", ${sourceSets.main.allJava.srcDirs} + ",webapp/src"
+        property "sonar.sources", "src/main,webapp/src"
     }
 }
 
