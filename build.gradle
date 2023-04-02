@@ -63,13 +63,6 @@ gradle.projectsEvaluated {
     }
 }
 
-bootJar {
-    dependsOn(":frontend:build")
-    from(project(":frontend").buildDir) {
-        into("BOOT-INF/classes/static/")
-    }
-}
-
 springBoot {
     buildInfo {
         properties {}
