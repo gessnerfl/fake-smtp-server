@@ -75,7 +75,7 @@ tasks.register('webappNpmBuild', NpmTask) {
 
 tasks.register('webappNpmTest', NpmTask) {
     dependsOn(webappNpmBuild)
-    args = ["run", "test"]
+    args = ["run", "test -- --coverage"]
 }
 
 bootJar {
