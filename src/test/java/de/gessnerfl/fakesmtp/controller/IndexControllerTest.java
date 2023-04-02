@@ -8,7 +8,7 @@ class IndexControllerTest {
 
     @Test
     public void shouldReturnIndexPage(){
-        assertEquals("index", new IndexController().home());
+        assertEquals("index.html", new IndexController().home());
     }
 
 }
