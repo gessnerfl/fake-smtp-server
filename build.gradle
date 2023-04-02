@@ -91,13 +91,13 @@ springBoot {
     }
 }
 
-sonarqube {
+sonar {
     properties {
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.organization", "gessnerfl-github"
         property "sonar.projectName", "Fake SMTP Server"
         property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
-        property "sonar.sources", "src,webapp"
+        property "sonar.sources", ${sourceSets.main.allJava.srcDirs} + ",webapp/src"
     }
 }
 
