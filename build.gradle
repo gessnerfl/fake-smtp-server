@@ -3,6 +3,7 @@ plugins {
     id "org.springframework.boot" version "3.0.4"
     id "org.sonarqube" version "4.0.0.2929"
     id 'com.google.cloud.tools.jib' version '3.3.1'
+    id "com.github.node-gradle.node" version "3.5.1"
 }
 
 apply plugin: "java"
@@ -63,6 +64,27 @@ gradle.projectsEvaluated {
     }
 }
 
+node {
+    nodeProjectDir = file("${project.projectDir}/webapp")
+}
+
+tasks.register('webappNpmBuild', NpmTask) {
+    dependsOn(npmInstall)
+    args = ["run", "build"]
+}
+
+tasks.register('webappNpmTest', NpmTask) {
+    dependsOn(webappNpmBuild)
+    args = ["run", "test"]
+}
+
+bootJar {
+    dependsOn(compileJava, webappNpmBuild)
+    from("webapp/build") {
+        into("BOOT-INF/classes/static/")
+    }
+}
+
 springBoot {
     buildInfo {
         properties {}
@@ -75,6 +97,7 @@ sonarqube {
         property "sonar.organization", "gessnerfl-github"
         property "sonar.projectName", "Fake SMTP Server"
         property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
+        property "sonar.sources", "src,webapp"
     }
 }
 
