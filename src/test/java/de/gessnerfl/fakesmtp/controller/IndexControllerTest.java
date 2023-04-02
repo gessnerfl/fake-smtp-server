@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class IndexControllerTest {
 
     @Test
-    public void shouldReturnIndexPage(){
+    void shouldReturnIndexPage(){
         assertEquals("index.html", new IndexController().home());
     }
 
