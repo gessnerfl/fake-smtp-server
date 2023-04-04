@@ -1,7 +1,7 @@
 import React from "react";
 import {Alert, AlertTitle, Card, CardHeader, IconButton} from "@mui/material";
 import {NavLink, useParams} from "react-router-dom";
-import {useGetEmailQuery} from "../stores/emails-api";
+import {useGetEmailQuery} from "../store/emails-api";
 import {EmailCardContent} from "../components/email/email-card-content";
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -23,7 +23,7 @@ export const EmailPage = () => {
     } else {
         return <Alert severity="error">
             <AlertTitle>Error</AlertTitle>
-            Email with ID <strong>{id ? id : "undefined"}</strong> does not exist.
+            <p>Email with ID {id ? id : "undefined"} does not exist.</p>
         </Alert>
     }
 

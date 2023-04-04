@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {DataGrid, GridColDef, GridRowSelectionModel} from '@mui/x-data-grid';
-import {useGetEmailsQuery} from "../stores/emails-api";
+import {useGetEmailsQuery} from "../store/emails-api";
 import {Email} from "../models/email";
 import {useSearchParams} from "react-router-dom";
 import Grid from '@mui/material/Unstable_Grid2';

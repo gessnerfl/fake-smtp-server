@@ -12,7 +12,7 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import EmailListPage from "./pages/email-list-page";
 import ErrorPage from "./pages/error-page";
 import {Provider} from "react-redux";
-import {store} from "./stores/store";
+import {store} from "./store/store";
 import {EmailPage} from "./pages/email-page";
 
 const router = createBrowserRouter([
