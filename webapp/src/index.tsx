@@ -7,32 +7,12 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import Shell from './pages/shell';
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import EmailListPage from "./pages/email-list-page";
-import ErrorPage from "./pages/error-page";
+import {BrowserRouter} from "react-router-dom";
 import {Provider} from "react-redux";
 import {store} from "./store/store";
-import {EmailPage} from "./pages/email-page";
+import App from "./app";
 
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Shell/>,
-        errorElement: <ErrorPage/>,
-        children: [
-            {
 
-                index: true,
-                element: <EmailListPage/>
-            },
-            {
-                path: "emails/:id",
-                element: <EmailPage/>
-            }
-        ]
-    },
-]);
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -40,7 +20,9 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <Provider store={store}>
-            <RouterProvider router={router}/>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
         </Provider>
     </React.StrictMode>
 );

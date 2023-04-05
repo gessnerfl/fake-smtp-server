@@ -5,8 +5,10 @@ import {useGetEmailQuery} from "../store/emails-api";
 import {EmailCardContent} from "../components/email/email-card-content";
 import CloseIcon from '@mui/icons-material/Close';
 
+export type EmailPageParam = { id: string }
+
 export const EmailPage = () => {
-    const {id} = useParams<{ id: string }>();
+    const {id} = useParams<EmailPageParam>();
     const {data} = useGetEmailQuery(id ? id : "-1")
 
     if (data) {
