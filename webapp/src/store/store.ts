@@ -6,16 +6,18 @@ const rootReducer = combineReducers({
     [emailsApi.reducerPath]: emailsApi.reducer
 })
 
-export const store = configureStore({
-    reducer: rootReducer,
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(emailsApi.middleware),
-});
 export function setupStore(preloadedState?: PreloadedState<RootState>) {
-    return store
+    return configureStore({
+        reducer: rootReducer,
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware().concat(emailsApi.middleware),
+        preloadedState
+    })
 }
+
+export const store = setupStore()
+setupListeners(store.dispatch)
 
 export type RootState = ReturnType<typeof rootReducer>
 export type AppStore = ReturnType<typeof setupStore>
-export type AppDispatch = typeof store.dispatch
-setupListeners(store.dispatch)
+export type AppDispatch = AppStore['dispatch']
