@@ -3,7 +3,11 @@ import {EmailContentTabPanelProperties} from "./email-content-tab-panel-properti
 import DOMPurify from "dompurify";
 import {Box} from "@mui/material";
 
-export const HtmlContentTabPanel: FunctionComponent<EmailContentTabPanelProperties> = ({activeContentType, email, data}) => {
+export const HtmlContentTabPanel: FunctionComponent<EmailContentTabPanelProperties> = ({
+                                                                                           activeContentType,
+                                                                                           email,
+                                                                                           data
+                                                                                       }) => {
 
     function getInlineImage(cid: string): (string | undefined) {
         const image = email.inlineImages.find(i => i.contentId === cid)
@@ -17,7 +21,7 @@ export const HtmlContentTabPanel: FunctionComponent<EmailContentTabPanelProperti
         let match = matches.next()
         let mappedData = data
         while (match.value) {
-            const cid = match.value[1];
+            const cid = match.value[1] ? match.value[1] : match.value[2];
             const image = getInlineImage(cid)
             if (image) {
                 mappedData = mappedData.replaceAll("cid:" + cid, image)
@@ -28,11 +32,8 @@ export const HtmlContentTabPanel: FunctionComponent<EmailContentTabPanelProperti
     }
 
     function formatHtml(): string {
-        if (data) {
-            const mappedData = mapInlineImages(data)
-            return DOMPurify.sanitize(mappedData)
-        }
-        return ""
+        const mappedData = mapInlineImages(data)
+        return DOMPurify.sanitize(mappedData)
     }
 
     return (
