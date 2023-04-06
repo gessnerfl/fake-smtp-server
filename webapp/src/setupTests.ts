@@ -14,8 +14,12 @@ export const testEmail1: Email = {
     attachments: []
 }
 export const handlers = [
-    rest.get('/api/emails/1', (req, res, ctx) => {
-        return res(ctx.json(testEmail1), ctx.delay(150))
+    rest.get('/api/emails/:emailId', (req, res, ctx) => {
+        const { emailId } = req.params
+        if(emailId && emailId === ""+testEmail1.id){
+            return res(ctx.json(testEmail1), ctx.delay(150))
+        }
+        return res(ctx.status(404), ctx.text("Not found"))
     })
 ]
 
