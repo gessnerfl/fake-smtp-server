@@ -2,6 +2,7 @@ import React, {FunctionComponent} from "react";
 import {EmailDetailsProperties} from "./email-details-properties";
 import {Typography, Unstable_Grid2 as Grid} from "@mui/material";
 import formatISO9075 from "date-fns/formatISO9075"
+import {parseJSON} from "date-fns";
 
 export const EmailHeaderPanel: FunctionComponent<EmailDetailsProperties> = ({email}) => {
     return (
@@ -16,7 +17,7 @@ export const EmailHeaderPanel: FunctionComponent<EmailDetailsProperties> = ({ema
             </Grid>
             <Grid xs={6}>
                 <Typography component='dt' variant='subtitle2'>ReceivedOn:</Typography>
-                <Typography component='dd' variant='body1'>{formatISO9075(Date.parse(email.receivedOn))}</Typography>
+                <Typography component='dd' variant='body1'>{formatISO9075(parseJSON(email.receivedOn))}</Typography>
             </Grid>
             <Grid xs={12}>
                 <Typography component='dt' variant='subtitle2'>Subject:</Typography>
