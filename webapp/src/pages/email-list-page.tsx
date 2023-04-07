@@ -6,13 +6,15 @@ import {useSearchParams} from "react-router-dom";
 import Grid from '@mui/material/Unstable_Grid2';
 import {EmailCard} from "../components/email/email-card";
 import {Alert, Card, CardContent, CardHeader} from "@mui/material";
+import {parseJSON} from "date-fns";
+import formatISO9075 from "date-fns/formatISO9075";
 
 function EmailListPage() {
     const pageSize = 10;
     const pageQueryParameter = "page";
     const noRowSelected = -1;
 
-    const [page, setPage] = useState(0)
+    const [page, setPage] = useState(1)
     const [selectedRow, setSelectedRow] = useState(noRowSelected)
     const [searchParams, setSearchParams] = useSearchParams()
     const {data, isLoading, refetch} = useGetEmailsQuery({page: page, pageSize: pageSize})
@@ -67,7 +69,7 @@ function EmailListPage() {
     ];
 
     function transformEmail(e: Email) {
-        return {...e, receivedOn: new Date(e.receivedOn)}
+        return {...e, receivedOn: parseJSON(e.receivedOn)}
     }
 
     function formatPageQueryParam(page: number) {
