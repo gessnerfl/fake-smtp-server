@@ -60,7 +60,8 @@
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
-      "!<rootDir>/node_modules/"
+      "!<rootDir>/node_modules/",
+      "!src/setupTests.ts"
     ],
     "coverageReporters": [
       "text",
