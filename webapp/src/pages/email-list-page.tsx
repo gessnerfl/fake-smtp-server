@@ -7,7 +7,6 @@ import Grid from '@mui/material/Unstable_Grid2';
 import {EmailCard} from "../components/email/email-card";
 import {Alert, Card, CardContent, CardHeader} from "@mui/material";
 import {parseJSON} from "date-fns";
-import formatISO9075 from "date-fns/formatISO9075";
 
 function EmailListPage() {
     const pageSize = 10;
