@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {prettyDOM, screen, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import {renderWithProviders} from "../utils";
+import {renderWithProviders} from "../test-utils";
 import App from "../app";
 import {MemoryRouter} from "react-router-dom";
 import {EmailPage} from "../models/email";
@@ -26,7 +26,7 @@ describe('EmailListPage', () => {
         })
     })
     it('render second page of email list', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/?page=2"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/?page=1"]}><App /></MemoryRouter>);
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {

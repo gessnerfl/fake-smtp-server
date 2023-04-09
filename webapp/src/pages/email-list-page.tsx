@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {DataGrid, GridColDef, GridRowSelectionModel} from '@mui/x-data-grid';
-import {useGetEmailsQuery} from "../store/emails-api";
+import {useGetEmailsQuery} from "../store/rest-api";
 import {Email} from "../models/email";
 import {useSearchParams} from "react-router-dom";
 import Grid from '@mui/material/Unstable_Grid2';
@@ -13,7 +13,7 @@ function EmailListPage() {
     const pageQueryParameter = "page";
     const noRowSelected = -1;
 
-    const [page, setPage] = useState(1)
+    const [page, setPage] = useState(0)
     const [selectedRow, setSelectedRow] = useState(noRowSelected)
     const [searchParams, setSearchParams] = useSearchParams()
     const {data, isLoading, refetch} = useGetEmailsQuery({page: page, pageSize: pageSize})

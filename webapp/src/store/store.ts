@@ -1,16 +1,16 @@
 import {combineReducers, configureStore, PreloadedState} from "@reduxjs/toolkit";
-import {emailsApi} from "./emails-api";
+import {restApi} from "./rest-api";
 import {setupListeners} from "@reduxjs/toolkit/query";
 
 const rootReducer = combineReducers({
-    [emailsApi.reducerPath]: emailsApi.reducer
+    [restApi.reducerPath]: restApi.reducer,
 })
 
 export function setupStore(preloadedState?: PreloadedState<RootState>) {
     return configureStore({
         reducer: rootReducer,
         middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware().concat(emailsApi.middleware),
+            getDefaultMiddleware().concat(restApi.middleware),
         preloadedState
     })
 }

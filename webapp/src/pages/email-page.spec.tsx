@@ -2,7 +2,7 @@ import * as React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {EmailPage} from "./email-page";
-import {renderWithProviders} from "../utils";
+import {renderWithProviders} from "../test-utils";
 import {MemoryRouter} from "react-router-dom";
 import App from "../app";
 

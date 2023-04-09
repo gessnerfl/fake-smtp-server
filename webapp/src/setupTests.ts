@@ -2,6 +2,7 @@ import {Email, EmailPage} from "./models/email";
 import {setupServer} from 'msw/node'
 import {rest} from 'msw'
 import {formatRFC3339} from "date-fns";
+import {MetaData} from "./models/meta-data";
 
 export const testEmail1: Email = {
     id: 1,
@@ -61,9 +62,9 @@ export const testEmailPage2: EmailPage = {
 export const handlers = [
     rest.get('/api/emails', (req, res, ctx) => {
         const page = req.url.searchParams.get('page')
-        if(page === null || "1" === page) {
+        if(page === null || "0" === page) {
             return res(ctx.json(testEmailPage1), ctx.delay(150))
-        } else if("2" === page) {
+        } else if("1" === page) {
             return res(ctx.json(testEmailPage2), ctx.delay(150))
         }
         return res(ctx.status(404), ctx.text("Not found"))
@@ -74,7 +75,11 @@ export const handlers = [
             return res(ctx.json(testEmail1), ctx.delay(150))
         }
         return res(ctx.status(404), ctx.text("Not found"))
-    })
+    }),
+    rest.get('/api/meta-data', (req, res, ctx) => {
+        const metaData: MetaData = {version: "local"}
+        return res(ctx.json(metaData), ctx.delay(150))
+    }),
 ]
 
 const server = setupServer(...handlers)
