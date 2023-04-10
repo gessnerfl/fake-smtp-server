@@ -7,6 +7,9 @@ import Grid from '@mui/material/Unstable_Grid2';
 import {EmailCard} from "../components/email/email-card";
 import {Alert, Card, CardContent, CardHeader} from "@mui/material";
 import {parseJSON} from "date-fns";
+import {DeleteEmailButton} from "../components/email/delete-email-button";
+import './email-list-page.tsx.scss'
+import {DeleteAllEmailButton} from "../components/email/delete-all-emails-button";
 
 function EmailListPage() {
     const pageSize = 10;
@@ -96,31 +99,41 @@ function EmailListPage() {
     }
 
     function renderGrid() {
-        return <DataGrid
-            columns={columns}
-            rows={data!.content.map(e => transformEmail(e))}
-            initialState={{
-                pagination: {
-                    paginationModel: {
-                        pageSize: pageSize,
-                        page: page
+        return <div>
+            <div className={"toolbar"}>
+                <DeleteEmailButton selectedEmail={getSelectedEmail()} />
+                <DeleteAllEmailButton emailsAvailable={data !== undefined && data.numberOfElements > 0} />
+            </div>
+            <DataGrid
+                columns={columns}
+                rows={data!.content.map(e => transformEmail(e))}
+                initialState={{
+                    pagination: {
+                        paginationModel: {
+                            pageSize: pageSize,
+                            page: page
+                        },
                     },
-                },
-            }}
-            rowSelectionModel={selectedRow > 0 ? [selectedRow] : []}
-            rowCount={data!.totalElements}
-            pageSizeOptions={[pageSize]}
-            loading={isLoading}
-            paginationMode={'server'}
-            autoHeight={true}
-            density={'compact'}
-            onPaginationModelChange={(m, _) => navigateTo(m.page)}
-            onRowSelectionModelChange={(m, _) => setSelectedRow(toSelectedRow(m))}
-        />;
+                }}
+                rowSelectionModel={selectedRow > 0 ? [selectedRow] : []}
+                rowCount={data!.totalElements}
+                pageSizeOptions={[pageSize]}
+                loading={isLoading}
+                paginationMode={'server'}
+                autoHeight={true}
+                density={'compact'}
+                onPaginationModelChange={(m, _) => navigateTo(m.page)}
+                onRowSelectionModelChange={(m, _) => setSelectedRow(toSelectedRow(m))}
+            />
+        </div>;
+    }
+
+    function getSelectedEmail(): Email | undefined {
+        return data && data.content.find(e => e.id === selectedRow);
     }
 
     function renderEmail() {
-        const email = data && data.content.find(e => e.id === selectedRow)
+        const email = getSelectedEmail()
         if (email) {
             return <EmailCard email={email}/>
         }
