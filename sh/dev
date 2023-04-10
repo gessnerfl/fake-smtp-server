@@ -1,0 +1,16 @@
+#!/bin/bash
+
+WORKDING_DIR="$(pwd)"
+CURRENT_DIR=$(basename $(pwd))
+
+DEV_COMMAND=${@:-"/bin/bash"}
+
+CONTAINER_RUNTIME_NAME="$CURRENT_DIR-dev"
+
+docker run -it --rm \
+    -v "$WORKDING_DIR":/opt/"$CURRENT_DIR" \
+    -v "$WORKDING_DIR"/gradle:/root/.gradle/. \
+    --name $CONTAINER_RUNTIME_NAME \
+    -w /opt/"$CURRENT_DIR" \
+    amazoncorretto:17.0.6-al2023 \
+    /bin/bash -c "$DEV_COMMAND"

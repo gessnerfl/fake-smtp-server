@@ -1,0 +1,51 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+spring:
+  profiles:
+    active: default
+
+  datasource:
+    url: jdbc:h2:mem:mail
+    username: admin
+    password: Test1234
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  data:
+    web:
+      pageable:
+        size-parameter: size
+        page-parameter: page
+        default-page-size: 10
+        one-indexed-parameters: false
+        max-page-size: 1000
+
+  h2:
+    console:
+      enabled: true
+
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+fakesmtp:
+  port: 8025
+

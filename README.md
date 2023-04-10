@@ -127,3 +127,34 @@ management:
 Documentation of exposed services is available at:
     
     localhost:8080/swagger-ui.html
+
+## Developpment Environment
+
+If you need to implement a new feature, you will probably need an correct JDK version setup in an environement
+
+```sh
+sh/dev
+```
+
+Then, in the dev container started by the command above, you can use various commands. 
+The following commands should be the most common ones:
+```bash
+sh gradlew test
+sh gradlew test --tests '*EmailRepositoryIntegration*' --info
+sh gradlew build
+```
+
+Run tests
+```bash
+sh/test
+```
+
+Run build
+```bash
+sh/build
+```
+
+Run app
+```bash
+sh/run
+```

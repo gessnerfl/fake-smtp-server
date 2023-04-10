@@ -141,4 +141,27 @@ class EmailRestControllerTest {
         verify(emailRepository).flush();
         verifyNoMoreInteractions(emailRepository);
     }
+
+    @Test
+    void shouldReturnEmailByMessageId() {
+        var messageId = "message-id";
+        var mail = mock(Email.class);
+        when(emailRepository.searchEmailByMessageId(messageId)).thenReturn(mail);
+
+        var result = sut.getEmailByMessageId(messageId);
+
+        assertEquals(mail, result);
+        verify(emailRepository).searchEmailByMessageId(messageId);
+    }
+
+    @Test
+    void shouldNotReturnEmailByMessageId() {
+        var messageId = "message-id";
+        when(emailRepository.searchEmailByMessageId(messageId)).thenReturn(null);
+
+        var result = sut.getEmailByMessageId(messageId);
+
+        assertEquals(null, result);
+        verify(emailRepository).searchEmailByMessageId(messageId);
+    }
 }

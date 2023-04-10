@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BaseMessageListenerIntegrationTest {
     private static final String SENDER = "sender";
     private static final String RECEIVER = "receiver";
+    private static final String MESSAGE_ID = "<message_id>";
 
     @Autowired
     private EmailRepository emailRepository;
@@ -87,7 +88,7 @@ class BaseMessageListenerIntegrationTest {
 
     @Test
     void shouldCreateMailForPlainText() throws Exception {
-        var rawData = "this is just some dummy content";
+        var rawData = "Message-ID: " + MESSAGE_ID + " this is just some dummy content";
         var data = new ByteArrayInputStream(rawData.getBytes(StandardCharsets.UTF_8));
 
         sut.deliver(SENDER, RECEIVER, data);

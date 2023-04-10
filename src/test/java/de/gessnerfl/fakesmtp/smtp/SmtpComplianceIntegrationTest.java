@@ -100,6 +100,7 @@ class SmtpComplianceIntegrationTest {
         this.sendMailFrom();
         this.sendReceiptTo();
         this.sendDataStart();
+        this.sendMessageId();
         this.send("");
         this.send("Body");
         this.sendDataEnd();
@@ -126,6 +127,7 @@ class SmtpComplianceIntegrationTest {
         this.sendMailFrom();
         this.sendReceiptTo();
         this.sendDataStart();
+        this.sendMessageId();
         this.send("");
         this.send("Body");
         this.sendDataEnd();
@@ -312,6 +314,10 @@ class SmtpComplianceIntegrationTest {
         this.send("MAIL FROM:<" + SmtpComplianceIntegrationTest.FROM_ADDRESS + ">");
         final String response = this.readInput();
         assertTrue(response, response.startsWith("250"));
+    }
+
+    private void sendMessageId() throws IOException {
+        this.send("Message-ID: <message_id>");
     }
 
     private void sendQuit() throws IOException {

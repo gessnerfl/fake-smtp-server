@@ -253,5 +253,6 @@ class EmailFactoryTest {
         assertEquals(now, result.getReceivedOn());
         assertThat(result.getAttachments(), hasSize(2));
         assertThat(result.getAttachments().stream().map(EmailAttachment::getFilename).collect(toList()), containsInAnyOrder("customizing.css", "app-icon.png"));
-    }
+    }    
+
 }

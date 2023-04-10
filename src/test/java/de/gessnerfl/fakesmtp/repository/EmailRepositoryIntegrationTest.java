@@ -76,6 +76,34 @@ class EmailRepositoryIntegrationTest {
         assertThat(beforeDeletion, contains(mail3, mail2, mail1));
     }
 
+    @Test
+    void shouldRetrieveEmailByMessageId(){
+        var mail = createRandomEmail(5);
+        var mail2 = createRandomEmail(4);
+        var mail3 = createRandomEmail(3);
+        
+        var mailsStored = sut.findAll(SORT_DESC_BY_RECEIVED_ON);
+        assertThat(mailsStored, hasSize(3));
+        assertThat(mailsStored, contains(mail3, mail2, mail));
+
+        var mailResult = sut.searchEmailByMessageId(mail.getMessageId());
+        assertEquals(mail, mailResult);
+    }
+
+    @Test
+    void shouldNotRetrieveEmailByMessageId(){
+        var mail = createRandomEmail(5);
+        var mail2 = createRandomEmail(4);
+        var mail3 = createRandomEmail(3);
+        
+        var mailsStored = sut.findAll(SORT_DESC_BY_RECEIVED_ON);
+        assertThat(mailsStored, hasSize(3));
+        assertThat(mailsStored, contains(mail3, mail2, mail));
+
+        var mailResult = sut.searchEmailByMessageId("<any-message-id>");
+        assertEquals(null, mailResult);
+    }
+
     private Email createRandomEmail(int minusMinutes) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
         var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
@@ -92,6 +120,7 @@ class EmailRepositoryIntegrationTest {
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
         mail.addContent(content);
+        mail.setMessageId(randomToken);
         return sut.save(mail);
     }
 

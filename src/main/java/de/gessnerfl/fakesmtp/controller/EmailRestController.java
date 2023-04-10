@@ -81,4 +81,9 @@ public class EmailRestController {
         emailRepository.flush();
     }
 
+    @GetMapping("/email/message-id/{messageId}")
+    public Email getEmailByMessageId(@PathVariable String messageId) {
+        return emailRepository.searchEmailByMessageId(messageId);
+    }
+
 }

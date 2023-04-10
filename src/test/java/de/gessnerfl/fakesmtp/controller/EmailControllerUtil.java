@@ -34,6 +34,7 @@ class EmailControllerUtil {
         mail.setReceivedOn(receivedOn);
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
+        mail.setMessageId("<message-id>");
         mail.addContent(content);
         mail.addAttachment(attachment);
         return mail;

@@ -30,12 +30,13 @@ public class EmailFactory {
             var subject = Objects.toString(mimeMessage.getSubject(), UNDEFINED);
             var contentType = ContentType.fromString(mimeMessage.getContentType());
             var messageContent = mimeMessage.getContent();
+            var messageId = mimeMessage.getMessageID();
 
             switch (contentType) {
                 case HTML, PLAIN, OCTET_STREAM:
-                    return createPlainOrHtmlMail(rawData, subject, contentType, messageContent);
+                    return createPlainOrHtmlMail(rawData, subject, contentType, messageContent, messageId);
                 case MULTIPART_ALTERNATIVE, MULTIPART_MIXED, MULTIPART_RELATED:
-                    return createMultipartMail(rawData, subject, (Multipart) messageContent);
+                    return createMultipartMail(rawData, subject, (Multipart) messageContent, messageId);
                 default:
                     throw new IllegalStateException("Unsupported e-mail content type " + mimeMessage.getContentType());
             }
@@ -44,16 +45,18 @@ public class EmailFactory {
         }
     }
 
-    private Email createPlainOrHtmlMail(RawData rawData, String subject, ContentType contentType, Object messageContent) {
+    private Email createPlainOrHtmlMail(RawData rawData, String subject, ContentType contentType, Object messageContent, String messageId) {
         var email = createEmailFromRawData(rawData);
         email.setSubject(subject);
-        createEmailContent(rawData, contentType, messageContent).ifPresent(email::addContent);
+        createEmailContent(rawData, contentType, messageContent, messageId).ifPresent(email::addContent);
+        email.setMessageId(messageId);
         return email;
     }
 
-    private Email createMultipartMail(RawData rawData, String subject, Multipart multipart) throws MessagingException, IOException {
+    private Email createMultipartMail(RawData rawData, String subject, Multipart multipart, String messageId) throws MessagingException, IOException {
         var email = createEmailFromRawData(rawData);
         email.setSubject(subject);
+        email.setMessageId(messageId);
 
         appendMultipartBodyParts(email, rawData, multipart);
 
@@ -77,7 +80,7 @@ public class EmailFactory {
         var partContentType = ContentType.fromString(part.getContentType());
         if (partContentType == ContentType.HTML || partContentType == ContentType.PLAIN) {
             final var partContent = part.getContent();
-            createEmailContent(rawData, partContentType, partContent).ifPresent(email::addContent);
+            createEmailContent(rawData, partContentType, partContent, email.getMessageId()).ifPresent(email::addContent);
         } else if (partContentType == ContentType.MULTIPART_RELATED || partContentType == ContentType.MULTIPART_ALTERNATIVE) {
             final var content = (Multipart) part.getContent();
             appendMultipartBodyParts(email, rawData, content);
@@ -106,7 +109,7 @@ public class EmailFactory {
         return email;
     }
 
-    private Optional<EmailContent> createEmailContent(RawData rawData, ContentType contentType, Object messageContent) {
+    private Optional<EmailContent> createEmailContent(RawData rawData, ContentType contentType, Object messageContent, String messageId) {
         var data = getMessageContentAsString(messageContent).map(this::normalizeContent).orElseGet(() -> normalizeContent(rawData.getContentAsString()));
         if (data == null) {
             return Optional.empty();

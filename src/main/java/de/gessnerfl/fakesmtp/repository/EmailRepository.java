@@ -14,4 +14,9 @@ public interface EmailRepository extends JpaRepository<Email,Long>{
     @Modifying
     @Query(value = "DELETE email o WHERE o.id IN ( SELECT i.id FROM email i ORDER BY i.received_on DESC OFFSET ?1)", nativeQuery = true)
     int deleteEmailsExceedingDateRetentionLimit(int maxNumber);
+
+    @Transactional
+    @Query(value = "SELECT * FROM email WHERE message_id = ?1", nativeQuery = true)
+    Email searchEmailByMessageId(String messageId);
+
 }
