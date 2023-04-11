@@ -4,11 +4,11 @@ import FolderDeleteIcon from '@mui/icons-material/FolderDelete';
 import {DeleteAllEmailsDialog} from "./delete-all-emails-dialog";
 import {useDeleteAllEmailsMutation} from "../../store/rest-api";
 
-export interface DeleteAllEmailButtonProperties {
+export interface DeleteAllEmailsButtonProperties {
     emailsAvailable: boolean
 }
 
-export const DeleteAllEmailButton: FunctionComponent<DeleteAllEmailButtonProperties> = ({emailsAvailable}) => {
+export const DeleteAllEmailsButton: FunctionComponent<DeleteAllEmailsButtonProperties> = ({emailsAvailable}) => {
     const [open, setOpen] = React.useState(false);
     const [deleteAllEmails] = useDeleteAllEmailsMutation()
 

@@ -9,7 +9,7 @@ import {Alert, Card, CardContent, CardHeader} from "@mui/material";
 import {parseJSON} from "date-fns";
 import {DeleteEmailButton} from "../components/email/delete-email-button";
 import './email-list-page.tsx.scss'
-import {DeleteAllEmailButton} from "../components/email/delete-all-emails-button";
+import {DeleteAllEmailsButton} from "../components/email/delete-all-emails-button";
 
 function EmailListPage() {
     const pageSize = 10;
@@ -102,7 +102,7 @@ function EmailListPage() {
         return <div>
             <div className={"toolbar"}>
                 <DeleteEmailButton selectedEmail={getSelectedEmail()} />
-                <DeleteAllEmailButton emailsAvailable={data !== undefined && data.numberOfElements > 0} />
+                <DeleteAllEmailsButton emailsAvailable={data !== undefined && data.numberOfElements > 0} />
             </div>
             <DataGrid
                 columns={columns}
