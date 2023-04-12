@@ -1,10 +1,10 @@
 import * as React from 'react'
-import {prettyDOM, screen, waitFor} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {renderWithProviders} from "../test-utils";
 import App from "../app";
 import {MemoryRouter} from "react-router-dom";
-import {testData} from "../setupTests";
+import {testData, originalTestData} from "../setupTests";
 import userEvent from "@testing-library/user-event";
 import {act} from "react-dom/test-utils";
 import {Email} from "../models/email";
@@ -21,7 +21,6 @@ describe('EmailListPage', () => {
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
-            prettyDOM()
             shouldContainPage(testData.slice(0, 10))
         })
     })
@@ -46,6 +45,123 @@ describe('EmailListPage', () => {
 
         await waitFor(() => {
             expect(screen.getByText("Email 1")).toBeInTheDocument()
+        })
+    })
+    it('should not allow to open delete dialog when no email is selected', async () => {
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+
+        await waitFor(() => {
+            expect(screen.getByTitle("1")).toBeInTheDocument()
+        })
+
+        expect(screen.getByText("Delete")).toBeDisabled()
+    })
+    it('should not delete selected email when delete is not confirmed', async () => {
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+
+        await waitFor(() => {
+            expect(screen.getByTitle("1")).toBeInTheDocument()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByTitle("1"))
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText("Delete")).toBeEnabled()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByText("Delete"))
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText("Delete Email 1")).toBeInTheDocument()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByText("No"))
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText("Email 1")).toBeInTheDocument()
+        })
+    })
+    it('should delete selected email when delete is confirmed', async () => {
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+
+        await waitFor(() => {
+            expect(screen.getByTitle("1")).toBeInTheDocument()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByTitle("1"))
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText("Delete")).toBeEnabled()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByText("Delete"))
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText("Delete Email 1")).toBeInTheDocument()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByText("Yes"))
+        })
+
+        await waitFor(() => {
+            shouldContainPage(originalTestData.splice(1,1).slice(0, 10))
+        })
+    })
+    it('should not delete all emails when delete is not confirmed', async () => {
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+
+        await waitFor(() => {
+            expect(screen.getByTitle("5")).toBeInTheDocument()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByText("Delete All"))
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText("Delete All Emails")).toBeInTheDocument()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByText("No"))
+        })
+
+        await waitFor(() => {
+            shouldContainPage(originalTestData.splice(1,1).slice(0, 10))
+        })
+    })
+    it('should delete all emails when delete is confirmed', async () => {
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+
+        await waitFor(() => {
+            expect(screen.getByTitle("5")).toBeInTheDocument()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByText("Delete All"))
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText("Delete All Emails")).toBeInTheDocument()
+        })
+
+        act(() => {
+            userEvent.click(screen.getByText("Yes"))
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText("No rows")).toBeInTheDocument()
         })
     })
 })

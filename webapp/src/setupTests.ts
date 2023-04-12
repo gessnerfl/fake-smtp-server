@@ -31,7 +31,8 @@ const generateTestData = () : Email[] => Array.from(Array(15).keys()).map(i => {
 })
 
 const pageSize = 10;
-export let testData = generateTestData()
+export const originalTestData = generateTestData()
+export let testData = [...originalTestData]
 
 export const handlers = [
     rest.get('/api/emails', (req, res, ctx) => {
@@ -91,6 +92,6 @@ const server = setupServer(...handlers)
 beforeAll(() => server.listen())
 afterEach(() => {
     server.resetHandlers()
-    testData = generateTestData()
+    testData = [...originalTestData]
 })
 afterAll(() => server.close())
