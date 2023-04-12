@@ -5,7 +5,7 @@ on:
       - master
 
 jobs:
-  build:
+  dependency_submission:
     name: Dependencies
     runs-on: ubuntu-latest
     permissions:
