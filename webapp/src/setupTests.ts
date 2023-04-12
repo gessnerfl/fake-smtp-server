@@ -38,7 +38,7 @@ export const handlers = [
         const pageStr = req.url.searchParams.get('page')
         const page = pageStr !== null ? parseInt(pageStr) : 0
         if(page < 2) {
-            const data = testData.slice(page, pageSize)
+            const data = testData.slice(page * pageSize, pageSize)
             const totalEntries = testData.length
             const totalPages = (testData.length / pageSize) + (testData.length % pageSize > 0 ? 1 :0)
             const pageData: EmailPage = {
@@ -57,8 +57,26 @@ export const handlers = [
         const {emailId} = req.params
         const id = typeof emailId === "string" ? parseInt(emailId) : undefined
         if (id) {
-            const email = testData[id]
-            return res(ctx.json(email), ctx.delay(150))
+            const emails = testData.filter(e => e.id === id)
+            if(emails.length > 0){
+                return res(ctx.json(emails[0]), ctx.delay(150))
+            }
+        }
+        return res(ctx.status(404), ctx.text("Not found"))
+    }),
+    rest.delete('/api/emails', (req, res, ctx) => {
+        testData = []
+        return res(ctx.status(200), ctx.text("Not found"))
+    }),
+    rest.delete('/api/emails/:emailId', (req, res, ctx) => {
+        const {emailId} = req.params
+        const id = typeof emailId === "string" ? parseInt(emailId) : undefined
+        if (id) {
+            const idx = testData.findIndex(e => e.id === id)
+            if(idx > 0){
+                testData.splice(idx, 1)
+                return res(ctx.status(200), ctx.delay(150))
+            }
         }
         return res(ctx.status(404), ctx.text("Not found"))
     }),

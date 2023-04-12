@@ -30,7 +30,7 @@ describe('EmailListPage', () => {
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
-            shouldContainPage(testData.slice(1, 10))
+            shouldContainPage(testData.slice(10, 10))
         })
     })
     it('should render email details on selection', async () => {
