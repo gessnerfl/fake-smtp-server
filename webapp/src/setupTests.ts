@@ -16,63 +16,49 @@ export const testEmail1: Email = {
     attachments: []
 }
 
-export const testEmailPage1: EmailPage = {
-    number: 1,
-    numberOfElements: 10,
-    size: 10,
-    totalPages: 2,
-    totalElements: 15,
-    content: Array.from(Array(10).keys()).map(i => {
-        return {
-            id: i,
-            fromAddress: `sender${i}@example.com`,
-            toAddress: `receiver${i}@example.com`,
-            subject: `subject${i}`,
-            receivedOn: formatRFC3339(new Date(2023, 3, 5, 21, i+1, 10, 20), {fractionDigits: 3}),
-            rawData: `test raw content${i}`,
-            contents: [],
-            inlineImages: [],
-            attachments: []
-        }
-    })
-}
+const generateTestData = () : Email[] => Array.from(Array(15).keys()).map(i => {
+    return {
+        id: i,
+        fromAddress: `sender${i}@example.com`,
+        toAddress: `receiver${i}@example.com`,
+        subject: `subject${i}`,
+        receivedOn: formatRFC3339(new Date(2023, 3, 5, 21, i+1, 10, 20), {fractionDigits: 3}),
+        rawData: `test raw content${i}`,
+        contents: [],
+        inlineImages: [],
+        attachments: []
+    }
+})
 
-export const testEmailPage2: EmailPage = {
-    number: 2,
-    numberOfElements: 5,
-    size: 5,
-    totalPages: 2,
-    totalElements: 15,
-    content: Array.from(Array(5).keys()).map(i => {
-        const index = i + 10;
-        return {
-            id: index,
-            fromAddress: `sender${index}@example.com`,
-            toAddress: `receiver${index}@example.com`,
-            subject: `subject${index}`,
-            receivedOn: formatRFC3339(new Date(2023, 3, 5, 21, index+1, 10, 20), {fractionDigits: 3}),
-            rawData: `test raw content${index}`,
-            contents: [],
-            inlineImages: [],
-            attachments: []
-        }
-    })
-}
+const pageSize = 10;
+export let testData = generateTestData()
 
 export const handlers = [
     rest.get('/api/emails', (req, res, ctx) => {
-        const page = req.url.searchParams.get('page')
-        if(page === null || "0" === page) {
-            return res(ctx.json(testEmailPage1), ctx.delay(150))
-        } else if("1" === page) {
-            return res(ctx.json(testEmailPage2), ctx.delay(150))
+        const pageStr = req.url.searchParams.get('page')
+        const page = pageStr !== null ? parseInt(pageStr) : 0
+        if(page < 2) {
+            const data = testData.slice(page, pageSize)
+            const totalEntries = testData.length
+            const totalPages = (testData.length / pageSize) + (testData.length % pageSize > 0 ? 1 :0)
+            const pageData: EmailPage = {
+                number: page,
+                numberOfElements: data.length,
+                size: data.length,
+                totalPages: totalPages,
+                totalElements: totalEntries,
+                content: data
+            }
+            return res(ctx.json(pageData), ctx.delay(150))
         }
         return res(ctx.status(404), ctx.text("Not found"))
     }),
     rest.get('/api/emails/:emailId', (req, res, ctx) => {
         const {emailId} = req.params
-        if (emailId && emailId === "" + testEmail1.id) {
-            return res(ctx.json(testEmail1), ctx.delay(150))
+        const id = typeof emailId === "string" ? parseInt(emailId) : undefined
+        if (id) {
+            const email = testData[id]
+            return res(ctx.json(email), ctx.delay(150))
         }
         return res(ctx.status(404), ctx.text("Not found"))
     }),
@@ -85,5 +71,8 @@ export const handlers = [
 const server = setupServer(...handlers)
 
 beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
+afterEach(() => {
+    server.resetHandlers()
+    testData = generateTestData()
+})
 afterAll(() => server.close())

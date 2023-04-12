@@ -4,13 +4,13 @@ import '@testing-library/jest-dom'
 import {renderWithProviders} from "../test-utils";
 import App from "../app";
 import {MemoryRouter} from "react-router-dom";
-import {EmailPage} from "../models/email";
-import {testEmailPage1, testEmailPage2} from "../setupTests";
+import {testData} from "../setupTests";
 import userEvent from "@testing-library/user-event";
 import {act} from "react-dom/test-utils";
+import {Email} from "../models/email";
 
-function shouldContainPage(page: EmailPage) {
-    page.content.forEach(mail => {
+function shouldContainPage(data: Email[]) {
+    data.forEach(mail => {
         expect(screen.getByText(mail.fromAddress)).toBeInTheDocument()
     })
 }
@@ -22,7 +22,7 @@ describe('EmailListPage', () => {
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
             prettyDOM()
-            shouldContainPage(testEmailPage1)
+            shouldContainPage(testData.slice(0, 10))
         })
     })
     it('render second page of email list', async () => {
@@ -30,7 +30,7 @@ describe('EmailListPage', () => {
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
-            shouldContainPage(testEmailPage2)
+            shouldContainPage(testData.slice(1, 10))
         })
     })
     it('should render email details on selection', async () => {
