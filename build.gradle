@@ -3,6 +3,7 @@ plugins {
     id "org.springframework.boot" version "3.0.4"
     id "org.sonarqube" version "4.0.0.2929"
     id 'com.google.cloud.tools.jib' version '3.3.1'
+    id "com.github.node-gradle.node" version "3.5.1"
 }
 
 apply plugin: "java"
@@ -37,18 +38,13 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("commons-io:commons-io:2.11.0")
     implementation('org.flywaydb:flyway-core')
-    implementation("org.jsoup:jsoup:1.15.4")
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.2")
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4')
-
-    implementation("org.webjars:bootstrap:$bootstrapVersion")
-    implementation("org.webjars:material-design-icons:4.0.0")
 
     runtimeOnly("com.h2database:h2:2.1.214")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -64,23 +60,47 @@ java {
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
         options.compilerArgs << "-Xlint:deprecation"
+        options.compilerArgs << "-Xlint:unchecked"
+    }
+}
+
+node {
+    nodeProjectDir = file("${project.projectDir}/webapp")
+}
+
+tasks.register('webappNpmBuild', NpmTask) {
+    dependsOn(npmInstall)
+    args = ["run", "build"]
+}
+
+tasks.register('webappNpmTest', NpmTask) {
+    dependsOn(webappNpmBuild)
+    args = ["run", "test", "--", "--coverage", "--watchAll=false"]
+}
+
+bootJar {
+    dependsOn(compileJava, webappNpmTest)
+    from("webapp/build") {
+        into("BOOT-INF/classes/static/")
     }
 }
 
 springBoot {
     buildInfo {
-        properties {
-            additional = ["bootstrap.version": "$bootstrapVersion"]
-        }
+        properties {}
     }
 }
 
-sonarqube {
+sonar {
     properties {
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.organization", "gessnerfl-github"
         property "sonar.projectName", "Fake SMTP Server"
         property "sonar.projectKey", "de.gessnerfl.fake-smtp-server"
+        property "sonar.sources", "src/main,webapp/src"
+        property "sonar.test.inclusions", "src/test/**/*.*, webapp/src/**/*.spec.ts, webapp/src/**/*.spec.tsx"
+        property "sonar.javascript.lcov.reportPaths", "./webapp/coverage/lcov.info"
+        property "sonar.coverage.exclusions", "webapp/src/setupTests.ts"
     }
 }
 
@@ -92,17 +112,17 @@ test {
 jacocoTestReport {
     dependsOn test
     reports {
-        xml.enabled true
+        xml.required = true
     }
 }
 
-jib{
+jib {
     from {
         image = 'amazoncorretto:11.0.17-al2'
         container {
             ports = ["5080", "5081", "5025"]
-            creationTime='USE_CURRENT_TIMESTAMP'
-            jvmFlags = ['-Djava.security.egd=file:/dev/./urandom','-Dfile.encoding=utf-8']
+            creationTime = 'USE_CURRENT_TIMESTAMP'
+            jvmFlags = ['-Djava.security.egd=file:/dev/./urandom', '-Dfile.encoding=utf-8']
         }
         platforms {
             platform {

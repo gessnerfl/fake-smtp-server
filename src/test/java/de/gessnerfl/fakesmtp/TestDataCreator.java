@@ -87,10 +87,11 @@ public class TestDataCreator {
             helper.setTo("receiver@example.com");
             helper.setFrom("sender@example.com");
             helper.setSubject("Test-Alternative-Mail " + i);
-            helper.setText("This is the test mail number" + i, "<html><head></head><body>This is the test mail number " + i + "<img src=\"cid:icon\"></img></body>");
-            helper.addInline("icon", new ClassPathResource("/static/gfx/app-icon.png"));
+            helper.setText("This is the test mail number" + i, "<html><head></head><body>This is the test mail number " + i + "<img src=\"cid:icon1\"></img><img src=\"cid:icon2\"></img></body>");
+            helper.addInline("icon1", new ClassPathResource("/static/gfx/app-icon.png"));
+            helper.addInline("icon2", new ClassPathResource("/static/gfx/inbox-solid.png"));
             helper.addAttachment("app-icon.png", new ClassPathResource("/static/gfx/app-icon.png"));
-            helper.addAttachment("customizing.css", new ClassPathResource("/static/customizing.css"));
+            helper.addAttachment("inbox-solid.png", new ClassPathResource("/static/gfx/inbox-solid.png"));
             sender.send(message);
         } catch (MessagingException e){
             throw new RuntimeException("Failed to create mail", e);

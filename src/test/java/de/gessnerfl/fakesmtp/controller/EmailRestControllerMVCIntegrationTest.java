@@ -50,7 +50,7 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldReturnEmptyListWhenNoEmailsAreAvailable() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/api/email")).andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/api/emails")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
         RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
@@ -66,7 +66,7 @@ class EmailRestControllerMVCIntegrationTest {
         var email2 = createRandomEmail(2);
         var email3 = createRandomEmail(1);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/email?page=0&size=2")).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails?page=0&size=2")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
         RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
@@ -84,7 +84,7 @@ class EmailRestControllerMVCIntegrationTest {
         var email2 = createRandomEmail(2);
         var email3 = createRandomEmail(1);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/email?page=1&size=2")).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails?page=1&size=2")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
         RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
@@ -100,7 +100,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnNoEmailsWhenGivenPageIsOutOfRange() throws Exception {
         var email1 = createRandomEmail(5);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/email?page=2&size=1")).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails?page=2&size=1")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
         RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
@@ -115,7 +115,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnMailById() throws Exception {
         var email = createRandomEmail(1);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/email/"+email.getId())).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/"+email.getId())).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
         Email actualEmail = mapFromJson(mvcResult.getResponse().getContentAsString(), Email.class);
@@ -133,7 +133,7 @@ class EmailRestControllerMVCIntegrationTest {
         var email = createRandomEmail(1);
         var attachment = email.getAttachments().get(0);
 
-        this.mockMvc.perform(get("/api/email/"+email.getId()+"/attachment/" + attachment.getId()))
+        this.mockMvc.perform(get("/api/emails/"+email.getId()+"/attachment/" + attachment.getId()))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename=" + attachment.getFilename()))
                 .andExpect(header().string(HttpHeaders.CONTENT_LENGTH,"" + attachment.getData().length))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE))
@@ -145,7 +145,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(get("/api/email/"+email.getId()+"/attachment/123"))
+        this.mockMvc.perform(get("/api/emails/"+email.getId()+"/attachment/123"))
                 .andExpect(status().isNotFound());
     }
 
@@ -153,7 +153,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(get("/api/email/123/attachment/"+email.getAttachments().get(0).getId()))
+        this.mockMvc.perform(get("/api/emails/123/attachment/"+email.getAttachments().get(0).getId()))
                 .andExpect(status().isNotFound());
     }
 
@@ -161,7 +161,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldDeleteEmail() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(delete("/api/email/"+email.getId()))
+        this.mockMvc.perform(delete("/api/emails/"+email.getId()))
                 .andExpect(status().is2xxSuccessful());
 
         assertThat(emailRepository.findAll(), empty());
@@ -173,7 +173,7 @@ class EmailRestControllerMVCIntegrationTest {
 
         assertThat(emailRepository.findAll(), hasSize(5));
 
-        this.mockMvc.perform(delete("/api/email"))
+        this.mockMvc.perform(delete("/api/emails"))
                 .andExpect(status().is2xxSuccessful());
 
         assertThat(emailRepository.findAll(), empty());

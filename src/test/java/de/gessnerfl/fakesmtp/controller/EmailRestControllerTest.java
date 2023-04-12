@@ -8,7 +8,6 @@ import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,7 +42,8 @@ class EmailRestControllerTest {
 
     @Test
     void shouldReturnListOfEmails() {
-        final Page<Email> page = createFirstPageEmail();
+        @SuppressWarnings("unchecked")
+        final Page<Email> page = mock(Page.class);
         when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
         
         var pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "receivedOn");
@@ -66,11 +66,6 @@ class EmailRestControllerTest {
 
         assertEquals(mail, result);
         verify(emailRepository).findById(id);
-    }
-
-    private Page<Email> createFirstPageEmail() {
-        var page = mock(Page.class);
-        return page;
     }
 
     @Test

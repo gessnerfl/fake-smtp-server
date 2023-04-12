@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/emails")
 @Validated
 public class EmailRestController {
 
@@ -31,25 +31,28 @@ public class EmailRestController {
     private final ServletContext servletContext;
 
     @Autowired
-    public EmailRestController(EmailRepository emailRepository, EmailAttachmentRepository emailAttachmentRepository, MediaTypeUtil mediaTypeUtil, ServletContext servletContext) {
+    public EmailRestController(EmailRepository emailRepository,
+                               EmailAttachmentRepository emailAttachmentRepository,
+                               MediaTypeUtil mediaTypeUtil,
+                               ServletContext servletContext) {
         this.emailRepository = emailRepository;
         this.emailAttachmentRepository = emailAttachmentRepository;
         this.mediaTypeUtil = mediaTypeUtil;
         this.servletContext = servletContext;
     }
 
-    @GetMapping("/email")
+    @GetMapping()
     public Page<Email> all(@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC) Pageable pageable)
     {
         return emailRepository.findAll(pageable);
     }
 
-    @GetMapping("/email/{id}")
+    @GetMapping("/{id}")
     public Email getEmailById(@PathVariable Long id) {
         return emailRepository.findById(id).orElseThrow(() -> new EmailNotFoundException("Could not find email " + id));
     }
 
-    @GetMapping("/email/{mailId}/attachment/{attachmentId}")
+    @GetMapping("/{mailId}/attachment/{attachmentId}")
     @ResponseBody
     public ResponseEntity<ByteArrayResource> getEmailAttachmentById(@PathVariable Long mailId, @PathVariable Long attachmentId) {
         var attachment = emailAttachmentRepository.findById(attachmentId)
@@ -65,13 +68,13 @@ public class EmailRestController {
                 .body(new ByteArrayResource(attachment.getData()));
     }
 
-    @DeleteMapping("/email/{id}")
+    @DeleteMapping("/{id}")
     public void deleteEmailById(@PathVariable Long id) {
         emailRepository.deleteById(id);
         emailRepository.flush();
     }
 
-    @DeleteMapping("/email")
+    @DeleteMapping()
     public void deleteAllEmails() {
         emailAttachmentRepository.deleteAllInBatch();
         emailRepository.deleteAllInBatch();
