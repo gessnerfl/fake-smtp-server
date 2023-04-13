@@ -1,8 +1,7 @@
-import {screen} from "@testing-library/react";
+import {screen, waitFor} from "@testing-library/react";
 import * as React from "react";
 import '@testing-library/jest-dom'
 import {DeleteAllEmailsButton} from "./delete-all-emails-button";
-import {act} from "react-dom/test-utils";
 import userEvent from "@testing-library/user-event";
 import {renderWithProviders} from "../../test-utils";
 
@@ -17,11 +16,13 @@ describe('DeleteAllEmailsButton', () => {
 
         expect(screen.getByText("Delete All")).toBeEnabled()
     })
-    it('open delete all emails dialog when clicking the button', () => {
+    it('open delete all emails dialog when clicking the button', async () => {
         renderWithProviders(<DeleteAllEmailsButton emailsAvailable={true}/>);
-        act(() => userEvent.click(screen.getByText("Delete All")))
+        userEvent.click(screen.getByText("Delete All"))
 
         //dialog header available
-        expect(screen.getByText("Delete All Emails")).toBeEnabled()
+        await waitFor(() => {
+            expect(screen.getByText("Delete All Emails")).toBeEnabled()
+        })
     })
 })

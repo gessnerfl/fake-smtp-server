@@ -1,10 +1,9 @@
-import {render, screen} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import {testEmail1} from "../../setupTests";
 import * as React from "react";
 import '@testing-library/jest-dom'
 import {DeleteEmailDialog} from "./delete-email-dialog";
 import userEvent from "@testing-library/user-event";
-import {act} from "react-dom/test-utils";
 
 describe('DeleteEmailDialog', () => {
     it('keep delete email dialog closed when open is false', () => {
@@ -18,22 +17,26 @@ describe('DeleteEmailDialog', () => {
         expect(screen.getByText("Delete Email 1")).toBeInTheDocument()
         expect(screen.getByText("Do you really want to delete email with id 1?")).toBeInTheDocument()
     })
-    it('should close delete email dialog with true when confirmed', () => {
+    it('should close delete email dialog with true when confirmed', async () => {
         let confirmed = false
         const closeCallback = (c: boolean) => confirmed = c
 
         render(<DeleteEmailDialog email={testEmail1} open={true} onClose={closeCallback}/>);
-        act(() => userEvent.click(screen.getByText("Yes")))
+        userEvent.click(screen.getByText("Yes"))
 
-        expect(confirmed).toBeTruthy()
+        await waitFor(() => {
+            expect(confirmed).toBeTruthy()
+        })
     })
-    it('should close delete email dialog with false when not confirmed', () => {
+    it('should close delete email dialog with false when not confirmed', async () => {
         let confirmed = true
         const closeCallback = (c: boolean) => confirmed = c
 
         render(<DeleteEmailDialog email={testEmail1} open={true} onClose={closeCallback}/>);
-        act(() => userEvent.click(screen.getByText("No")))
+        userEvent.click(screen.getByText("No"))
 
-        expect(confirmed).toBeFalsy()
+        await waitFor(() => {
+            expect(confirmed).toBeFalsy()
+        })
     })
 })

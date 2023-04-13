@@ -17,7 +17,7 @@ function shouldContainPage(data: Email[]) {
 
 describe('EmailListPage', () => {
     it('render first page of email list', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
@@ -25,7 +25,7 @@ describe('EmailListPage', () => {
         })
     })
     it('render second page of email list', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/?page=1"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/?page=1"]}><App/></MemoryRouter>);
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
@@ -33,22 +33,20 @@ describe('EmailListPage', () => {
         })
     })
     it('should render email details on selection', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByTitle("1"))
-        })
+        userEvent.click(screen.getByTitle("1"))
 
         await waitFor(() => {
             expect(screen.getByText("Email 1")).toBeInTheDocument()
         })
     })
     it('should not allow to open delete dialog when no email is selected', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
@@ -57,54 +55,44 @@ describe('EmailListPage', () => {
         expect(screen.getByText("Delete")).toBeDisabled()
     })
     it('should not delete selected email when delete is not confirmed', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByTitle("1"))
-        })
+        userEvent.click(screen.getByTitle("1"))
 
         await waitFor(() => {
             expect(screen.getByText("Delete")).toBeEnabled()
         })
 
-        act(() => {
-            userEvent.click(screen.getByText("Delete"))
-        })
+        userEvent.click(screen.getByText("Delete"))
 
         await waitFor(() => {
             expect(screen.getByText("Delete Email 1")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByText("No"))
-        })
+        userEvent.click(screen.getByText("No"))
 
         await waitFor(() => {
             expect(screen.getByText("Email 1")).toBeInTheDocument()
         })
     })
     it('should delete selected email when delete is confirmed', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByTitle("1"))
-        })
+        userEvent.click(screen.getByTitle("1"))
 
         await waitFor(() => {
             expect(screen.getByText("Delete")).toBeEnabled()
         })
 
-        act(() => {
-            userEvent.click(screen.getByText("Delete"))
-        })
+        userEvent.click(screen.getByText("Delete"))
 
         await waitFor(() => {
             expect(screen.getByText("Delete Email 1")).toBeInTheDocument()
@@ -115,42 +103,36 @@ describe('EmailListPage', () => {
         })
 
         await waitFor(() => {
-            shouldContainPage(originalTestData.splice(1,1).slice(0, 10))
+            shouldContainPage(originalTestData.splice(1, 1).slice(0, 10))
         })
     })
     it('should not delete all emails when delete is not confirmed', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("5")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByText("Delete All"))
-        })
+        userEvent.click(screen.getByText("Delete All"))
 
         await waitFor(() => {
             expect(screen.getByText("Delete All Emails")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByText("No"))
-        })
+        userEvent.click(screen.getByText("No"))
 
         await waitFor(() => {
-            shouldContainPage(originalTestData.splice(1,1).slice(0, 10))
+            shouldContainPage(originalTestData.splice(1, 1).slice(0, 10))
         })
     })
     it('should delete all emails when delete is confirmed', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App /></MemoryRouter>);
+        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("5")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByText("Delete All"))
-        })
+        userEvent.click(screen.getByText("Delete All"))
 
         await waitFor(() => {
             expect(screen.getByText("Delete All Emails")).toBeInTheDocument()
