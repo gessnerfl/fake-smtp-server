@@ -51,6 +51,8 @@ dependencies {
     implementation("org.webjars:material-design-icons:4.0.0")
 
     runtimeOnly("com.h2database:h2:2.1.214")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.ow2.asm:asm:9.4")
     testImplementation("org.apache.commons:commons-lang3:3.12.0")
