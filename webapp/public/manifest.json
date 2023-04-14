@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "FakeSMTP",
+  "name": "Fake SMTP Server",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,14 +8,14 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "logo128.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "128x129"
     },
     {
-      "src": "logo512.png",
+      "src": "logo256.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "256x256"
     }
   ],
   "start_url": ".",
