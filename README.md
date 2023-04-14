@@ -44,7 +44,7 @@ In order to run this application locally from sources, execute:
 
     ./gradlew bootRun
 
-Afterwards, the web interface is be availabe under http://localhost:5080.
+Afterwards, the web interface is be availabe under http://localhost:8080.
 
 # Configuration
 
@@ -62,7 +62,7 @@ The following snippet shows the configuration of a fake smtp server with its def
 ```yaml
 fakesmtp:
   #The SMTP Server Port used by the Fake SMTP Server
-  port: 5025
+  port: 8025
 
   #The binding address of the Fake SMTP Server; Bound to all interfaces by default / no value
   bindAddress: 127.0.0.1
@@ -113,12 +113,12 @@ The following snippet shows the pre-defined web application configuration
 ```yaml
 #Port of the web interface
 server:
-  port: 5080
+  port: 8080
 
 #Port of the http management api
 management:
   server:
-    port: 5081 
+    port: 8081 
 ```
     
 
@@ -126,4 +126,4 @@ management:
 
 Documentation of exposed services is available at:
     
-    localhost:5080/swagger-ui.html
+    localhost:8080/swagger-ui.html
