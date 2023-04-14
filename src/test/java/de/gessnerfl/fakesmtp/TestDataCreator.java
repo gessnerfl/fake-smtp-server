@@ -101,7 +101,7 @@ public class TestDataCreator {
     private static JavaMailSender getEmailSender() {
         var mailSender = new JavaMailSenderImpl();
         mailSender.setHost("localhost");
-        mailSender.setPort(5025);
+        mailSender.setPort(8025);
 
         var props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

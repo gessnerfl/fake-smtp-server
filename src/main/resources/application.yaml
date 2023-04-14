@@ -1,10 +1,10 @@
 server:
-  port: 5080
+  port: 8080
   shutdown: graceful
 
 management:
   server:
-    port: 5081
+    port: 8081
   endpoints:
     web:
       exposure:
@@ -47,5 +47,5 @@ springdoc:
     path: /swagger-ui.html
 
 fakesmtp:
-  port: 5025
+  port: 8025
 

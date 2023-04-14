@@ -120,9 +120,9 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:11.0.17-al2'
+        image = 'amazoncorretto:17.0.6-al2023'
         container {
-            ports = ["5080", "5081", "5025"]
+            ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'
             jvmFlags = ['-Djava.security.egd=file:/dev/./urandom', '-Dfile.encoding=utf-8']
         }
