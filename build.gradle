@@ -126,6 +126,14 @@ jib {
             creationTime = 'USE_CURRENT_TIMESTAMP'
             jvmFlags = ['-Djava.security.egd=file:/dev/./urandom', '-Dfile.encoding=utf-8']
         }
+        extraDirectories {
+            paths {
+                path {
+                    from = 'webapp/build'
+                    into = '/app/resources/static'
+                }
+            }
+        }
         platforms {
             platform {
                 architecture = 'amd64'
