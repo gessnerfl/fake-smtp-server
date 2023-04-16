@@ -69,16 +69,6 @@ jobs:
           asset_name: fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-sources.jar
           asset_content_type: application/java-archive
 
-      - name: Upload javadoc jar
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/libs/fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-javadoc.jar
-          asset_name: fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-javadoc.jar
-          asset_content_type: application/java-archive
-
       - name: Setup Login to DockerHub
         run: |
           sed -i 's/docker_hub_username/${{ secrets.DOCKERHUB_USERNAME }}/' ./gradle.properties
