@@ -3,7 +3,7 @@ plugins {
     id "org.springframework.boot" version "3.0.6"
     id "org.sonarqube" version "4.0.0.2929"
     id 'com.google.cloud.tools.jib' version '3.3.1'
-    id "com.github.node-gradle.node" version "3.5.1"
+    id "com.github.node-gradle.node" version "3.6.0"
 }
 
 apply plugin: "java"
