@@ -12,12 +12,12 @@ public class UiRouteController {
 
     @GetMapping({"/"})
     public String index() {
-        return "index.html";
+        return "index";
     }
 
     @GetMapping("/emails/**")
     public String emails(HttpServletRequest request) {
-        return "/index.html";
+        return "index";
     }
 
 }

@@ -1,6 +1,6 @@
 plugins {
     id "pl.allegro.tech.build.axion-release" version "1.15.0"
-    id "org.springframework.boot" version "3.0.5"
+    id "org.springframework.boot" version "3.0.6"
     id "org.sonarqube" version "4.0.0.2929"
     id 'com.google.cloud.tools.jib' version '3.3.1'
     id "com.github.node-gradle.node" version "3.5.1"
@@ -38,6 +38,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
@@ -84,6 +85,11 @@ bootJar {
     dependsOn(compileJava, webappNpmTest)
     from("webapp/build") {
         into("BOOT-INF/classes/static/")
+        exclude("index.html")
+    }
+    from("webapp/build/index.html") {
+        into("BOOT-INF/classes/templates/")
+        filter { line -> line.replaceAll(/(href|src)(=\")([^\"]+)(\")/, 'th:$1$2@{$3}$4').replaceAll(/(name="base-path"\s+)(content=")([^"]+)(")/, '$1th:$2@{$3}$4') }
     }
 }
 

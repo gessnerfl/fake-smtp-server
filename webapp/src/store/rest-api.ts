@@ -2,10 +2,16 @@ import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {Email, EmailPage} from "../models/email";
 import {Pageable} from "../models/pageable";
 import {MetaData} from "../models/meta-data";
+import {getBasePath} from "../utils";
+
+function getBasePathString() {
+    const path = getBasePath();
+    return path ? path : ""
+}
 
 export const restApi = createApi({
     reducerPath: 'restApi',
-    baseQuery: fetchBaseQuery({baseUrl: '/api'}),
+    baseQuery: fetchBaseQuery({baseUrl: `${(getBasePathString())}/api`}),
     tagTypes: ['Emails'],
     endpoints: (builder) => ({
         getEmails: builder.query<EmailPage, Pageable>({
@@ -39,7 +45,7 @@ export const restApi = createApi({
             invalidatesTags: (result, error, id) => [{ type: 'Emails', id }],
         }),
         getMetaData: builder.query<MetaData, void>({
-            query: (p) => "/meta-data",
+            query: (p) => `/meta-data`,
         }),
     }),
 })
