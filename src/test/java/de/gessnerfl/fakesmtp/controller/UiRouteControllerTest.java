@@ -18,12 +18,12 @@ class UiRouteControllerTest {
 
     @Test
     void shouldReturnIndexForBasePath(){
-        assertEquals("index.html", sut.index());
+        assertEquals("index", sut.index());
     }
 
     @Test
     void shouldReturnIndexPageForEmailsRoutes(){
-        assertEquals("/index.html", sut.emails(mock(HttpServletRequest.class)));
+        assertEquals("index", sut.emails(mock(HttpServletRequest.class)));
     }
 
 }
