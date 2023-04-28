@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -62,7 +63,7 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldReturnFirstPageOfEmails() throws Exception {
-        var email1 = createRandomEmail(5);
+        createRandomEmail(5);
         var email2 = createRandomEmail(2);
         var email3 = createRandomEmail(1);
 
@@ -81,8 +82,8 @@ class EmailRestControllerMVCIntegrationTest {
     @Test
     void shouldReturnSecondPageOfEmails() throws Exception {
         var email1 = createRandomEmail(5);
-        var email2 = createRandomEmail(2);
-        var email3 = createRandomEmail(1);
+        createRandomEmail(2);
+        createRandomEmail(1);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/emails?page=1&size=2")).andReturn();
 
@@ -98,7 +99,7 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldReturnNoEmailsWhenGivenPageIsOutOfRange() throws Exception {
-        var email1 = createRandomEmail(5);
+        createRandomEmail(5);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/api/emails?page=2&size=1")).andReturn();
 
@@ -169,7 +170,7 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldDeleteAllEmails() throws Exception {
-        var email = createRandomEmails(5, 1);
+        createRandomEmails(5, 1);
 
         assertThat(emailRepository.findAll(), hasSize(5));
 
@@ -177,6 +178,43 @@ class EmailRestControllerMVCIntegrationTest {
                 .andExpect(status().is2xxSuccessful());
 
         assertThat(emailRepository.findAll(), empty());
+    }
+
+    @Test
+    void shouldSearchEmailsByToAddress() throws Exception {
+        createRandomEmails(5, 1);
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?search=toAddress:receiver@example.com"))
+                .andReturn();
+
+        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(), ArrayList.class);
+
+        assertEquals(emailSearch.size(), 5);
+    }
+
+    @Test
+    void shouldSearchEmailsById() throws Exception {
+        createRandomEmails(5, 1);
+        var email = createRandomEmail(5);
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?search=id:" + email.getId()))
+                .andReturn();
+
+        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(), ArrayList.class);
+
+        assertEquals(emailSearch.size(), 1);
+    }
+
+    @Test
+    void shouldSearchEmailsByToAddressRegex() throws Exception {
+        createRandomEmails(5, 1);
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?search=toAddress:*receiver*"))
+                .andReturn();
+
+        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(), ArrayList.class);
+
+        assertEquals(emailSearch.size(), 5);
     }
 
     private static <T> T mapFromJson(String json, Class<T> clazz) throws IOException {
