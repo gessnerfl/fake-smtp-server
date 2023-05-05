@@ -159,3 +159,10 @@ Run app
 ```bash
 sh/run
 ```
+
+### Build & Push a new development docker image
+
+To update/change the development image, update the `dev.Dockerfile`, dont forget to change the version in the `dev-image-tag` file and edit the registery if needed.
+```bash
+sh/push-dev-image
+```
