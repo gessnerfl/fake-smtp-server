@@ -6,7 +6,6 @@ import de.gessnerfl.fakesmtp.model.SearchOperation;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
-
 import jakarta.servlet.ServletContext;
 
 import java.util.List;
@@ -90,11 +89,11 @@ public class EmailRestController {
     }
 
     @GetMapping("/search")
-    public List<Email> search(@RequestParam(value = "search") String search) {
+    public List<Email> search(@RequestParam(value = "query") String query) {
         EmailSpecificationsBuilder builder = new EmailSpecificationsBuilder();
         String operationSetExper = String.join("|", SearchOperation.SIMPLE_OPERATION_SET);
         Pattern pattern = Pattern.compile("(\\w+?)(" + operationSetExper + ")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),");
-        Matcher matcher = pattern.matcher(search + ",");
+        Matcher matcher = pattern.matcher(query + ",");
         while (matcher.find()) {
             builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
         }

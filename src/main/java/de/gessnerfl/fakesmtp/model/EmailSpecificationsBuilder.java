@@ -20,23 +20,23 @@ public class EmailSpecificationsBuilder {
 
     public final EmailSpecificationsBuilder with(String orPredicate, String key, String operation, 
       Object value, String prefix, String suffix) {
-        SearchOperation op = SearchOperation.getSimpleOperation(operation.charAt(0));
-        if (op != null) {
-            if (op == SearchOperation.EQUALITY) { // the operation may be complex operation
+        SearchOperation searchOperation = SearchOperation.getSimpleOperation(operation.charAt(0));
+        if (searchOperation != null) {
+            if (searchOperation == SearchOperation.EQUALITY) {
                 boolean startWithAsterisk = prefix != null && 
                   prefix.contains(SearchOperation.ZERO_OR_MORE_REGEX);
                 boolean endWithAsterisk = suffix != null && 
                   suffix.contains(SearchOperation.ZERO_OR_MORE_REGEX);
 
                 if (startWithAsterisk && endWithAsterisk) {
-                    op = SearchOperation.CONTAINS;
+                    searchOperation = SearchOperation.CONTAINS;
                 } else if (startWithAsterisk) {
-                    op = SearchOperation.ENDS_WITH;
+                    searchOperation = SearchOperation.ENDS_WITH;
                 } else if (endWithAsterisk) {
-                    op = SearchOperation.STARTS_WITH;
+                    searchOperation = SearchOperation.STARTS_WITH;
                 }
             }
-            params.add(new SpecSearchCriteria(orPredicate, key, op, value));
+            params.add(new SpecSearchCriteria(orPredicate, key, searchOperation, value));
         }
         return this;
     }

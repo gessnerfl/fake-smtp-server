@@ -98,7 +98,7 @@ Optionally authentication can be turned on. Configuring authentication does not 
 just allows you to test PLAIN and LOGIN SMTP Authentication against the server instance.
 
 ```yaml
-fakesmpt:
+fakesmtp:
   authentication:
     #Username of the client to be authenticated
     username: myuser
@@ -130,7 +130,8 @@ Documentation of exposed services is available at:
 
 ## Developpment Environment
 
-If you need to implement a new feature, you will probably need an correct JDK version setup in an environement
+This requires to have docker installed.
+If you need to implement a new feature, you will probably need an correct JDK version setup in an environement.
 
 ```sh
 sh/dev

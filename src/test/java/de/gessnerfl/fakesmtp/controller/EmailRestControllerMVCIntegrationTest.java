@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.model.RestResponsePage;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -184,9 +185,10 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldSearchEmailsByToAddress() throws Exception {
         createRandomEmails(5, 1);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?search=toAddress:receiver@example.com"))
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?query=toAddress:receiver@example.com"))
                 .andReturn();
 
+        @SuppressWarnings("unchecked")
         ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(), ArrayList.class);
 
         assertEquals(emailSearch.size(), 5);
@@ -197,23 +199,79 @@ class EmailRestControllerMVCIntegrationTest {
         createRandomEmails(5, 1);
         var email = createRandomEmail(5);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?search=id:" + email.getId()))
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?query=id:" + email.getId()))
                 .andReturn();
 
-        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(), ArrayList.class);
+        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<ArrayList<Email>>() {});
 
         assertEquals(emailSearch.size(), 1);
+        assertEquals(email.getId(), emailSearch.get(0).getId());
+        assertEquals(email.getFromAddress(), emailSearch.get(0).getFromAddress());
+        assertEquals(email.getMessageId(), emailSearch.get(0).getMessageId());
+        assertEquals(email.getSubject(), emailSearch.get(0).getSubject());
+        assertEquals(email.getToAddress(), emailSearch.get(0).getToAddress());
     }
 
     @Test
     void shouldSearchEmailsByToAddressRegex() throws Exception {
         createRandomEmails(5, 1);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?search=toAddress:*receiver*"))
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?query=toAddress:*receiver*"))
                 .andReturn();
 
-        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(), ArrayList.class);
+        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<ArrayList<Email>>() {});
 
+        assertEquals(emailSearch.size(), 5);
+    }
+
+    @Test
+    void shouldSearchEmailsBySubjectRegexAndToAddress() throws Exception {
+        createRandomEmails(5, 1);
+        var email1 = save(EmailControllerUtil.prepareEmail("subject", "friend@address.domain", 1));
+        var email2 = save(EmailControllerUtil.prepareEmail("an another subject", "friend@address.domain", 15));
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?query=subject:*subject*,AND,toAddress:friend@address.domain"))
+                .andReturn();
+
+        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(),new TypeReference<ArrayList<Email>>() {});
+        
+        assertEquals(emailSearch.size(), 2);
+        assertEquals(email1.getId(), emailSearch.get(0).getId());
+        assertEquals(email1.getFromAddress(), emailSearch.get(0).getFromAddress());
+        assertEquals(email1.getMessageId(), emailSearch.get(0).getMessageId());
+        assertEquals(email1.getSubject(), emailSearch.get(0).getSubject());
+        assertEquals(email1.getToAddress(), emailSearch.get(0).getToAddress());
+
+        assertEquals(email2.getId(), emailSearch.get(1).getId());
+        assertEquals(email2.getFromAddress(), emailSearch.get(1).getFromAddress());
+        assertEquals(email2.getMessageId(), emailSearch.get(1).getMessageId());
+        assertEquals(email2.getSubject(), emailSearch.get(1).getSubject());
+        assertEquals(email2.getToAddress(), emailSearch.get(1).getToAddress());
+    }
+
+    @Test
+    void shouldSearchEmailsByToSubjectRegexOrToAddress() throws Exception {
+        createRandomEmails(5, 1);
+        save(EmailControllerUtil.prepareEmail("Subject", "friend@address.domain", 1));
+        save(EmailControllerUtil.prepareEmail("an another Subject", "friend@address.domain", 15));
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?query=subject:*Subject* OR toAddress:friend@address.domain"))
+                .andReturn();
+
+        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(),new TypeReference<ArrayList<Email>>() {});
+        
+        assertEquals(emailSearch.size(), 7);
+    }
+
+    @Test
+    void shouldSearchEmailsByReceiveOn() throws Exception {
+        createRandomEmails(5, 1);
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/search?query=receivedOn:*02/05/2023*"))
+                .andReturn();
+
+        ArrayList<Email> emailSearch = mapFromJson(mvcResult.getResponse().getContentAsString(),new TypeReference<ArrayList<Email>>() {});
+        
         assertEquals(emailSearch.size(), 5);
     }
 
@@ -234,7 +292,11 @@ class EmailRestControllerMVCIntegrationTest {
     }
 
     private Email createRandomEmail(int minusMinutes) {
-        return emailRepository.save(EmailControllerUtil.prepareRandomEmail(minusMinutes));
+        return save(EmailControllerUtil.prepareRandomEmail(minusMinutes));
+    }
+
+    private Email save(Email email) {
+        return emailRepository.save(email);
     }
 
 }

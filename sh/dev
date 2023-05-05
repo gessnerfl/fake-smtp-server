@@ -1,5 +1,6 @@
 #!/bin/bash
 
+SH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 WORKDING_DIR="$(pwd)"
 CURRENT_DIR=$(basename $(pwd))
 
@@ -12,5 +13,5 @@ docker run -it --rm \
     -v "$WORKDING_DIR"/gradle:/root/.gradle/. \
     --name $CONTAINER_RUNTIME_NAME \
     -w /opt/"$CURRENT_DIR" \
-    amazoncorretto:17.0.6-al2023 \
+    "$( "$SH_DIR/dev-image-tag" )" \
     /bin/bash -c "$DEV_COMMAND"
