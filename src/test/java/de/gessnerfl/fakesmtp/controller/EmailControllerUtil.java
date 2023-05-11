@@ -49,6 +49,23 @@ class EmailControllerUtil {
             receivedOn, "sender@example.com", toAdress, "<message-id>", minusMinutes);
     }
 
+    public static Email prepareEmail(String subject, String toAdress, int minusMinutes, String messageId) {
+        var randomToken = RandomStringUtils.randomAlphanumeric(6);
+        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
+        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+
+        var content = new EmailContent();
+        content.setContentType(ContentType.PLAIN);
+        content.setData("Test Content " + randomToken);
+
+        var attachment = new EmailAttachment();
+        attachment.setFilename("test.txt");
+        attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
+
+        return prepareEmail(attachment, content, subject, "Test Content " + randomToken, 
+            receivedOn, "sender@example.com", toAdress, messageId, minusMinutes);
+    }
+
     public static Email prepareEmail(
         EmailAttachment emailAttachment,
         EmailContent emailContent, 

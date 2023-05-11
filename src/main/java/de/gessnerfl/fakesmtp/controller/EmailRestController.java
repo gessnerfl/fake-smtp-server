@@ -1,23 +1,18 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.Email;
-import de.gessnerfl.fakesmtp.model.EmailSpecificationsBuilder;
-import de.gessnerfl.fakesmtp.model.SearchOperation;
+import de.gessnerfl.fakesmtp.model.query.SearchRequest;
+import de.gessnerfl.fakesmtp.model.query.SearchSpecification;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import jakarta.servlet.ServletContext;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -88,18 +83,11 @@ public class EmailRestController {
         emailRepository.flush();
     }
 
-    @GetMapping("/search")
-    public List<Email> search(@RequestParam(value = "query") String query) {
-        EmailSpecificationsBuilder builder = new EmailSpecificationsBuilder();
-        String operationSetExper = String.join("|", SearchOperation.SIMPLE_OPERATION_SET);
-        Pattern pattern = Pattern.compile("(\\w+?)(" + operationSetExper + ")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),");
-        Matcher matcher = pattern.matcher(query + ",");
-        while (matcher.find()) {
-            builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
-        }
-
-        Specification<Email> spec = builder.build();
-        return emailRepository.findAll(spec);
+    @PostMapping(value = "/search")
+    public Page<Email> search(@RequestBody SearchRequest request) {
+        SearchSpecification<Email> specification = new SearchSpecification<>(request);
+        Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
+        return emailRepository.findAll(specification, pageable);
     }
 
 }
