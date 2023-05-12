@@ -145,17 +145,17 @@ sh gradlew test --tests '*EmailRepositoryIntegration*' --info
 sh gradlew build
 ```
 
-Run tests
+Run UI & Backend tests
 ```bash
 sh/test
 ```
 
-Run build
+Build UI & Backend
 ```bash
 sh/build
 ```
 
-Run app
+Run app (UI & Backend)
 ```bash
 sh/run
 ```
