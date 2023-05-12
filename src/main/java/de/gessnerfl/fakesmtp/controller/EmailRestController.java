@@ -6,6 +6,10 @@ import de.gessnerfl.fakesmtp.model.query.SearchSpecification;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.servlet.ServletContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +48,16 @@ public class EmailRestController {
     }
 
     @GetMapping()
-    public Page<Email> all(@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC) Pageable pageable)
+    @Parameters({
+        @Parameter(name = "page", description = "Page number", example = "0"),
+        @Parameter(name = "size", description = "Page size", example = "1"),
+        @Parameter(name = "sort", description = "Sort criteria", example = DEFAULT_SORT_PROPERTY)
+    })
+    public Page<Email> all(
+        @SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC)
+        @Parameter(hidden = true)
+        Pageable pageable    
+    )
     {
         return emailRepository.findAll(pageable);
     }
@@ -84,7 +97,31 @@ public class EmailRestController {
     }
 
     @PostMapping(value = "/search")
-    public Page<Email> search(@RequestBody SearchRequest request) {
+    public Page<Email> search(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Search request",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\n" +
+                                    "  \"filters\": [\n" +
+                                    "    {\n" +
+                                    "      \"key\": \"toAddress\",\n" +
+                                    "      \"fieldType\": \"STRING\",\n" +
+                                    "      \"operator\": \"EQUAL\",\n" +
+                                    "      \"value\": \"address@em.ail\"\n" +
+                                    "    }\n" +
+                                    "  ],\n" +
+                                    "  \"sorts\": [\n" +
+                                    "    {\n" +
+                                    "      \"key\": \"receivedOn\",\n" +
+                                    "      \"direction\": \"DESC\"\n" +
+                                    "    }\n" +
+                                    "  ],\n" +
+                                    "  \"page\": 0,\n" +
+                                    "  \"size\": 10,\n" +
+                                    "  \"logicalOperator\": \"AND\"\n" +
+                                    "}")))
+        @RequestBody
+        SearchRequest request
+    ) {
         SearchSpecification<Email> specification = new SearchSpecification<>(request);
         Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
         return emailRepository.findAll(specification, pageable);

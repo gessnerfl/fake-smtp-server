@@ -4,7 +4,7 @@ SH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 WORKDING_DIR="$(pwd)"
 CURRENT_DIR=$(basename $(pwd))
 
-CONTAINER_RUNTIME_NAME="$CURRENT_DIR-test"
+CONTAINER_RUNTIME_NAME="$CURRENT_DIR-run"
 
 docker run -it --rm \
     -v "$WORKDING_DIR":/opt/"$CURRENT_DIR" \
@@ -15,4 +15,4 @@ docker run -it --rm \
     -p 3000:3000 \
     -w /opt/"$CURRENT_DIR" \
     "$( "$SH_DIR/dev-image-tag" )" \
-    sh gradlew bootRun & yarn --cwd webapp/ run start & wait
+    sh -c "sh gradlew bootRun > combined.log 2>&1 & yarn --cwd webapp/ run start >> combined.log 2>&1 & tail -f combined.log"

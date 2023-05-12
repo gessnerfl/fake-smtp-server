@@ -12,4 +12,4 @@ docker run -it --rm \
     --name $CONTAINER_RUNTIME_NAME \
     -w /opt/"$CURRENT_DIR" \
     "$( "$SH_DIR/dev-image-tag" )" \
-    yarn --cwd webapp/ run build && sh gradlew build
+    sh gradlew build
