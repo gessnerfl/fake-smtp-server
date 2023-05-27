@@ -81,16 +81,22 @@ tasks.register('webappNpmTest', NpmTask) {
     args = ["run", "test", "--", "--coverage", "--watchAll=false"]
 }
 
-bootJar {
+tasks.register('copyStaticAssets', Copy) {
     dependsOn(compileJava, webappNpmTest)
-    from("webapp/build") {
-        into("BOOT-INF/classes/static/")
-        exclude("index.html")
-    }
-    from("webapp/build/index.html") {
-        into("BOOT-INF/classes/templates/")
-        filter { line -> line.replaceAll(/(href|src)(=\")([^\"]+)(\")/, 'th:$1$2@{$3}$4').replaceAll(/(name="base-path"\s+)(content=")([^"]+)(")/, '$1th:$2@{$3}$4') }
-    }
+    from(file('webapp/build'))
+    into(file('build/resources/main/static/'))
+    exclude("index.html")
+}
+
+tasks.register('copyTemplateAssets', Copy) {
+    dependsOn(compileJava, webappNpmTest)
+    from(file('webapp/build/index.html'))
+    into(file('build/resources/main/templates/'))
+    filter { line -> line.replaceAll(/(href|src)(=\")([^\"]+)(\")/, 'th:$1$2@{$3}$4').replaceAll(/(name="base-path"\s+)(content=")([^"]+)(")/, '$1th:$2@{$3}$4') }
+}
+
+bootJar {
+    dependsOn(copyStaticAssets, copyTemplateAssets)
 }
 
 springBoot {
@@ -126,7 +132,7 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:17.0.6-al2023'
+        image = 'amazoncorretto:17.0.7-al2023-headless'
         container {
             ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'
@@ -145,10 +151,10 @@ jib {
                 architecture = 'amd64'
                 os = 'linux'
             }
-            platform {
-                architecture = 'arm64'
-                os = 'linux'
-            }
+//            platform {
+//                architecture = 'arm64'
+//                os = 'linux'
+//            }
         }
     }
     to {

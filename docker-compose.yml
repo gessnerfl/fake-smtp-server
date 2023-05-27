@@ -1,11 +1,11 @@
-version: '2.2'
+version: '3'
 
 services:
-  fakesmtp:
-    image: gessnerfl/fake-smtp-server:1.10.4
-    container_name: fakesmtp
-    hostname: fakesmtp
+  fake-smtp-server:
+    image: gessnerfl/fake-smtp-server:2.0.3-SNAPSHOT
+    hostname: "fake-smtp-server"
+    restart: always
     ports:
-      - "8080:8080"
-      - "8081:8081"
-      - "8025:8025"
+      - 8025:8025      #expose smtp port
+      - 8080:8080      #expose web ui
+      - 8081:8081      #expose management api
