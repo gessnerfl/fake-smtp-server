@@ -129,7 +129,7 @@ function EmailListPage() {
     }
 
     function getSelectedEmail(): Email | undefined {
-        return data && data.content.find(e => e.id === selectedRow);
+        return data?.content.find(e => e.id === selectedRow);
     }
 
     function renderEmail() {

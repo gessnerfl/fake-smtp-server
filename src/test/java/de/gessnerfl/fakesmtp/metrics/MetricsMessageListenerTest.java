@@ -33,7 +33,7 @@ class MetricsMessageListenerTest {
 		assertThat(registry.counter(MetricsMessageListener.MESSAGES_BLOCKED,
 				"from", "foo", "recipient", recipient)
 				.count())
-				.isEqualTo(0);
+				.isZero();
 		assertFalse(sut.accept("foo", recipient));
 		verify(blockedRecipientAddresses).isBlocked(recipient);
 		assertThat(registry.counter(MetricsMessageListener.MESSAGES_BLOCKED,
@@ -49,7 +49,7 @@ class MetricsMessageListenerTest {
 		assertThat(registry.counter(MetricsMessageListener.MESSAGES_DELIVERED,
 				"from", "foo", "recipient", recipient)
 				.count())
-				.isEqualTo(0);
+				.isZero();
 		sut.deliver("foo", recipient, null);
 		assertThat(registry.counter(MetricsMessageListener.MESSAGES_DELIVERED,
 				"from", "foo", "recipient", recipient)

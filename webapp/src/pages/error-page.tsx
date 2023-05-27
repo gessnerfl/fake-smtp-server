@@ -5,7 +5,10 @@ function ErrorPage() {
     console.error(error);
 
     const getErrorMessage = function(error: any) {
-        return error.statusText ? error.statusText : (error.message ? error.message :  "")
+        if(error.statusText) {
+            return error.statusText
+        }
+        return error.message ? error.message :  ""
     }
 
     return (
