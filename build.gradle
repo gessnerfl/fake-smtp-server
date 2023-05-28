@@ -118,7 +118,7 @@ sonar {
         property "sonar.sources", "src/main,webapp/src"
         property "sonar.test.inclusions", "src/test/**/*.*, webapp/src/**/*.spec.ts, webapp/src/**/*.spec.tsx"
         property "sonar.javascript.lcov.reportPaths", "./webapp/coverage/lcov.info"
-        property "sonar.coverage.exclusions", "webapp/src/setupTests.ts"
+        property "sonar.coverage.exclusions", "webapp/src/setupTests.ts, webapp/src/setupProxy.js"
     }
 }
 
