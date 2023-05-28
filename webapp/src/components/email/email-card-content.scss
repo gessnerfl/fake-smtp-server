@@ -1,3 +1,13 @@
-.email-card > .email-content {
-  margin-top: 10px;
+.email-card {
+  .email-content {
+    margin-top: 10px;
+  }
+  .attachments {
+    margin-top: 0.67em;
+
+    h5 {
+      margin-block-start: 0.67em;
+      margin-block-end: 0.67em;
+    }
+  }
 }

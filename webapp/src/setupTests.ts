@@ -16,6 +16,18 @@ export const testEmail1: Email = {
     attachments: []
 }
 
+export const testEmailWithAttachment: Email = {
+    id: 1,
+    fromAddress: "sender2@example.com",
+    toAddress: "receiver2@example.com",
+    subject: "subject2",
+    receivedOn: formatRFC3339(new Date(2023, 3, 5, 21, 5, 10, 20), {fractionDigits: 3}),
+    rawData: "test raw content\non multiple lines 2",
+    contents: [],
+    inlineImages: [],
+    attachments: [{ id: 1234, filename: "test1.png" }, { id: 2345, filename: "test2.png" }]
+}
+
 const generateTestData = () : Email[] => Array.from(Array(15).keys()).map(i => {
     return {
         id: i,
