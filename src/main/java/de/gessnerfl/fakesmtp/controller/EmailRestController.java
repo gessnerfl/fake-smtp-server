@@ -52,7 +52,7 @@ public class EmailRestController {
         return emailRepository.findById(id).orElseThrow(() -> new EmailNotFoundException("Could not find email " + id));
     }
 
-    @GetMapping("/{mailId}/attachment/{attachmentId}")
+    @GetMapping("/{mailId}/attachments/{attachmentId}")
     @ResponseBody
     public ResponseEntity<ByteArrayResource> getEmailAttachmentById(@PathVariable Long mailId, @PathVariable Long attachmentId) {
         var attachment = emailAttachmentRepository.findById(attachmentId)

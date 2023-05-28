@@ -133,7 +133,7 @@ class EmailRestControllerMVCIntegrationTest {
         var email = createRandomEmail(1);
         var attachment = email.getAttachments().get(0);
 
-        this.mockMvc.perform(get("/api/emails/"+email.getId()+"/attachment/" + attachment.getId()))
+        this.mockMvc.perform(get("/api/emails/"+email.getId()+"/attachments/" + attachment.getId()))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename=" + attachment.getFilename()))
                 .andExpect(header().string(HttpHeaders.CONTENT_LENGTH,"" + attachment.getData().length))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE))
@@ -145,7 +145,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(get("/api/emails/"+email.getId()+"/attachment/123"))
+        this.mockMvc.perform(get("/api/emails/"+email.getId()+"/attachments/123"))
                 .andExpect(status().isNotFound());
     }
 
@@ -153,7 +153,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(get("/api/emails/123/attachment/"+email.getAttachments().get(0).getId()))
+        this.mockMvc.perform(get("/api/emails/123/attachments/"+email.getAttachments().get(0).getId()))
                 .andExpect(status().isNotFound());
     }
 

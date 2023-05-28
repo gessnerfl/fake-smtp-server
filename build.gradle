@@ -82,17 +82,21 @@ tasks.register('webappNpmTest', NpmTask) {
 }
 
 tasks.register('copyStaticAssets', Copy) {
-    dependsOn(compileJava, webappNpmTest)
+    dependsOn(compileJava, compileTestJava, webappNpmTest, resolveMainClassName)
     from(file('webapp/build'))
     into(file('build/resources/main/static/'))
     exclude("index.html")
 }
 
 tasks.register('copyTemplateAssets', Copy) {
-    dependsOn(compileJava, webappNpmTest)
+    dependsOn(compileJava, compileTestJava, webappNpmTest, resolveMainClassName)
     from(file('webapp/build/index.html'))
     into(file('build/resources/main/templates/'))
     filter { line -> line.replaceAll(/(href|src)(=\")([^\"]+)(\")/, 'th:$1$2@{$3}$4').replaceAll(/(name="base-path"\s+)(content=")([^"]+)(")/, '$1th:$2@{$3}$4') }
+}
+
+jar {
+    dependsOn(copyStaticAssets, copyTemplateAssets)
 }
 
 bootJar {
@@ -114,11 +118,12 @@ sonar {
         property "sonar.sources", "src/main,webapp/src"
         property "sonar.test.inclusions", "src/test/**/*.*, webapp/src/**/*.spec.ts, webapp/src/**/*.spec.tsx"
         property "sonar.javascript.lcov.reportPaths", "./webapp/coverage/lcov.info"
-        property "sonar.coverage.exclusions", "webapp/src/setupTests.ts"
+        property "sonar.coverage.exclusions", "webapp/src/setupTests.ts, webapp/src/setupProxy.js"
     }
 }
 
 test {
+    dependsOn(copyStaticAssets, copyTemplateAssets)
     useJUnitPlatform()
     finalizedBy jacocoTestReport
 }

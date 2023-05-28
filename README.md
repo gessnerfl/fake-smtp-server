@@ -68,7 +68,7 @@ fakesmtp:
   bindAddress: 127.0.0.1
 
   persistence:
-    #The maximum number of emails which should be stored in the database; Defualts to 100
+    #The maximum number of emails which should be stored in the database; Defaults to 100
     maxNumberEmails: 100
 
   #List of recipient addresses which should be blocked/rejected
