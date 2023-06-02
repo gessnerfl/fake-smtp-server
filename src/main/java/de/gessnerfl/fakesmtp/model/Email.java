@@ -39,6 +39,10 @@ public class Email {
     @Basic(optional = false)
     private String rawData;
 
+    @Column(name = "message_id", nullable = false)
+    @Basic(optional = false)
+    private String messageId;
+
     @OneToMany(mappedBy = "email", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EmailContent> contents = new ArrayList<>();
 
@@ -141,6 +145,14 @@ public class Email {
 
     public List<InlineImage> getInlineImages() {
         return inlineImages;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     @Override

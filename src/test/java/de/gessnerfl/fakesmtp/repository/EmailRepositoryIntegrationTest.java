@@ -92,6 +92,7 @@ class EmailRepositoryIntegrationTest {
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
         mail.addContent(content);
+        mail.setMessageId(randomToken);
         return sut.save(mail);
     }
 

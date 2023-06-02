@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+SH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+ROOT_DIR="$(dirname "$SH_DIR")"
+
+DEV_IMAGE_REGISTRY=etidahouse
+DEV_IMAGE_NAME=fake-smtp-server-dev
+DEV_IMAGE_VERSION=1.0.0
+
+echo "$DEV_IMAGE_REGISTRY/$DEV_IMAGE_NAME:$DEV_IMAGE_VERSION"

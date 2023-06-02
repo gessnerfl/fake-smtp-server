@@ -5,6 +5,7 @@ CREATE TABLE email (
     subject CLOB NOT NULL,
     received_on TIMESTAMP NOT NULL,
     raw_data CLOB NOT NULL,
+    message_id VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
 

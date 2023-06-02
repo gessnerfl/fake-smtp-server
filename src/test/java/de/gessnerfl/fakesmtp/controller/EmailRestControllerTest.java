@@ -141,4 +141,5 @@ class EmailRestControllerTest {
         verify(emailRepository).flush();
         verifyNoMoreInteractions(emailRepository);
     }
+
 }

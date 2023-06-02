@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+SH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+ROOT_DIR="$(dirname "$SH_DIR")"
+
+docker buildx build --push --tag="$( "$SH_DIR/dev-image-tag" )" \
+    --platform linux/amd64,linux/arm64 \
+    -f "$ROOT_DIR/dev.Dockerfile" "$ROOT_DIR"

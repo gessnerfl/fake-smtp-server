@@ -98,7 +98,7 @@ Optionally authentication can be turned on. Configuring authentication does not 
 just allows you to test PLAIN and LOGIN SMTP Authentication against the server instance.
 
 ```yaml
-fakesmpt:
+fakesmtp:
   authentication:
     #Username of the client to be authenticated
     username: myuser
@@ -127,3 +127,42 @@ management:
 Documentation of exposed services is available at:
     
     localhost:8080/swagger-ui.html
+
+## Developpment Environment
+
+This requires to have docker installed.
+If you need to implement a new feature, you will probably need an correct JDK version setup in an environement.
+
+```sh
+sh/dev
+```
+
+Then, in the dev container started by the command above, you can use various commands. 
+The following commands should be the most common ones:
+```bash
+sh gradlew test
+sh gradlew test --tests '*EmailRepositoryIntegration*' --info
+sh gradlew build
+```
+
+Run UI & Backend tests
+```bash
+sh/test
+```
+
+Build UI & Backend
+```bash
+sh/build
+```
+
+Run app (UI & Backend)
+```bash
+sh/run
+```
+
+### Build & Push a new development docker image
+
+To update/change the development image, update the `dev.Dockerfile`, dont forget to change the version in the `dev-image-tag` file and edit the registery if needed.
+```bash
+sh/push-dev-image
+```
