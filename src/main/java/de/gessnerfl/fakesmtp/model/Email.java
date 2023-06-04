@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
@@ -32,7 +33,7 @@ public class Email {
     @Column(name = "received_on", nullable = false)
     @Basic(optional = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date receivedOn;
+    private LocalDateTime receivedOn;
 
     @Lob
     @Column(name = "raw_data", nullable = false)
@@ -84,11 +85,11 @@ public class Email {
         this.subject = subject;
     }
 
-    public Date getReceivedOn() {
+    public LocalDateTime getReceivedOn() {
         return receivedOn;
     }
 
-    public void setReceivedOn(Date receivedOn) {
+    public void setReceivedOn(LocalDateTime receivedOn) {
         this.receivedOn = receivedOn;
     }
 

@@ -5,13 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.model.RestResponsePage;
-import de.gessnerfl.fakesmtp.model.query.FieldType;
-import de.gessnerfl.fakesmtp.model.query.FilterRequest;
-import de.gessnerfl.fakesmtp.model.query.LogicalOperator;
-import de.gessnerfl.fakesmtp.model.query.Operator;
-import de.gessnerfl.fakesmtp.model.query.SearchRequest;
-import de.gessnerfl.fakesmtp.model.query.SortDirection;
-import de.gessnerfl.fakesmtp.model.query.SortRequest;
+import de.gessnerfl.fakesmtp.model.query.*;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -51,12 +45,14 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Autowired
     private EmailRepository emailRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc;
 
     @BeforeEach
-    void init(){
+    void init() {
         emailRepository.deleteAll();
     }
 
@@ -65,7 +61,8 @@ class EmailRestControllerMVCIntegrationTest {
         MvcResult mvcResult = mockMvc.perform(get("/api/emails")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
-        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
         assertEquals(0, emailPage.getNumber());
         assertEquals(0, emailPage.getNumberOfElements());
         assertEquals(0, emailPage.getTotalElements());
@@ -81,7 +78,8 @@ class EmailRestControllerMVCIntegrationTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/emails?page=0&size=2")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
-        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
         assertEquals(0, emailPage.getNumber());
         assertEquals(2, emailPage.getSize());
         assertEquals(2, emailPage.getTotalPages());
@@ -99,7 +97,8 @@ class EmailRestControllerMVCIntegrationTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/emails?page=1&size=2")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
-        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
         assertEquals(1, emailPage.getNumber());
         assertEquals(2, emailPage.getSize());
         assertEquals(2, emailPage.getTotalPages());
@@ -115,7 +114,8 @@ class EmailRestControllerMVCIntegrationTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/api/emails?page=2&size=1")).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
-        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailPage = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
         assertEquals(2, emailPage.getNumber());
         assertEquals(1, emailPage.getSize());
         assertEquals(1, emailPage.getTotalPages());
@@ -127,7 +127,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnMailById() throws Exception {
         var email = createRandomEmail(1);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/"+email.getId())).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/emails/" + email.getId())).andReturn();
 
         assertEquals(200, mvcResult.getResponse().getStatus());
         Email actualEmail = mapFromJson(mvcResult.getResponse().getContentAsString(), Email.class);
@@ -145,9 +145,9 @@ class EmailRestControllerMVCIntegrationTest {
         var email = createRandomEmail(1);
         var attachment = email.getAttachments().get(0);
 
-        this.mockMvc.perform(get("/api/emails/"+email.getId()+"/attachments/" + attachment.getId()))
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename=" + attachment.getFilename()))
-                .andExpect(header().string(HttpHeaders.CONTENT_LENGTH,"" + attachment.getData().length))
+        this.mockMvc.perform(get("/api/emails/" + email.getId() + "/attachments/" + attachment.getId()))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + attachment.getFilename()))
+                .andExpect(header().string(HttpHeaders.CONTENT_LENGTH, String.valueOf(attachment.getData().length)))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE))
                 .andExpect(content().bytes(attachment.getData()))
                 .andExpect(status().isOk());
@@ -157,7 +157,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(get("/api/emails/"+email.getId()+"/attachments/123"))
+        this.mockMvc.perform(get("/api/emails/" + email.getId() + "/attachments/123"))
                 .andExpect(status().isNotFound());
     }
 
@@ -165,7 +165,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(get("/api/emails/123/attachments/"+email.getAttachments().get(0).getId()))
+        this.mockMvc.perform(get("/api/emails/123/attachments/" + email.getAttachments().get(0).getId()))
                 .andExpect(status().isNotFound());
     }
 
@@ -173,7 +173,7 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldDeleteEmail() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(delete("/api/emails/"+email.getId()))
+        this.mockMvc.perform(delete("/api/emails/" + email.getId()))
                 .andExpect(status().is2xxSuccessful());
 
         assertThat(emailRepository.findAll(), empty());
@@ -196,11 +196,12 @@ class EmailRestControllerMVCIntegrationTest {
         createRandomEmails(5, 1);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"filters\": [], \"sorts\": [], \"page\": null, \"size\": null}"))
-            .andReturn();
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andReturn();
 
-        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
 
         assertEquals(emailSearchResult.getNumberOfElements(), 5);
     }
@@ -211,57 +212,44 @@ class EmailRestControllerMVCIntegrationTest {
         var email1 = save(EmailControllerUtil.prepareEmail("subject", "an@address.domain", 1));
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"filters\": [{" +
-                    "\"key\": \"toAddress\"," +
-                    "\"logicalOperator\": \"AND\"," +
-                    "\"operator\": \"EQUAL\"," +
-                    "\"fieldType\": \"STRING\"," + 
-                    "\"value\": \"an@address.domain\"" +
-                "}], " +
-                "\"sorts\": [" +
-                    "{\"key\": \"receivedOn\", \"direction\": \"ASC\"}" +
-                "], \"page\": null, \"size\": null}"))
-            .andReturn();
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"filter\": {" +
+                                "\"type\": \"biexp\"," +
+                                "\"property\": \"toAddress\"," +
+                                "\"operator\": \"EQUAL\"," +
+                                "\"value\": \"an@address.domain\"" +
+                                "}, " +
+                                "\"sort\": {\"orders\": [" +
+                                "{\"property\": \"receivedOn\", \"direction\": \"ASC\"}" +
+                                "]}}"))
+                .andReturn();
 
-        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
 
-        assertEquals(emailSearchResult.getNumberOfElements(), 1);
+        assertEquals(1, emailSearchResult.getNumberOfElements());
         assertEquals(List.of(email1), emailSearchResult.getContent());
     }
 
     @Test
     void shouldSearchEmailsByMessageId() throws Exception {
-        String messageId = "my-message-id";
+        final var messageId = "my-message-id";
 
         createRandomEmails(5, 1);
-        var email1 = save(EmailControllerUtil.prepareEmail("subject", "an@address.domain", 1, messageId));
+        final var email1 = save(EmailControllerUtil.prepareEmail("subject", "an@address.domain", 1, messageId));
 
-        FilterRequest filter1 = FilterRequest.builder()
-            .key("messageId")
-            .operator(Operator.LIKE)
-            .fieldType(FieldType.STRING)
-            .value(messageId)
-            .build();
-
-        SortRequest sortRequest = SortRequest.builder()
-            .key("receivedOn")
-            .direction(SortDirection.ASC)
-            .build();
-
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .filters(List.of(filter1))
-            .sorts(List.of(sortRequest))
-            .build();
+        final var binaryExpression = new BinaryExpression("messageId", BinaryOperator.LIKE, messageId);
+        final var sorting = Sorting.by(new SortOrder("receivedOn"));
+        final var searchRequest = SearchRequest.of(binaryExpression, sorting);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapToJson(searchRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(searchRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
 
         assertEquals(emailSearchResult.getNumberOfElements(), 1);
         assertEquals(List.of(email1), emailSearchResult.getContent());
@@ -275,20 +263,21 @@ class EmailRestControllerMVCIntegrationTest {
         var email2 = save(EmailControllerUtil.prepareEmail("subject", "an@address.domain", 1));
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"filters\": [{" +
-                    "\"key\": \"toAddress\"," +
-                    "\"logicalOperator\": \"AND\"," +
-                    "\"operator\": \"LIKE\"," +
-                    "\"fieldType\": \"STRING\"," + 
-                    "\"value\": \"address.domain\"" +
-                "}], " +
-                "\"sorts\": [" +
-                    "{\"key\": \"receivedOn\", \"direction\": \"ASC\"}" +
-                "], \"page\": null, \"size\": null}"))
-            .andReturn();
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"filter\": {" +
+                                "\"type\": \"biexp\"," +
+                                "\"property\": \"toAddress\"," +
+                                "\"operator\": \"LIKE\"," +
+                                "\"value\": \"address.domain\"" +
+                                "}, " +
+                                "\"sort\": { " +
+                                "\"orders\": [" +
+                                "{\"property\": \"receivedOn\", \"direction\": \"ASC\"}" +
+                                "]}}"))
+                .andReturn();
 
-        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
 
         assertEquals(emailSearchResult.getNumberOfElements(), 2);
         assertEquals(List.of(email1, email2), emailSearchResult.getContent());
@@ -296,45 +285,28 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldSearchEmailsByToAddressContainsAndSubjectEqual() throws Exception {
-        var email1 = save(EmailControllerUtil.prepareEmail("hello world", "hello@address.domain", 1));
+        final var email1 = save(EmailControllerUtil.prepareEmail("hello world", "hello@address.domain", 1));
         createRandomEmails(5, 1);
         save(EmailControllerUtil.prepareEmail("subject", "an@address.domain", 1));
         save(EmailControllerUtil.prepareEmail("hello world", "an@something.domain", 1));
 
-        FilterRequest filter1 = FilterRequest.builder()
-            .key("toAddress")
-            .operator(Operator.LIKE)
-            .fieldType(FieldType.STRING)
-            .value("address.domain")
-            .build();
+        final var expression = LogicalAnd.of(
+                new BinaryExpression("toAddress", BinaryOperator.LIKE, "address.domain"),
+                new BinaryExpression("subject", BinaryOperator.EQUAL, "hello world")
+        );
+        final var sorting = Sorting.by(new SortOrder("receivedOn"));
+        final var searchRequest = SearchRequest.of(expression, sorting);
 
-        FilterRequest filter2 = FilterRequest.builder()
-            .key("subject")
-            .operator(Operator.EQUAL)
-            .fieldType(FieldType.STRING)
-            .value("hello world")
-            .build();
-
-        SortRequest sortRequest = SortRequest.builder()
-            .key("receivedOn")
-            .direction(SortDirection.ASC)
-            .build();
-
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .filters(List.of(filter1, filter2))
-            .sorts(List.of(sortRequest))
-            .logicalOperator(LogicalOperator.AND)
-            .build();
-
+        final var json = mapToJson(searchRequest);
         MvcResult mvcResult = this.mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapToJson(searchRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
-                
+        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
+
         assertEquals(emailSearchResult.getNumberOfElements(), 1);
         assertEquals(List.of(email1), emailSearchResult.getContent());
     }
@@ -346,81 +318,24 @@ class EmailRestControllerMVCIntegrationTest {
         var email2 = save(EmailControllerUtil.prepareEmail("subject", "an@address.domain", 1));
         var email3 = save(EmailControllerUtil.prepareEmail("hello world", "an@something.domain", 1));
 
-        FilterRequest filter1 = FilterRequest.builder()
-            .key("toAddress")
-            .operator(Operator.LIKE)
-            .fieldType(FieldType.STRING)
-            .value("address.domain")
-            .build();
-
-        FilterRequest filter2 = FilterRequest.builder()
-            .key("subject")
-            .operator(Operator.EQUAL)
-            .fieldType(FieldType.STRING)
-            .value("hello world")
-            .build();
-
-        SortRequest sortRequest = SortRequest.builder()
-            .key("receivedOn")
-            .direction(SortDirection.ASC)
-            .build();
-
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .filters(List.of(filter1, filter2))
-            .sorts(List.of(sortRequest))
-            .logicalOperator(LogicalOperator.OR)
-            .build();
+        final var expression = LogicalOr.of(
+                new BinaryExpression("toAddress", BinaryOperator.LIKE, "address.domain"),
+                new BinaryExpression("subject", BinaryOperator.EQUAL, "hello world")
+        );
+        final var sorting = Sorting.by(new SortOrder("receivedOn"));
+        final var searchRequest = SearchRequest.of(expression, sorting);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapToJson(searchRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(searchRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {
+        });
 
         assertEquals(3, emailSearchResult.getNumberOfElements());
         assertEquals(List.of(email1, email2, email3), emailSearchResult.getContent());
-    }
-
-
-    @Test
-    void shouldSearchEmailsByReceivedOnBetweenDates() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startDate = now.minusMinutes(1);
-        LocalDateTime endDate = now.plusMinutes(5);
-
-        createRandomEmails(5, 5);
-        Email email1 = createRandomEmail(0);
-        createRandomEmails(5, 10);
-        createRandomEmails(5, 15);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-        FilterRequest filter1 = FilterRequest.builder()
-            .key("receivedOn")
-            .operator(Operator.BETWEEN)
-            .fieldType(FieldType.DATE)
-            .value(startDate.format(formatter))
-            .valueTo(endDate.format(formatter))
-            .build();
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .filters(List.of(filter1))
-            .build();
-
-        MvcResult mvcResult = mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapToJson(searchRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String responseContent = mvcResult.getResponse().getContentAsString();
-        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {});
-
-        assertEquals(1, emailSearchResult.getNumberOfElements());
-        assertEquals(List.of(email1), emailSearchResult.getContent());
     }
 
     @Test
@@ -433,27 +348,19 @@ class EmailRestControllerMVCIntegrationTest {
         createRandomEmails(5, 10);
         createRandomEmails(5, 15);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-        FilterRequest filter1 = FilterRequest.builder()
-            .key("receivedOn")
-            .operator(Operator.GREATER_THAN_OR_EQUAL)
-            .fieldType(FieldType.DATE)
-            .value(startDate.format(formatter))
-            .build();
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .filters(List.of(filter1))
-            .build();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        final var binaryExpression = new BinaryExpression("receivedOn", BinaryOperator.GREATER_THAN_OR_EQUAL, startDate.format(formatter));
+        final var searchRequest = SearchRequest.of(binaryExpression);
 
         MvcResult mvcResult = mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapToJson(searchRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(searchRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String responseContent = mvcResult.getResponse().getContentAsString();
-        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {
+        });
 
         assertEquals(1, emailSearchResult.getNumberOfElements());
         assertEquals(List.of(email1), emailSearchResult.getContent());
@@ -469,27 +376,19 @@ class EmailRestControllerMVCIntegrationTest {
         createRandomEmails(5, 10);
         createRandomEmails(5, 15);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-        FilterRequest filter1 = FilterRequest.builder()
-            .key("receivedOn")
-            .operator(Operator.GREATER_THAN)
-            .fieldType(FieldType.DATE)
-            .value(startDate.format(formatter))
-            .build();
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .filters(List.of(filter1))
-            .build();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        final var binaryExpression = new BinaryExpression("receivedOn", BinaryOperator.GREATER_THAN, startDate.format(formatter));
+        final var searchRequest = SearchRequest.of(binaryExpression);
 
         MvcResult mvcResult = mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapToJson(searchRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(searchRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String responseContent = mvcResult.getResponse().getContentAsString();
-        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {
+        });
 
         assertEquals(1, emailSearchResult.getNumberOfElements());
         assertEquals(List.of(email1), emailSearchResult.getContent());
@@ -505,27 +404,19 @@ class EmailRestControllerMVCIntegrationTest {
         Email email1 = createRandomEmail(25);
         createRandomEmails(5, 15);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-        FilterRequest filter1 = FilterRequest.builder()
-            .key("receivedOn")
-            .operator(Operator.LESS_THAN)
-            .fieldType(FieldType.DATE)
-            .value(endDate.format(formatter))
-            .build();
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .filters(List.of(filter1))
-            .build();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        final var binaryExpression = new BinaryExpression("receivedOn", BinaryOperator.LESS_THAN, endDate.format(formatter));
+        final var searchRequest = SearchRequest.of(binaryExpression);
 
         MvcResult mvcResult = mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapToJson(searchRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(searchRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String responseContent = mvcResult.getResponse().getContentAsString();
-        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {
+        });
 
         assertEquals(1, emailSearchResult.getNumberOfElements());
         assertEquals(List.of(email1), emailSearchResult.getContent());
@@ -541,42 +432,30 @@ class EmailRestControllerMVCIntegrationTest {
         Email email1 = createRandomEmail(25);
         createRandomEmails(5, 15);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-        FilterRequest filter1 = FilterRequest.builder()
-            .key("receivedOn")
-            .operator(Operator.LESS_THAN_OR_EQUAL)
-            .fieldType(FieldType.DATE)
-            .value(endDate.format(formatter))
-            .build();
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .filters(List.of(filter1))
-            .build();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        final var binaryExpression = new BinaryExpression("receivedOn", BinaryOperator.LESS_THAN_OR_EQUAL, endDate.format(formatter));
+        final var searchRequest = SearchRequest.of(binaryExpression);
 
         MvcResult mvcResult = mockMvc.perform(post("/api/emails/search")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapToJson(searchRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(searchRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String responseContent = mvcResult.getResponse().getContentAsString();
-        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {});
+        RestResponsePage<Email> emailSearchResult = mapFromJson(responseContent, new TypeReference<RestResponsePage<Email>>() {
+        });
 
         assertEquals(1, emailSearchResult.getNumberOfElements());
         assertEquals(List.of(email1), emailSearchResult.getContent());
     }
 
 
-    private static <T> T mapFromJson(String json, Class<T> clazz) throws IOException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
+    private <T> T mapFromJson(String json, Class<T> clazz) throws IOException {
         return objectMapper.readValue(json, clazz);
     }
 
-    private static <T> T mapFromJson(String json, TypeReference<T> typeReference) throws IOException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
+    private <T> T mapFromJson(String json, TypeReference<T> typeReference) throws IOException {
         return objectMapper.readValue(json, typeReference);
     }
 
@@ -593,7 +472,6 @@ class EmailRestControllerMVCIntegrationTest {
     }
 
     public String mapToJson(Object object) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(object);
     }
 

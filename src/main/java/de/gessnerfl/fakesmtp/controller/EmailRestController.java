@@ -56,9 +56,7 @@ public class EmailRestController {
     public Page<Email> all(
         @SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC)
         @Parameter(hidden = true)
-        Pageable pageable    
-    )
-    {
+        Pageable pageable) {
         return emailRepository.findAll(pageable);
     }
 
@@ -100,31 +98,60 @@ public class EmailRestController {
     public Page<Email> search(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Search request",
                     content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = "{\n" +
-                                    "  \"filters\": [\n" +
-                                    "    {\n" +
-                                    "      \"key\": \"toAddress\",\n" +
-                                    "      \"fieldType\": \"STRING\",\n" +
+                            examples = {
+                            @ExampleObject(value = "{\n" +
+                                    "  \"filter\": {\n" +
+                                    "      \"type\": \"biexp\",\n" +
+                                    "      \"property\": \"toAddress\",\n" +
                                     "      \"operator\": \"EQUAL\",\n" +
-                                    "      \"value\": \"address@em.ail\"\n" +
-                                    "    }\n" +
-                                    "  ],\n" +
-                                    "  \"sorts\": [\n" +
-                                    "    {\n" +
-                                    "      \"key\": \"receivedOn\",\n" +
-                                    "      \"direction\": \"DESC\"\n" +
-                                    "    }\n" +
-                                    "  ],\n" +
+                                    "      \"value\": \"test@example.com\"\n" +
+                                    "  },\n" +
+                                    "  \"sort\": {\n" +
+                                    "      \"orders\": [\n" +
+                                    "         {\n" +
+                                    "            \"property\": \"receivedOn\",\n" +
+                                    "            \"direction\": \"DESC\"\n" +
+                                    "         }\n" +
+                                    "      ]\n" +
+                                    "  },\n" +
                                     "  \"page\": 0,\n" +
-                                    "  \"size\": 10,\n" +
-                                    "  \"logicalOperator\": \"AND\"\n" +
-                                    "}")))
+                                    "  \"size\": 10\n" +
+                                    "}"),
+                            @ExampleObject(value = "{\n" +
+                                    "  \"filter\": {\n" +
+                                    "      \"type\": \"and\",\n" +
+                                    "      \"expressions\": [\n" +
+                                    "          {\n" +
+                                    "              \"type\": \"biexp\",\n" +
+                                    "              \"property\": \"toAddress\",\n" +
+                                    "              \"operator\": \"EQUAL\",\n" +
+                                    "              \"value\": \"test@example.com\"\n" +
+                                    "          },\n" +
+                                    "          {\n" +
+                                    "              \"type\": \"biexp\",\n" +
+                                    "              \"property\": \"subject\",\n" +
+                                    "              \"operator\": \"LIKE\",\n" +
+                                    "              \"value\": \"foo\"\n" +
+                                    "          }\n" +
+                                    "      ]\n" +
+                                    "  },\n" +
+                                    "  \"sort\": {\n" +
+                                    "      \"orders\": [\n" +
+                                    "         {\n" +
+                                    "            \"property\": \"receivedOn\",\n" +
+                                    "            \"direction\": \"DESC\"\n" +
+                                    "         }\n" +
+                                    "      ]\n" +
+                                    "  },\n" +
+                                    "  \"page\": 0,\n" +
+                                    "  \"size\": 10\n" +
+                                    "}")
+                    }))
         @RequestBody
         SearchRequest request
     ) {
         SearchSpecification<Email> specification = new SearchSpecification<>(request);
-        Pageable pageable = SearchSpecification.getPageable(request.getPage(), request.getSize());
-        return emailRepository.findAll(specification, pageable);
+        return emailRepository.findAll(specification, request.getPageable());
     }
 
 }

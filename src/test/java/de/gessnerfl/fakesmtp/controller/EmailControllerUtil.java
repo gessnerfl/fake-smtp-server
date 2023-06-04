@@ -8,8 +8,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 
 class EmailControllerUtil {
 
@@ -17,8 +15,7 @@ class EmailControllerUtil {
 
     public static Email prepareRandomEmail(int minusMinutes) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
@@ -29,13 +26,12 @@ class EmailControllerUtil {
         attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
         
         return prepareEmail(attachment, content, "Test Subject " + randomToken, "Test Content " + randomToken, receivedOn,
-            "sender@example.com", "receiver@example.com", "<message-id>", minusMinutes);
+            "sender@example.com", "receiver@example.com", "<message-id>");
     }
 
     public static Email prepareEmail(String subject, String toAdress, int minusMinutes) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
@@ -46,13 +42,12 @@ class EmailControllerUtil {
         attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
 
         return prepareEmail(attachment, content, subject, "Test Content " + randomToken, 
-            receivedOn, "sender@example.com", toAdress, "<message-id>", minusMinutes);
+            receivedOn, "sender@example.com", toAdress, "<message-id>");
     }
 
     public static Email prepareEmail(String subject, String toAdress, int minusMinutes, String messageId) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
@@ -63,7 +58,7 @@ class EmailControllerUtil {
         attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
 
         return prepareEmail(attachment, content, subject, "Test Content " + randomToken, 
-            receivedOn, "sender@example.com", toAdress, messageId, minusMinutes);
+            receivedOn, "sender@example.com", toAdress, messageId);
     }
 
     public static Email prepareEmail(
@@ -71,12 +66,10 @@ class EmailControllerUtil {
         EmailContent emailContent, 
         String subject,
         String rawData,
-        Date receivedOn,
+        LocalDateTime receivedOn,
         String fromAddress,
         String toAdress, 
-        String messageId,
-        int minusMinutes
-    ) {
+        String messageId) {
         var mail = new Email();
         mail.setSubject(subject);
         mail.setRawData(rawData);
