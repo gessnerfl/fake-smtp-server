@@ -1,5 +1,6 @@
 package de.gessnerfl.fakesmtp.model.query;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -46,16 +47,16 @@ public class SearchRequest {
         return page;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setPage(Integer page) {
+        this.page = page != null ? page : DEFAULT_PAGE;
     }
 
     public int getSize() {
         return size;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setSize(Integer size) {
+        this.size = size != null ? size : DEFAULT_PAGE_SIZE;
     }
 
     public Optional<Sorting> getSort() {
@@ -66,6 +67,7 @@ public class SearchRequest {
         this.sort = sort;
     }
 
+    @JsonIgnore
     public Pageable getPageable() {
         Sort sort = getSort().map(this::mapSort).orElseGet(() -> Sort.by(Sort.Direction.DESC, DEFAULT_SORT_PROPERTY));
         return PageRequest.of(page, size, sort);
