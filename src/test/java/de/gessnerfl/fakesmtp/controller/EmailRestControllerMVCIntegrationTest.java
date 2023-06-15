@@ -198,7 +198,7 @@ class EmailRestControllerMVCIntegrationTest {
 
         final var emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
 
-        assertEquals(emailSearchResult.getNumberOfElements(), 5);
+        assertEquals(5, emailSearchResult.getNumberOfElements());
     }
 
     @Test
@@ -243,7 +243,7 @@ class EmailRestControllerMVCIntegrationTest {
 
         final var emailSearchResult = mapFromJson(mvcResult.getResponse().getContentAsString(), new TypeReference<RestResponsePage<Email>>() {});
 
-        assertEquals(emailSearchResult.getNumberOfElements(), 1);
+        assertEquals(1, emailSearchResult.getNumberOfElements());
         assertEquals(List.of(email1), emailSearchResult.getContent());
     }
 

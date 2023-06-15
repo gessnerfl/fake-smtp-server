@@ -74,8 +74,8 @@ public class SearchRequest {
 
     @JsonIgnore
     public Pageable getPageable() {
-        Sort sort = getSort().map(this::mapSort).orElseGet(() -> Sort.by(Sort.Direction.DESC, DEFAULT_SORT_PROPERTY));
-        return PageRequest.of(page, size, sort);
+        final var sortOrDefault = getSort().map(this::mapSort).orElseGet(() -> Sort.by(Sort.Direction.DESC, DEFAULT_SORT_PROPERTY));
+        return PageRequest.of(page, size, sortOrDefault);
     }
 
     private Sort mapSort(Sorting sorting) {

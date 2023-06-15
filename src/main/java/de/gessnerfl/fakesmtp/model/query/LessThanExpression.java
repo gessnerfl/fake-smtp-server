@@ -13,6 +13,7 @@ import static de.gessnerfl.fakesmtp.model.query.ExpressionValueHelper.convertDat
 @JsonTypeName("less_than")
 public record LessThanExpression(@NotEmpty String property, @NotEmpty Object value) implements FilterExpression {
     @Override
+    @SuppressWarnings("rawtypes")
     public <T> Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         Path<Comparable> path = root.get(property);
         return cb.lessThan(path, (Comparable) convertDateIfApplicable(path, value));

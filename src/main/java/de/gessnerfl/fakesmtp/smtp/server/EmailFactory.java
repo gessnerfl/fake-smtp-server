@@ -48,7 +48,7 @@ public class EmailFactory {
     private Email createPlainOrHtmlMail(RawData rawData, String subject, ContentType contentType, Object messageContent, String messageId) {
         var email = createEmailFromRawData(rawData);
         email.setSubject(subject);
-        createEmailContent(rawData, contentType, messageContent, messageId).ifPresent(email::addContent);
+        createEmailContent(rawData, contentType, messageContent).ifPresent(email::addContent);
         email.setMessageId(messageId);
         return email;
     }
@@ -80,7 +80,7 @@ public class EmailFactory {
         var partContentType = ContentType.fromString(part.getContentType());
         if (partContentType == ContentType.HTML || partContentType == ContentType.PLAIN) {
             final var partContent = part.getContent();
-            createEmailContent(rawData, partContentType, partContent, email.getMessageId()).ifPresent(email::addContent);
+            createEmailContent(rawData, partContentType, partContent).ifPresent(email::addContent);
         } else if (partContentType == ContentType.MULTIPART_RELATED || partContentType == ContentType.MULTIPART_ALTERNATIVE) {
             final var content = (Multipart) part.getContent();
             appendMultipartBodyParts(email, rawData, content);
@@ -109,7 +109,7 @@ public class EmailFactory {
         return email;
     }
 
-    private Optional<EmailContent> createEmailContent(RawData rawData, ContentType contentType, Object messageContent, String messageId) {
+    private Optional<EmailContent> createEmailContent(RawData rawData, ContentType contentType, Object messageContent) {
         var data = getMessageContentAsString(messageContent).map(this::normalizeContent).orElseGet(() -> normalizeContent(rawData.getContentAsString()));
         if (data == null) {
             return Optional.empty();

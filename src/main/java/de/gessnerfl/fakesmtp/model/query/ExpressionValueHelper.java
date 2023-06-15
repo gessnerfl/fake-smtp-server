@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ExpressionValueHelper {
+    private ExpressionValueHelper(){}
+
     public static Object convertDateIfApplicable(Path<?> path, Object value) {
         return path.getJavaType().isAssignableFrom(LocalDateTime.class) ? parseDate(value) : value;
     }
