@@ -1,6 +1,8 @@
 package de.gessnerfl.fakesmtp.model.query;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -9,15 +11,15 @@ import org.springframework.util.Assert;
 import java.util.Optional;
 
 public class SearchRequest {
-    public static SearchRequest of(LogicalExpression filter) {
+    public static SearchRequest of(FilterExpression filter) {
         return SearchRequest.of(filter, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, null);
     }
 
-    public static SearchRequest of(LogicalExpression filter, Sorting sort) {
+    public static SearchRequest of(FilterExpression filter, Sorting sort) {
         return SearchRequest.of(filter, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, sort);
     }
 
-    public static SearchRequest of(LogicalExpression filter, int page, int size, Sorting sort) {
+    public static SearchRequest of(FilterExpression filter, int page, int size, Sorting sort) {
         final var req = new SearchRequest();
         req.setFilter(filter);
         req.setPage(page);
@@ -30,16 +32,19 @@ public class SearchRequest {
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final String DEFAULT_SORT_PROPERTY = "receivedOn";
 
-    private LogicalExpression filter;
+    private FilterExpression filter;
+    @Min(0)
     private int page = DEFAULT_PAGE;
+    @Max(500)
+    @Min(10)
     private int size = DEFAULT_PAGE_SIZE;
     private Sorting sort;
 
-    public Optional<LogicalExpression> getFilter() {
+    public Optional<FilterExpression> getFilter() {
         return Optional.ofNullable(filter);
     }
 
-    public void setFilter(LogicalExpression filter) {
+    public void setFilter(FilterExpression filter) {
         this.filter = filter;
     }
 

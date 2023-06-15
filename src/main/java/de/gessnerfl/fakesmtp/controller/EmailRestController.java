@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/api/emails")
 @Validated
@@ -99,53 +98,55 @@ public class EmailRestController {
         @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Search request",
                     content = @Content(mediaType = "application/json",
                             examples = {
-                            @ExampleObject(value = "{\n" +
-                                    "  \"filter\": {\n" +
-                                    "      \"type\": \"biexp\",\n" +
-                                    "      \"property\": \"toAddress\",\n" +
-                                    "      \"operator\": \"EQUAL\",\n" +
-                                    "      \"value\": \"test@example.com\"\n" +
-                                    "  },\n" +
-                                    "  \"sort\": {\n" +
-                                    "      \"orders\": [\n" +
-                                    "         {\n" +
-                                    "            \"property\": \"receivedOn\",\n" +
-                                    "            \"direction\": \"DESC\"\n" +
-                                    "         }\n" +
-                                    "      ]\n" +
-                                    "  },\n" +
-                                    "  \"page\": 0,\n" +
-                                    "  \"size\": 10\n" +
-                                    "}"),
-                            @ExampleObject(value = "{\n" +
-                                    "  \"filter\": {\n" +
-                                    "      \"type\": \"and\",\n" +
-                                    "      \"expressions\": [\n" +
-                                    "          {\n" +
-                                    "              \"type\": \"biexp\",\n" +
-                                    "              \"property\": \"toAddress\",\n" +
-                                    "              \"operator\": \"EQUAL\",\n" +
-                                    "              \"value\": \"test@example.com\"\n" +
-                                    "          },\n" +
-                                    "          {\n" +
-                                    "              \"type\": \"biexp\",\n" +
-                                    "              \"property\": \"subject\",\n" +
-                                    "              \"operator\": \"LIKE\",\n" +
-                                    "              \"value\": \"foo\"\n" +
-                                    "          }\n" +
-                                    "      ]\n" +
-                                    "  },\n" +
-                                    "  \"sort\": {\n" +
-                                    "      \"orders\": [\n" +
-                                    "         {\n" +
-                                    "            \"property\": \"receivedOn\",\n" +
-                                    "            \"direction\": \"DESC\"\n" +
-                                    "         }\n" +
-                                    "      ]\n" +
-                                    "  },\n" +
-                                    "  \"page\": 0,\n" +
-                                    "  \"size\": 10\n" +
-                                    "}")
+                            @ExampleObject(value = """
+                                    {
+                                      "filter": {
+                                          "type": "biexp",
+                                          "property": "toAddress",
+                                          "operator": "EQUAL",
+                                          "value": "test@example.com"
+                                      },
+                                      "sort": {
+                                          "orders": [
+                                             {
+                                                "property": "receivedOn",
+                                                "direction": "DESC"
+                                             }
+                                          ]
+                                      },
+                                      "page": 0,
+                                      "size": 10
+                                    }"""),
+                            @ExampleObject(value = """
+                                    {
+                                      "filter": {
+                                          "type": "and",
+                                          "expressions": [
+                                              {
+                                                  "type": "biexp",
+                                                  "property": "toAddress",
+                                                  "operator": "EQUAL",
+                                                  "value": "test@example.com"
+                                              },
+                                              {
+                                                  "type": "biexp",
+                                                  "property": "subject",
+                                                  "operator": "LIKE",
+                                                  "value": "foo"
+                                              }
+                                          ]
+                                      },
+                                      "sort": {
+                                          "orders": [
+                                             {
+                                                "property": "receivedOn",
+                                                "direction": "DESC"
+                                             }
+                                          ]
+                                      },
+                                      "page": 0,
+                                      "size": 10
+                                    }""")
                     }))
         @RequestBody
         SearchRequest request

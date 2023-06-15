@@ -3,20 +3,18 @@ package de.gessnerfl.fakesmtp.model.query;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotEmpty;
 
-import java.util.List;
+import static de.gessnerfl.fakesmtp.model.query.ExpressionValueHelper.convertDateIfApplicable;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonSerialize
-@JsonTypeName("or")
-public record LogicalOr(@NotEmpty List<FilterExpression> expressions) implements FilterExpression {
+@JsonTypeName("equal")
+public record EqualExpression(@NotEmpty String property, @NotEmpty Object value) implements FilterExpression {
     @Override
     public <T> Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.or(expressions.stream().map(e -> e.toPredicate(root, query, cb)).toArray(Predicate[]::new));
+        Path<?> path = root.get(property);
+        return cb.equal(path, convertDateIfApplicable(path, value));
     }
 }
