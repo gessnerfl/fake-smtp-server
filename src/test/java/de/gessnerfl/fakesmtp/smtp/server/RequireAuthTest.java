@@ -102,6 +102,7 @@ class RequireAuthTest {
         c.send("DATA");
         c.expect("354");
 
+        c.send("Message-ID: <message_id> \r\n");
         c.send("\r\n.");
         c.expect("250");
 

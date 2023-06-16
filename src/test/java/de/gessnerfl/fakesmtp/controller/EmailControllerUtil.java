@@ -8,8 +8,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 
 class EmailControllerUtil {
 
@@ -17,8 +15,23 @@ class EmailControllerUtil {
 
     public static Email prepareRandomEmail(int minusMinutes) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
+
+        var content = new EmailContent();
+        content.setContentType(ContentType.PLAIN);
+        content.setData("Test Content " + randomToken);
+
+        var attachment = new EmailAttachment();
+        attachment.setFilename("test.txt");
+        attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
+        
+        return prepareEmail(attachment, content, "Test Subject " + randomToken, "Test Content " + randomToken, receivedOn,
+            "sender@example.com", "receiver@example.com", "<message-id>");
+    }
+
+    public static Email prepareEmail(String subject, String toAdress, int minusMinutes) {
+        var randomToken = RandomStringUtils.randomAlphanumeric(6);
+        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
@@ -28,14 +41,44 @@ class EmailControllerUtil {
         attachment.setFilename("test.txt");
         attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
 
+        return prepareEmail(attachment, content, subject, "Test Content " + randomToken, 
+            receivedOn, "sender@example.com", toAdress, "<message-id>");
+    }
+
+    public static Email prepareEmail(String subject, String toAdress, int minusMinutes, String messageId) {
+        var randomToken = RandomStringUtils.randomAlphanumeric(6);
+        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
+
+        var content = new EmailContent();
+        content.setContentType(ContentType.PLAIN);
+        content.setData("Test Content " + randomToken);
+
+        var attachment = new EmailAttachment();
+        attachment.setFilename("test.txt");
+        attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
+
+        return prepareEmail(attachment, content, subject, "Test Content " + randomToken, 
+            receivedOn, "sender@example.com", toAdress, messageId);
+    }
+
+    public static Email prepareEmail(
+        EmailAttachment emailAttachment,
+        EmailContent emailContent, 
+        String subject,
+        String rawData,
+        LocalDateTime receivedOn,
+        String fromAddress,
+        String toAdress, 
+        String messageId) {
         var mail = new Email();
-        mail.setSubject("Test Subject " + randomToken);
-        mail.setRawData("Test Content " + randomToken);
+        mail.setSubject(subject);
+        mail.setRawData(rawData);
         mail.setReceivedOn(receivedOn);
-        mail.setFromAddress("sender@example.com");
-        mail.setToAddress("receiver@example.com");
-        mail.addContent(content);
-        mail.addAttachment(attachment);
+        mail.setFromAddress(fromAddress);
+        mail.setToAddress(toAdress);
+        mail.setMessageId(messageId);
+        mail.addContent(emailContent);
+        mail.addAttachment(emailAttachment);
         return mail;
     }
 

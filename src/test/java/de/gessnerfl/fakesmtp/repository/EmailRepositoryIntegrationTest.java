@@ -15,8 +15,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.contains;
@@ -78,8 +76,7 @@ class EmailRepositoryIntegrationTest {
 
     private Email createRandomEmail(int minusMinutes) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var localDateTime = LocalDateTime.now().minusMinutes(minusMinutes);
-        var receivedOn = Date.from(localDateTime.atZone(ZoneOffset.systemDefault()).toInstant());
+        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
@@ -92,6 +89,7 @@ class EmailRepositoryIntegrationTest {
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");
         mail.addContent(content);
+        mail.setMessageId(randomToken);
         return sut.save(mail);
     }
 

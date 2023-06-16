@@ -1,11 +1,16 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.model.query.SearchRequest;
+import de.gessnerfl.fakesmtp.model.query.SearchSpecification;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.servlet.ServletContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
@@ -16,7 +21,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/emails")
@@ -42,8 +46,13 @@ public class EmailRestController {
     }
 
     @GetMapping()
-    public Page<Email> all(@SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC) Pageable pageable)
-    {
+    @Parameter(name = "page", description = "Page number", example = "0")
+    @Parameter(name = "size", description = "Page size", example = "1")
+    @Parameter(name = "sort", description = "Sort criteria", example = DEFAULT_SORT_PROPERTY)
+    public Page<Email> all(
+            @SortDefault(sort = DEFAULT_SORT_PROPERTY, direction = Sort.Direction.DESC)
+            @Parameter(hidden = true)
+            Pageable pageable) {
         return emailRepository.findAll(pageable);
     }
 
@@ -79,6 +88,68 @@ public class EmailRestController {
         emailAttachmentRepository.deleteAllInBatch();
         emailRepository.deleteAllInBatch();
         emailRepository.flush();
+    }
+
+    @PostMapping(value = "/search")
+    public Page<Email> search(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Search request",
+                    content = @Content(mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(value = """
+                                            {
+                                              "filter": {
+                                                  "type": "biexp",
+                                                  "property": "toAddress",
+                                                  "operator": "EQUAL",
+                                                  "value": "test@example.com"
+                                              },
+                                              "sort": {
+                                                  "orders": [
+                                                     {
+                                                        "property": "receivedOn",
+                                                        "direction": "DESC"
+                                                     }
+                                                  ]
+                                              },
+                                              "page": 0,
+                                              "size": 10
+                                            }"""),
+                                    @ExampleObject(value = """
+                                            {
+                                              "filter": {
+                                                  "type": "and",
+                                                  "expressions": [
+                                                      {
+                                                          "type": "biexp",
+                                                          "property": "toAddress",
+                                                          "operator": "EQUAL",
+                                                          "value": "test@example.com"
+                                                      },
+                                                      {
+                                                          "type": "biexp",
+                                                          "property": "subject",
+                                                          "operator": "LIKE",
+                                                          "value": "foo"
+                                                      }
+                                                  ]
+                                              },
+                                              "sort": {
+                                                  "orders": [
+                                                     {
+                                                        "property": "receivedOn",
+                                                        "direction": "DESC"
+                                                     }
+                                                  ]
+                                              },
+                                              "page": 0,
+                                              "size": 10
+                                            }""")
+                            }))
+            @RequestBody
+            SearchRequest request
+    ) {
+        SearchSpecification<Email> specification = new SearchSpecification<>(request);
+        return emailRepository.findAll(specification, request.getPageable());
     }
 
 }

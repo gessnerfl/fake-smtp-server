@@ -62,6 +62,7 @@ class DataTest extends AbstractCommandIntegrationTest {
 		this.send("DATA");
 		this.expect("354 End data with <CR><LF>.<CR><LF>");
 
+		this.send("Message-ID: <message_id> \r\n");
 		this.send("alsdkfj \r\n.");
 
 		this.send("RSET");

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
@@ -32,12 +33,16 @@ public class Email {
     @Column(name = "received_on", nullable = false)
     @Basic(optional = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date receivedOn;
+    private LocalDateTime receivedOn;
 
     @Lob
     @Column(name = "raw_data", nullable = false)
     @Basic(optional = false)
     private String rawData;
+
+    @Column(name = "message_id", nullable = false)
+    @Basic(optional = false)
+    private String messageId;
 
     @OneToMany(mappedBy = "email", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EmailContent> contents = new ArrayList<>();
@@ -80,11 +85,11 @@ public class Email {
         this.subject = subject;
     }
 
-    public Date getReceivedOn() {
+    public LocalDateTime getReceivedOn() {
         return receivedOn;
     }
 
-    public void setReceivedOn(Date receivedOn) {
+    public void setReceivedOn(LocalDateTime receivedOn) {
         this.receivedOn = receivedOn;
     }
 
@@ -141,6 +146,14 @@ public class Email {
 
     public List<InlineImage> getInlineImages() {
         return inlineImages;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     @Override

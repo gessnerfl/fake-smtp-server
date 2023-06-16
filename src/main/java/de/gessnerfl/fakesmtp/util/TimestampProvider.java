@@ -2,13 +2,13 @@ package de.gessnerfl.fakesmtp.util;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Service
 public class TimestampProvider {
 
-    public Date now(){
-        return new Date();
+    public LocalDateTime now(){
+        return LocalDateTime.now();
     }
 
 }
