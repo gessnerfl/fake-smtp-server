@@ -1,10 +1,10 @@
 plugins {
     id "pl.allegro.tech.build.axion-release" version "1.15.3"
-    id "org.springframework.boot" version "3.1.0"
+    id "org.springframework.boot" version "3.1.1"
     id "org.sonarqube" version "4.2.1.3168"
     id 'com.google.cloud.tools.jib' version '3.3.2'
     id "com.github.node-gradle.node" version "5.0.0"
-    id("io.freefair.lombok") version "8.0.1"
+    id("io.freefair.lombok") version "8.1.0"
 }
 
 apply plugin: "java"
@@ -164,10 +164,10 @@ jib {
                 architecture = 'amd64'
                 os = 'linux'
             }
-//            platform {
-//                architecture = 'arm64'
-//                os = 'linux'
-//            }
+            platform {
+                architecture = 'arm64'
+                os = 'linux'
+            }
         }
     }
     to {
