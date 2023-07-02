@@ -12,10 +12,12 @@ import './email-list-page.tsx.scss'
 import {DeleteAllEmailsButton} from "../components/email/delete-all-emails-button";
 
 function EmailListPage() {
-    const pageSize = 10;
     const pageQueryParameter = "page";
+    const pageSizeQueryParameter = "pageSize";
     const noRowSelected = -1;
 
+    const [pageSizeOptions, setPageSizeOptions] = useState([10, 25, 50, 100])
+    const [pageSize, setPageSize] = useState(10)
     const [page, setPage] = useState(0)
     const [selectedRow, setSelectedRow] = useState(noRowSelected)
     const [searchParams, setSearchParams] = useSearchParams()
@@ -74,21 +76,35 @@ function EmailListPage() {
         return {...e, receivedOn: parseJSON(e.receivedOn)}
     }
 
-    function formatPageQueryParam(page: number) {
-        return pageQueryParameter + "=" + page;
+    function formatPageQueryParam(page: number, pageSize: number) {
+        return `${pageQueryParameter}=${page}&${pageSizeQueryParameter}=${pageSize}`;
     }
 
-    function navigateTo(nextPage: number) {
-        if (page !== nextPage) {
-            setSearchParams(formatPageQueryParam(nextPage))
+    function navigateTo(nextPage: number, newPageSize: number) {
+        if (page !== nextPage || pageSize !== newPageSize) {
+            setSearchParams(formatPageQueryParam(nextPage, newPageSize))
         }
     }
 
     useEffect(() => {
         const pageString = searchParams.get(pageQueryParameter)
+        let fetchNeeded = false
         if (pageString != null) {
             const page = parseInt(pageString)
             setPage(isNaN(page) ? 0 : page)
+            fetchNeeded = true
+        }
+        const pageSizeString = searchParams.get(pageSizeQueryParameter)
+        if (pageSizeString != null) {
+            const defaultPageSizeOptions = [10, 25, 50, 100]
+            const parsedPageSize = parseInt(pageSizeString)
+            const pageSize = parsedPageSize > 100 ? 100 : parsedPageSize
+            const pageSizeOptions = defaultPageSizeOptions.indexOf(pageSize) > -1 ? defaultPageSizeOptions : [...defaultPageSizeOptions, pageSize].sort((a,b) => a > b ? 1 : -1)
+            setPageSize(isNaN(pageSize) ? 10 : pageSize)
+            setPageSizeOptions(pageSizeOptions)
+            fetchNeeded = true
+        }
+        if(fetchNeeded){
             refetch()
         }
     }, [searchParams, refetch])
@@ -101,8 +117,8 @@ function EmailListPage() {
     function renderGrid() {
         return <div>
             <div className={"toolbar"}>
-                <DeleteEmailButton selectedEmail={getSelectedEmail()} />
-                <DeleteAllEmailsButton emailsAvailable={data !== undefined && data.numberOfElements > 0} />
+                <DeleteEmailButton selectedEmail={getSelectedEmail()}/>
+                <DeleteAllEmailsButton emailsAvailable={data !== undefined && data.numberOfElements > 0}/>
             </div>
             <DataGrid
                 columns={columns}
@@ -117,12 +133,12 @@ function EmailListPage() {
                 }}
                 rowSelectionModel={selectedRow > 0 ? [selectedRow] : []}
                 rowCount={data!.totalElements}
-                pageSizeOptions={[pageSize]}
+                pageSizeOptions={pageSizeOptions}
                 loading={isLoading}
                 paginationMode={'server'}
                 autoHeight={true}
                 density={'compact'}
-                onPaginationModelChange={(m, _) => navigateTo(m.page)}
+                onPaginationModelChange={(m, _) => navigateTo(m.page, m.pageSize)}
                 onRowSelectionModelChange={(m, _) => setSelectedRow(toSelectedRow(m))}
             />
         </div>;

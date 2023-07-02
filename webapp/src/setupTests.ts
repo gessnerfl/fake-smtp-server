@@ -42,7 +42,6 @@ const generateTestData = () : Email[] => Array.from(Array(15).keys()).map(i => {
     }
 })
 
-const pageSize = 10;
 export const originalTestData = generateTestData()
 export let testData = [...originalTestData]
 
@@ -50,6 +49,8 @@ export const handlers = [
     rest.get('/api/emails', (req, res, ctx) => {
         const pageStr = req.url.searchParams.get('page')
         const page = pageStr !== null ? parseInt(pageStr) : 0
+        const pageSizeStr = req.url.searchParams.get('size')
+        const pageSize = pageSizeStr !== null ? parseInt(pageSizeStr) : 10
         if(page < 2) {
             const data = testData.slice(page * pageSize, pageSize)
             const totalEntries = testData.length

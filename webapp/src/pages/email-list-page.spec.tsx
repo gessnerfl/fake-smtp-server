@@ -23,6 +23,20 @@ describe('EmailListPage', () => {
         await waitFor(() => {
             shouldContainPage(testData.slice(0, 10))
         })
+
+        userEvent.click(screen.getByTitle("Go to next page"))
+
+        expect(screen.getByText("Inbox")).toBeInTheDocument()
+        await waitFor(() => {
+            shouldContainPage(testData.slice(10, 10))
+        })
+
+        userEvent.click(screen.getByTitle("Go to previous page"))
+
+        expect(screen.getByText("Inbox")).toBeInTheDocument()
+        await waitFor(() => {
+            shouldContainPage(testData.slice(0, 10))
+        })
     })
     it('render second page of email list', async () => {
         renderWithProviders(<MemoryRouter initialEntries={["/?page=1"]}><App/></MemoryRouter>);
@@ -30,6 +44,14 @@ describe('EmailListPage', () => {
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
             shouldContainPage(testData.slice(10, 10))
+        })
+    })
+    it('render first page of size 25', async () => {
+        renderWithProviders(<MemoryRouter initialEntries={["/?pageSize=25"]}><App/></MemoryRouter>);
+
+        expect(screen.getByText("Inbox")).toBeInTheDocument()
+        await waitFor(() => {
+            shouldContainPage(testData.slice(0, 25))
         })
     })
     it('should render email details on selection', async () => {
