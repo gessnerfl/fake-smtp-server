@@ -32,6 +32,14 @@ describe('EmailListPage', () => {
             shouldContainPage(testData.slice(10, 10))
         })
     })
+    it('render first page of size 25', async () => {
+        renderWithProviders(<MemoryRouter initialEntries={["/?pageSize=25"]}><App/></MemoryRouter>);
+
+        expect(screen.getByText("Inbox")).toBeInTheDocument()
+        await waitFor(() => {
+            shouldContainPage(testData.slice(0, 25))
+        })
+    })
     it('should render email details on selection', async () => {
         renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
 
