@@ -131,7 +131,7 @@ test {
 
 tasks.register('copyJacocoReports', Copy) {
     from(file('build/reports/jacoco/test/jacocoTestReport.xml'))
-    into(file('.qodana/coverage-data/'))
+    into(file('.qodana/code-coverage/'))
 }
 
 jacocoTestReport {
