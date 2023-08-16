@@ -4,6 +4,7 @@
 /out/
 !gradle/wrapper/gradle-wrapper.jar
 /gradle/
+.qodana/
 
 ### STS ###
 .apt_generated

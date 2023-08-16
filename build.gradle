@@ -129,11 +129,17 @@ test {
     finalizedBy jacocoTestReport
 }
 
+tasks.register('copyJacocoReports', Copy) {
+    from(file('build/reports/jacoco/test/jacocoTestReport.xml'))
+    into(file('.qodana/coverage-data/'))
+}
+
 jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
     }
+    finalizedBy copyJacocoReports
 }
 
 jib {
