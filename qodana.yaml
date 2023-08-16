@@ -9,8 +9,8 @@ profile:
   name: qodana.starter
 
 #Enable inspections
-#include:
-#  - name: <SomeEnabledInspectionId>
+include:
+  - name: JvmCoverageInspection
 
 #Disable inspections
 #exclude:
