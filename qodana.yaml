@@ -11,6 +11,7 @@ profile:
 #Enable inspections
 include:
   - name: JvmCoverageInspection
+  - name: CheckDependencyLicenses
 
 #Disable inspections
 #exclude:
