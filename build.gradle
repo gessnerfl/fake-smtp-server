@@ -48,7 +48,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0')
 
-    runtimeOnly("com.h2database:h2:2.1.214")
+    runtimeOnly("com.h2database:h2:2.2.222")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
