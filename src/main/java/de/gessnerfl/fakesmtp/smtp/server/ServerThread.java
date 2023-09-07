@@ -240,13 +240,6 @@ class ServerThread extends Thread {
 		connectionPermits.release();
 	}
 
-	private static final class SocketSession {
-		final Socket socket;
-		final Session session;
-
-		public SocketSession(Socket socket, Session session) {
-			this.socket = socket;
-			this.session = session;
-		}
+	private record SocketSession(Socket socket, Session session) {
 	}
 }
