@@ -42,7 +42,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("commons-io:commons-io:2.13.0")
-    implementation("org.yaml:snakeyaml:2.0")
+    implementation("org.yaml:snakeyaml:2.2")
     implementation('org.flywaydb:flyway-core')
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
