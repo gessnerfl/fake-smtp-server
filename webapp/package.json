@@ -6,7 +6,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@fontsource/roboto": "^5.0.1",
-    "@mui/icons-material": "^5.11.16",
+    "@mui/icons-material": "^5.14.11",
     "@mui/material": "^5.12.0",
     "@mui/x-data-grid": "^6.5.0",
     "@reduxjs/toolkit": "^1.9.3",
