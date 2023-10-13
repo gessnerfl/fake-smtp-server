@@ -54,6 +54,9 @@ Documentation (http://docs.spring.io/spring-boot/docs/current/reference/htmlsing
 The configuration file application.yaml can be placed next to the application jar, in a sub-directory config or 
 in any other location when specifying the location with the parameter `-Dspring.config.location=<path to config file>`.
 
+All configuration parameters can also be passed as environment variables using uppercase characters and underscores as 
+separators such as `SERVER_PORT` or `MANAGEMENT_SERVER_PORT`.
+
 The following paragraphs describe the application specific resp. pre-defined configuration parameters.
 
 ## Fake SMTP Server
