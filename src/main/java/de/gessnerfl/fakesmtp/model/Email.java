@@ -40,8 +40,8 @@ public class Email {
     @Basic(optional = false)
     private String rawData;
 
-    @Column(name = "message_id", nullable = false)
-    @Basic(optional = false)
+    @Column(name = "message_id", nullable = true)
+    @Basic(optional = true)
     private String messageId;
 
     @OneToMany(mappedBy = "email", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -148,8 +148,8 @@ public class Email {
         return inlineImages;
     }
 
-    public String getMessageId() {
-        return messageId;
+    public Optional<String> getMessageId() {
+        return Optional.ofNullable(messageId);
     }
 
     public void setMessageId(String messageId) {
