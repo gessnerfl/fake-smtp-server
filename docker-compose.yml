@@ -2,9 +2,12 @@ version: '3'
 
 services:
   fake-smtp-server:
-    image: gessnerfl/fake-smtp-server:2.1.0
+    image: gessnerfl/fake-smtp-server:2.1.3
     hostname: "fake-smtp-server"
     restart: always
+    environment:
+      - FAKESMTP_AUTHENTICATION_USERNAME=myuser
+      - FAKESMTP_AUTHENTICATION_PASSWORD=mysecretpassword
     ports:
       - 8025:8025      #expose smtp port
       - 8080:8080      #expose web ui
