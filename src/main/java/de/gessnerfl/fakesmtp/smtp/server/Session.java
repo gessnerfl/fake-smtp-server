@@ -281,8 +281,8 @@ public class Session implements Runnable, MessageContext {
     public void setSocket(final Socket socket) throws IOException {
         this.socket = socket;
         this.input = this.socket.getInputStream();
-        this.reader = new CRLFTerminatedReader(this.input, StandardCharsets.US_ASCII);
-        this.writer = new PrintWriter(new OutputStreamWriter(this.socket.getOutputStream(), StandardCharsets.US_ASCII));
+        this.reader = new CRLFTerminatedReader(this.input,StandardCharsets.UTF_8);
+        this.writer = new PrintWriter(new OutputStreamWriter(this.socket.getOutputStream(), StandardCharsets.UTF_8));
 
         this.socket.setSoTimeout(CONNECTION_TIMEOUT);
     }
