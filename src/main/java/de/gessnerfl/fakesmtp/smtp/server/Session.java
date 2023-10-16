@@ -212,33 +212,30 @@ public class Session implements Runnable, MessageContext {
         this.sendResponse("220 " + this.server.getHostName() + " ESMTP " + this.server.getSoftwareName());
 
         while (!this.quitting) {
-            onCommandLoop();
-        }
-    }
+            try {
+                Optional<String> line = readCommandLine();
+                if (line.isPresent()) {
+                    LOGGER.debug("Client: {}", line);
+                    this.server.getCommandHandler().handleCommand(this, line.get());
+                } else {
+                    LOGGER.debug("no more lines from client");
+                    return;
+                }
+            } catch (final SocketTimeoutException ex) {
+                this.sendResponse("421 Timeout waiting for data from client.");
+            } catch (final CRLFTerminatedReader.TerminationException te) {
+                final String msg = "501 Syntax error at character position "
+                        + te.position()
+                        + ". CR and LF must be CRLF paired.  See RFC 2821 #2.7.1.";
 
-    private void onCommandLoop() throws IOException {
-        try {
-            Optional<String> line = readCommandLine();
-            if (line.isPresent()) {
-                LOGGER.debug("Client: {}", line);
-                this.server.getCommandHandler().handleCommand(this, line.get());
-            } else {
-                LOGGER.debug("no more lines from client");
+                LOGGER.debug(msg);
+                this.sendResponse(msg);
+            } catch (final CRLFTerminatedReader.MaxLineLengthException mlle) {
+                final String msg = "501 " + mlle.getMessage();
+
+                LOGGER.debug(msg);
+                this.sendResponse(msg);
             }
-        } catch (final SocketTimeoutException ex) {
-            this.sendResponse("421 Timeout waiting for data from client.");
-        } catch (final CRLFTerminatedReader.TerminationException te) {
-            final String msg = "501 Syntax error at character position "
-                    + te.position()
-                    + ". CR and LF must be CRLF paired.  See RFC 2821 #2.7.1.";
-
-            LOGGER.debug(msg);
-            this.sendResponse(msg);
-        } catch (final CRLFTerminatedReader.MaxLineLengthException mlle) {
-            final String msg = "501 " + mlle.getMessage();
-
-            LOGGER.debug(msg);
-            this.sendResponse(msg);
         }
     }
 
