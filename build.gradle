@@ -44,7 +44,7 @@ dependencies {
     implementation("commons-io:commons-io:2.14.0")
     implementation("org.yaml:snakeyaml:2.2")
     implementation('org.flywaydb:flyway-core')
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.3")
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.4")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0')
 
