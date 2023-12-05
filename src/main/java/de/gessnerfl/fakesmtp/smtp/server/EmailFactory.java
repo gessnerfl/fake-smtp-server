@@ -1,9 +1,9 @@
 package de.gessnerfl.fakesmtp.smtp.server;
 
-import com.sun.mail.util.BASE64DecoderStream;
 import de.gessnerfl.fakesmtp.model.*;
 import de.gessnerfl.fakesmtp.util.TimestampProvider;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.angus.mail.util.BASE64DecoderStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
