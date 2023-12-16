@@ -72,6 +72,13 @@ node {
     nodeProjectDir = file("${project.projectDir}/webapp")
 }
 
+tasks.register('webappClean', Delete) {
+    delete file("${project.projectDir}/webapp/build")
+    delete file("${project.projectDir}/webapp/dist")
+    delete file("${project.projectDir}/webapp/coverage")
+}
+clean.dependsOn webappClean
+
 tasks.register('webappNpmBuild', NpmTask) {
     dependsOn(npmInstall)
     args = ["run", "build"]
@@ -84,14 +91,14 @@ tasks.register('webappNpmTest', NpmTask) {
 
 tasks.register('copyStaticAssets', Copy) {
     dependsOn(compileJava, compileTestJava, webappNpmTest, resolveMainClassName)
-    from(file('webapp/build'))
+    from(file('webapp/dist'))
     into(file('build/resources/main/static/'))
     exclude("index.html")
 }
 
 tasks.register('copyTemplateAssets', Copy) {
     dependsOn(compileJava, compileTestJava, webappNpmTest, resolveMainClassName)
-    from(file('webapp/build/index.html'))
+    from(file('webapp/dist/index.html'))
     into(file('build/resources/main/templates/'))
     filter { line -> line.replaceAll(/(href|src)(=\")([^\"]+)(\")/, 'th:$1$2@{$3}$4').replaceAll(/(name="base-path"\s+)(content=")([^"]+)(")/, '$1th:$2@{$3}$4') }
 }
