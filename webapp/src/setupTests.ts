@@ -1,3 +1,4 @@
+import "whatwg-fetch";
 import {Email, EmailPage} from "./models/email";
 import {setupServer} from 'msw/node'
 import {rest} from 'msw'

@@ -5,6 +5,7 @@
 !gradle/wrapper/gradle-wrapper.jar
 /gradle/
 .qodana/
+dist/
 
 ### STS ###
 .apt_generated

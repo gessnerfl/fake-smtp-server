@@ -1,6 +1,6 @@
 plugins {
-    id "pl.allegro.tech.build.axion-release" version "1.15.5"
-    id "org.springframework.boot" version "3.1.4"
+    id "pl.allegro.tech.build.axion-release" version "1.16.1"
+    id "org.springframework.boot" version "3.2.1"
     id "org.sonarqube" version "4.4.1.3373"
     id 'com.google.cloud.tools.jib' version '3.4.0'
     id "com.github.node-gradle.node" version "7.0.1"
@@ -41,19 +41,19 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("commons-io:commons-io:2.14.0")
+    implementation("commons-io:commons-io:2.15.1")
     implementation("org.yaml:snakeyaml:2.2")
     implementation('org.flywaydb:flyway-core')
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.3")
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.4")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0')
+    implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0')
 
     runtimeOnly("com.h2database:h2:2.2.224")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.ow2.asm:asm:9.6")
-    testImplementation("org.apache.commons:commons-lang3:3.13.0")
+    testImplementation("org.apache.commons:commons-lang3:3.14.0")
     testImplementation("org.hamcrest:hamcrest-core:2.2")
 }
 
@@ -72,6 +72,13 @@ node {
     nodeProjectDir = file("${project.projectDir}/webapp")
 }
 
+tasks.register('webappClean', Delete) {
+    delete file("${project.projectDir}/webapp/build")
+    delete file("${project.projectDir}/webapp/dist")
+    delete file("${project.projectDir}/webapp/coverage")
+}
+clean.dependsOn webappClean
+
 tasks.register('webappNpmBuild', NpmTask) {
     dependsOn(npmInstall)
     args = ["run", "build"]
@@ -84,14 +91,14 @@ tasks.register('webappNpmTest', NpmTask) {
 
 tasks.register('copyStaticAssets', Copy) {
     dependsOn(compileJava, compileTestJava, webappNpmTest, resolveMainClassName)
-    from(file('webapp/build'))
+    from(file('webapp/dist'))
     into(file('build/resources/main/static/'))
     exclude("index.html")
 }
 
 tasks.register('copyTemplateAssets', Copy) {
     dependsOn(compileJava, compileTestJava, webappNpmTest, resolveMainClassName)
-    from(file('webapp/build/index.html'))
+    from(file('webapp/dist/index.html'))
     into(file('build/resources/main/templates/'))
     filter { line -> line.replaceAll(/(href|src)(=\")([^\"]+)(\")/, 'th:$1$2@{$3}$4').replaceAll(/(name="base-path"\s+)(content=")([^"]+)(")/, '$1th:$2@{$3}$4') }
 }
@@ -119,7 +126,7 @@ sonar {
         property "sonar.sources", "src/main,webapp/src"
         property "sonar.test.inclusions", "src/test/**/*.*, webapp/src/**/*.spec.ts, webapp/src/**/*.spec.tsx"
         property "sonar.javascript.lcov.reportPaths", "./webapp/coverage/lcov.info"
-        property "sonar.coverage.exclusions", "webapp/src/setupTests.ts, webapp/src/setupProxy.js"
+        property "sonar.coverage.exclusions", "webapp/src/setupTests.ts"
     }
 }
 
@@ -144,7 +151,7 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:17.0.8-al2023-headless'
+        image = 'amazoncorretto:17.0.9-al2023-headless'
         container {
             ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'
