@@ -160,7 +160,7 @@ jib {
         extraDirectories {
             paths {
                 path {
-                    from = 'webapp/build'
+                    from = 'webapp/dist'
                     into = '/app/resources/static'
                 }
             }
