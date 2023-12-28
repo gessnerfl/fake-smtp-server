@@ -15,7 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.*;
@@ -38,7 +39,7 @@ class EmailFactoryTest {
     @ParameterizedTest
     @ValueSource(strings = {"mail-with-subject.eml", "mail-with-subject-without-content-type.eml", "multipart-mail-plain-only.eml"})
     void shouldCreateMailPlainTextEmails(String testFilename) throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var dataAsString = new String(data, StandardCharsets.UTF_8);
         var rawData = new RawData(SENDER, RECEIVER, data);
@@ -50,7 +51,7 @@ class EmailFactoryTest {
         assertPlainTextEmail(now, dataAsString, result);
     }
 
-    private void assertPlainTextEmail(LocalDateTime now, String dataAsString, Email result) {
+    private void assertPlainTextEmail(ZonedDateTime now, String dataAsString, Email result) {
         assertEquals(SENDER, result.getFromAddress());
         assertEquals(RECEIVER, result.getToAddress());
         assertEquals("This is the mail title", result.getSubject());
@@ -65,7 +66,7 @@ class EmailFactoryTest {
 
     @Test
     void shouldCreateEmailForEmlFileWithSubjectAndContentTypeHtml() throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var testFilename = "mail-with-subject-and-content-type-html.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var dataAsString = new String(data, StandardCharsets.UTF_8);
@@ -89,7 +90,7 @@ class EmailFactoryTest {
 
     @Test
     void shouldCreateEmailForEmlFileWithSubjectAndContentTypeHtmlAndEmbeddedImage() throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var testFilename = "mail-with-subect-and-content-type-html-with-inline-image.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var dataAsString = new String(data, StandardCharsets.UTF_8);
@@ -118,7 +119,7 @@ class EmailFactoryTest {
 
     @Test
     void shouldThrowExceptionWhenInlineImageIsBroken() throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var testFilename = "mail-with-subect-and-content-type-html-with-broken-inline-image.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var rawData = new RawData(SENDER, RECEIVER, data);
@@ -134,7 +135,7 @@ class EmailFactoryTest {
 
     @Test
     void shouldCreateEmailForEmlFileWithoutSubjectAndContentTypePlain() throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var testFilename = "mail-without-subject.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var dataAsString = new String(data, StandardCharsets.UTF_8);
@@ -158,7 +159,7 @@ class EmailFactoryTest {
 
     @Test
     void shouldCreateMailForPlainText() throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var dataAsString = "this is just some dummy content";
         var data = dataAsString.getBytes(StandardCharsets.UTF_8);
         var rawData = new RawData(SENDER, RECEIVER, data);
@@ -181,7 +182,7 @@ class EmailFactoryTest {
 
     @Test
     void shouldCreateMailForMultipartWithContentTypeHtmlAndPlain() throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var testFilename = "multipart-mail.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var dataAsString = new String(data, StandardCharsets.UTF_8);
@@ -206,7 +207,7 @@ class EmailFactoryTest {
 
     @Test
     void shouldCreateMailForMultipartWithUnknownContentType() throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var testFilename = "multipart-mail-unknown-content-type.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var dataAsString = new String(data, StandardCharsets.UTF_8);
@@ -231,7 +232,7 @@ class EmailFactoryTest {
 
     @Test
     void shouldCreateMailForMultipartWithPlainAndHtmlContentAndAttachments() throws Exception {
-        var now = LocalDateTime.now();
+        var now = getUtcNow();
         var testFilename = "multipart-mail-html-and-plain-with-attachments.eml";
         var data = TestResourceUtil.getTestFileContentBytes(testFilename);
         var dataAsString = new String(data, StandardCharsets.UTF_8);
@@ -253,6 +254,10 @@ class EmailFactoryTest {
         assertEquals(now, result.getReceivedOn());
         assertThat(result.getAttachments(), hasSize(2));
         assertThat(result.getAttachments().stream().map(EmailAttachment::getFilename).collect(toList()), containsInAnyOrder("customizing.css", "app-icon.png"));
-    }    
+    }
+
+    private static ZonedDateTime getUtcNow() {
+        return ZonedDateTime.now(ZoneId.of("UTC"));
+    }
 
 }

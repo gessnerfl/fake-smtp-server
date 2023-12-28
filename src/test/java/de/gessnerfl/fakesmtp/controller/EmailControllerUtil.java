@@ -7,7 +7,8 @@ import de.gessnerfl.fakesmtp.model.EmailContent;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 class EmailControllerUtil {
 
@@ -15,7 +16,7 @@ class EmailControllerUtil {
 
     public static Email prepareRandomEmail(int minusMinutes) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
+        var receivedOn = getUtcNow().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
@@ -31,7 +32,7 @@ class EmailControllerUtil {
 
     public static Email prepareEmail(String subject, String toAdress, int minusMinutes) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
+        var receivedOn = getUtcNow().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
@@ -47,7 +48,7 @@ class EmailControllerUtil {
 
     public static Email prepareEmail(String subject, String toAdress, int minusMinutes, String messageId) {
         var randomToken = RandomStringUtils.randomAlphanumeric(6);
-        var receivedOn = LocalDateTime.now().minusMinutes(minusMinutes);
+        var receivedOn = getUtcNow().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
@@ -61,12 +62,16 @@ class EmailControllerUtil {
             receivedOn, "sender@example.com", toAdress, messageId);
     }
 
+    private static ZonedDateTime getUtcNow() {
+        return ZonedDateTime.now(ZoneId.of("UTC"));
+    }
+
     public static Email prepareEmail(
         EmailAttachment emailAttachment,
         EmailContent emailContent, 
         String subject,
         String rawData,
-        LocalDateTime receivedOn,
+        ZonedDateTime receivedOn,
         String fromAddress,
         String toAdress, 
         String messageId) {
