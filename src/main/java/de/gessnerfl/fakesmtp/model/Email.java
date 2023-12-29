@@ -1,10 +1,11 @@
 package de.gessnerfl.fakesmtp.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
@@ -33,7 +34,8 @@ public class Email {
     @Column(name = "received_on", nullable = false)
     @Basic(optional = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime receivedOn;
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone="UTC")
+    private ZonedDateTime receivedOn;
 
     @Lob
     @Column(name = "raw_data", nullable = false)
@@ -85,11 +87,11 @@ public class Email {
         this.subject = subject;
     }
 
-    public LocalDateTime getReceivedOn() {
+    public ZonedDateTime getReceivedOn() {
         return receivedOn;
     }
 
-    public void setReceivedOn(LocalDateTime receivedOn) {
+    public void setReceivedOn(ZonedDateTime receivedOn) {
         this.receivedOn = receivedOn;
     }
 

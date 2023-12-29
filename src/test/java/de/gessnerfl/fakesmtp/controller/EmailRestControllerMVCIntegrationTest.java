@@ -21,12 +21,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.hamcrest.MatcherAssert.*;
@@ -375,7 +376,7 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldSearchEmailsByReceivedOnGreaterThanOrEqualDates() throws Exception {
-        final var now = LocalDateTime.now();
+        final var now = getUtcNow();
         final var startDate = now.minusMinutes(1);
 
         createRandomEmails(5, 5);
@@ -383,7 +384,7 @@ class EmailRestControllerMVCIntegrationTest {
         createRandomEmails(5, 10);
         createRandomEmails(5, 15);
 
-        final var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        final var formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         final var greaterThanOrEqualExpression = new GreaterThanOrEqualExpression("receivedOn", startDate.format(formatter));
         final var searchRequest = SearchRequest.of(greaterThanOrEqualExpression);
 
@@ -402,7 +403,7 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldSearchEmailsByReceivedOnGreaterThanDates() throws Exception {
-        final var now = LocalDateTime.now();
+        final var now = getUtcNow();
         final var startDate = now.minusMinutes(1);
 
         createRandomEmails(5, 5);
@@ -410,7 +411,7 @@ class EmailRestControllerMVCIntegrationTest {
         createRandomEmails(5, 10);
         createRandomEmails(5, 15);
 
-        final var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        final var formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         final var greaterThanExpression = new GreaterThanExpression("receivedOn", startDate.format(formatter));
         final var searchRequest = SearchRequest.of(greaterThanExpression);
 
@@ -429,7 +430,7 @@ class EmailRestControllerMVCIntegrationTest {
 
     @Test
     void shouldSearchEmailsByReceivedOnLessThanDates() throws Exception {
-        final var now = LocalDateTime.now();
+        final var now = getUtcNow();
         final var endDate = now.minusMinutes(20);
 
         createRandomEmails(5, 5);
@@ -437,7 +438,7 @@ class EmailRestControllerMVCIntegrationTest {
         final var email1 = createRandomEmail(25);
         createRandomEmails(5, 15);
 
-        final var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        final var formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         final var lessThanExpression = new LessThanExpression("receivedOn", endDate.format(formatter));
         final var searchRequest = SearchRequest.of(lessThanExpression);
 
@@ -455,9 +456,13 @@ class EmailRestControllerMVCIntegrationTest {
         assertEquals(List.of(email1), emailSearchResult.getContent());
     }
 
+    private static ZonedDateTime getUtcNow() {
+        return ZonedDateTime.now(ZoneId.of("UTC"));
+    }
+
     @Test
     void shouldSearchEmailsByReceivedOnLessThanOrEqualDates() throws Exception {
-        final var now = LocalDateTime.now();
+        final var now = getUtcNow();
         final var endDate = now.minusMinutes(20);
 
         createRandomEmails(5, 5);
@@ -465,7 +470,7 @@ class EmailRestControllerMVCIntegrationTest {
         final var email1 = createRandomEmail(25);
         createRandomEmails(5, 15);
 
-        final var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        final var formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         final var lessThanOrEqualExpression = new LessThanOrEqualExpression("receivedOn", endDate.format(formatter));
         final var searchRequest = SearchRequest.of(lessThanOrEqualExpression);
 

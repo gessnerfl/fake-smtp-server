@@ -45,6 +45,7 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: false
+    time-zone: "UTC"
 
 springdoc:
   swagger-ui:
