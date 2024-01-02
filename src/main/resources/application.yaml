@@ -14,6 +14,10 @@ spring:
   profiles:
     active: default
 
+  threads:
+    virtual:
+      enabled: true
+
   datasource:
     url: jdbc:h2:mem:mail
     username: admin

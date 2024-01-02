@@ -14,11 +14,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
-          java-version: 17
+          java-version: 21
 
       - name: Build with Gradle
         run: ./gradlew build jacocoTestReport sonarqube --info
