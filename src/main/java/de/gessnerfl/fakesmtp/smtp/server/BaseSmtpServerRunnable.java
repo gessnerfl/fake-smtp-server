@@ -56,7 +56,7 @@ class BaseSmtpServerRunnable implements Runnable {
 		final int countOfConnectionPermits = MAX_CONNECTIONS + 10;
 		this.connectionPermits = new Semaphore(countOfConnectionPermits);
 		this.sessionThreads = new HashSet<>(countOfConnectionPermits * 4 / 3 + 1);
-		this.executorService = Executors.newVirtualThreadPerTaskExecutor();
+		this.executorService = server.isVirtualThreadsEnabled() ? Executors.newVirtualThreadPerTaskExecutor() : Executors.newCachedThreadPool();
 	}
 
 	/**

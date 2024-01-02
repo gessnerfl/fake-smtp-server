@@ -53,6 +53,7 @@ public class BaseSmtpServer implements SmtpServer {
     private final CommandHandler commandHandler;
     private Thread serverThread;
     private BaseSmtpServerRunnable baseSmtpServerRunnable;
+    private final boolean virtualThreadsEnabled;
 
     /**
      * True if this SMTPServer was started. It remains true even if the SMTPServer
@@ -96,8 +97,9 @@ public class BaseSmtpServer implements SmtpServer {
     public BaseSmtpServer(final String softwareName,
                           final MessageHandlerFactory handlerFactory,
                           final CommandHandler commandHandler,
-                          final SessionIdFactory sessionIdFactory) {
-        this(softwareName, handlerFactory, commandHandler, sessionIdFactory, null);
+                          final SessionIdFactory sessionIdFactory,
+                          final boolean virtualThreadsEnabled) {
+        this(softwareName, handlerFactory, commandHandler, sessionIdFactory, null, virtualThreadsEnabled);
     }
 
     /**
@@ -116,12 +118,14 @@ public class BaseSmtpServer implements SmtpServer {
                           final MessageHandlerFactory msgHandlerFact,
                           final CommandHandler commandHandler,
                           final SessionIdFactory sessionIdFactory,
-                          final AuthenticationHandlerFactory authHandlerFact) {
+                          final AuthenticationHandlerFactory authHandlerFact,
+                          final boolean virtualThreadsEnabled) {
         this.softwareName = softwareName;
         this.messageHandlerFactory = msgHandlerFact;
         this.authenticationHandlerFactory = authHandlerFact;
         this.commandHandler = commandHandler;
         this.sessionIdFactory = sessionIdFactory;
+        this.virtualThreadsEnabled = virtualThreadsEnabled;
 
         try {
             this.hostName = InetAddress.getLocalHost().getCanonicalHostName();
@@ -135,6 +139,10 @@ public class BaseSmtpServer implements SmtpServer {
      */
     public String getHostName() {
         return this.hostName == null ? UNKNOWN_HOSTNAME : this.hostName;
+    }
+
+    public boolean isVirtualThreadsEnabled() {
+        return virtualThreadsEnabled;
     }
 
     /**
@@ -183,7 +191,8 @@ public class BaseSmtpServer implements SmtpServer {
         }
 
         final var serverThread = new BaseSmtpServerRunnable(this, serverSocket);
-        this.serverThread = Thread.ofVirtual().name(BaseSmtpServerRunnable.class.getName() + " " + getDisplayableLocalSocketAddress()).start(serverThread);
+        final var threadBuilder = isVirtualThreadsEnabled() ? Thread.ofVirtual() : Thread.ofPlatform();
+        this.serverThread = threadBuilder.name(BaseSmtpServerRunnable.class.getName() + " " + getDisplayableLocalSocketAddress()).start(serverThread);
         this.baseSmtpServerRunnable = serverThread;
 
         this.started = true;
