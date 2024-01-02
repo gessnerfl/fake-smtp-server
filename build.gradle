@@ -27,8 +27,8 @@ project.archivesBaseName = "fake-smtp-server"
 ext.scmUrl = "git@github.com:gessnerfl/fake-smtp-server.git"
 ext.projectUrl = "https://github.com/gessnerfl/fake-smtp-server"
 
-sourceCompatibility = 17
-targetCompatibility = 17
+sourceCompatibility = 21
+targetCompatibility = 21
 
 repositories {
     mavenCentral()
@@ -70,6 +70,10 @@ gradle.projectsEvaluated {
 
 node {
     nodeProjectDir = file("${project.projectDir}/webapp")
+    npmInstallCommand = System.getenv("CI") ? 'ci' : 'install'
+    download = true
+    version = "20.10.0"
+    npmVersion = "10.2.5"
 }
 
 tasks.register('webappClean', Delete) {
@@ -151,7 +155,7 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:17.0.9-al2023-headless'
+        image = 'amazoncorretto:21.0.1-al2023-headless'
         container {
             ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'

@@ -6,6 +6,7 @@ import de.gessnerfl.fakesmtp.smtp.command.CommandHandler;
 import de.gessnerfl.fakesmtp.smtp.server.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
     private final List<MessageListener> messageListeners;
     private final BasicUsernamePasswordValidator basicUsernamePasswordValidator;
     private final CommandHandler commandHandler;
+    private final boolean virtualThreadsEnabled;
     private final Logger logger;
 
     @Autowired
@@ -31,12 +33,14 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
                                 List<MessageListener> messageListeners,
                                 BasicUsernamePasswordValidator basicUsernamePasswordValidator,
                                 CommandHandler commandHandler,
+                                @Value("${spring.threads.virtual.enabled:false}") boolean virtualThreadsEnabled,
                                 Logger logger) {
         this.buildProperties = buildProperties;
         this.fakeSmtpConfigurationProperties = fakeSmtpConfigurationProperties;
         this.messageListeners = messageListeners;
         this.basicUsernamePasswordValidator = basicUsernamePasswordValidator;
         this.commandHandler = commandHandler;
+        this.virtualThreadsEnabled = virtualThreadsEnabled;
         this.logger = logger;
     }
 
@@ -64,7 +68,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
 
     BaseSmtpServer createBaseSmtpServerFor(MessageListenerAdapter messageListenerAdapter, SessionIdFactory sessionIdFactory){
         final var softwareName = "FakeSMTPServer " + buildProperties.getVersion();
-        return new BaseSmtpServer(softwareName, messageListenerAdapter, commandHandler, sessionIdFactory);
+        return new BaseSmtpServer(softwareName, messageListenerAdapter, commandHandler, sessionIdFactory, virtualThreadsEnabled);
     }
 
     private void configureAuthentication(BaseSmtpServer smtpServer, FakeSmtpConfigurationProperties.Authentication authentication) {

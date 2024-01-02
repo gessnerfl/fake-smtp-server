@@ -43,7 +43,7 @@ class BaseSmtpServerConfigTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, Collections.singletonList(baseMessageListener), basicUsernamePasswordValidator, commandHandler, logger));
+        sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, Collections.singletonList(baseMessageListener), basicUsernamePasswordValidator, commandHandler, true, logger));
         when(sut.createBaseSmtpServerFor(any(MessageListenerAdapter.class), any(SessionIdFactory.class))).thenReturn(smtpServer);
     }
 

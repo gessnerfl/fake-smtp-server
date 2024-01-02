@@ -42,7 +42,7 @@ public class Session implements Runnable, MessageContext {
      * A link to our parent server thread, which must be notified when this
      * connection is finished.
      */
-    private final ServerThread serverThread;
+    private final BaseSmtpServerRunnable baseSmtpServerRunnable;
 
     /**
      * Saved SLF4J mapped diagnostic context of the parent thread. The parent thread
@@ -113,9 +113,9 @@ public class Session implements Runnable, MessageContext {
      * @param socket is the socket to the client
      * @throws IOException on IO error
      */
-    public Session(final BaseSmtpServer server, final ServerThread serverThread, final Socket socket) throws IOException {
+    public Session(final BaseSmtpServer server, final BaseSmtpServerRunnable baseSmtpServerRunnable, final Socket socket) throws IOException {
         this.server = server;
-        this.serverThread = serverThread;
+        this.baseSmtpServerRunnable = baseSmtpServerRunnable;
 
         this.setSocket(socket);
     }
@@ -161,7 +161,7 @@ public class Session implements Runnable, MessageContext {
 
             LOGGER.debug("SMTP connection from {}, new connection count: {}",
                     remoteInetAddress,
-                    this.serverThread.getNumberOfConnections());
+                    this.baseSmtpServerRunnable.getNumberOfConnections());
         }
     }
 
@@ -188,7 +188,7 @@ public class Session implements Runnable, MessageContext {
     private void onRunCompleted(String originalName) {
         this.closeConnection();
         this.endMessageHandler();
-        serverThread.sessionEnded(this);
+        baseSmtpServerRunnable.sessionEnded(this);
         Thread.currentThread().setName(originalName);
         MDC.clear();
     }
@@ -202,7 +202,7 @@ public class Session implements Runnable, MessageContext {
      * @throws IOException if sending to or receiving from the client fails.
      */
     private void runCommandLoop() throws IOException {
-        if (this.serverThread.hasTooManyConnections()) {
+        if (this.baseSmtpServerRunnable.hasTooManyConnections()) {
             LOGGER.debug("SMTP Too many connections!");
 
             this.sendResponse("421 Too many connections, try again later");

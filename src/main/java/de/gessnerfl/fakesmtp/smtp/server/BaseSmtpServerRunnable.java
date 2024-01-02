@@ -15,8 +15,8 @@ import org.slf4j.MDC;
  * {@link Session} thread for each connection which will handle the connection.
  * On shutdown it terminates not only this thread, but the session threads too.
  */
-class ServerThread extends Thread {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ServerThread.class);
+class BaseSmtpServerRunnable implements Runnable {
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseSmtpServerRunnable.class);
 
 	/**
 	 * set a hard limit on the maximum number of connections this server will accept
@@ -48,8 +48,7 @@ class ServerThread extends Thread {
 	 */
 	private volatile boolean shuttingDown;
 
-	public ServerThread(final BaseSmtpServer server, final ServerSocket serverSocket) {
-		super(ServerThread.class.getName() + " " + server.getDisplayableLocalSocketAddress());
+	public BaseSmtpServerRunnable(final BaseSmtpServer server, final ServerSocket serverSocket) {
 		this.server = server;
 		this.serverSocket = serverSocket;
 		// reserve a few places for graceful disconnects with informative
@@ -57,7 +56,7 @@ class ServerThread extends Thread {
 		final int countOfConnectionPermits = MAX_CONNECTIONS + 10;
 		this.connectionPermits = new Semaphore(countOfConnectionPermits);
 		this.sessionThreads = new HashSet<>(countOfConnectionPermits * 4 / 3 + 1);
-		this.executorService = Executors.newCachedThreadPool();
+		this.executorService = server.isVirtualThreadsEnabled() ? Executors.newVirtualThreadPerTaskExecutor() : Executors.newCachedThreadPool();
 	}
 
 	/**
@@ -178,12 +177,6 @@ class ServerThread extends Thread {
 	private void shutdownServerThread() {
 		shuttingDown = true;
 		closeServerSocket();
-		interrupt();
-		try {
-			join();
-		} catch (final InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
 	}
 
 	/**

@@ -51,7 +51,9 @@ public class BaseSmtpServer implements SmtpServer {
     private final MessageHandlerFactory messageHandlerFactory;
     private AuthenticationHandlerFactory authenticationHandlerFactory;
     private final CommandHandler commandHandler;
-    private ServerThread serverThread;
+    private Thread serverThread;
+    private BaseSmtpServerRunnable baseSmtpServerRunnable;
+    private final boolean virtualThreadsEnabled;
 
     /**
      * True if this SMTPServer was started. It remains true even if the SMTPServer
@@ -95,8 +97,9 @@ public class BaseSmtpServer implements SmtpServer {
     public BaseSmtpServer(final String softwareName,
                           final MessageHandlerFactory handlerFactory,
                           final CommandHandler commandHandler,
-                          final SessionIdFactory sessionIdFactory) {
-        this(softwareName, handlerFactory, commandHandler, sessionIdFactory, null);
+                          final SessionIdFactory sessionIdFactory,
+                          final boolean virtualThreadsEnabled) {
+        this(softwareName, handlerFactory, commandHandler, sessionIdFactory, null, virtualThreadsEnabled);
     }
 
     /**
@@ -115,12 +118,14 @@ public class BaseSmtpServer implements SmtpServer {
                           final MessageHandlerFactory msgHandlerFact,
                           final CommandHandler commandHandler,
                           final SessionIdFactory sessionIdFactory,
-                          final AuthenticationHandlerFactory authHandlerFact) {
+                          final AuthenticationHandlerFactory authHandlerFact,
+                          final boolean virtualThreadsEnabled) {
         this.softwareName = softwareName;
         this.messageHandlerFactory = msgHandlerFact;
         this.authenticationHandlerFactory = authHandlerFact;
         this.commandHandler = commandHandler;
         this.sessionIdFactory = sessionIdFactory;
+        this.virtualThreadsEnabled = virtualThreadsEnabled;
 
         try {
             this.hostName = InetAddress.getLocalHost().getCanonicalHostName();
@@ -134,6 +139,10 @@ public class BaseSmtpServer implements SmtpServer {
      */
     public String getHostName() {
         return this.hostName == null ? UNKNOWN_HOSTNAME : this.hostName;
+    }
+
+    public boolean isVirtualThreadsEnabled() {
+        return virtualThreadsEnabled;
     }
 
     /**
@@ -181,8 +190,11 @@ public class BaseSmtpServer implements SmtpServer {
             throw new FailedToCreateServerSocketException(e);
         }
 
-        this.serverThread = new ServerThread(this, serverSocket);
-        this.serverThread.start();
+        final var serverThread = new BaseSmtpServerRunnable(this, serverSocket);
+        final var threadBuilder = isVirtualThreadsEnabled() ? Thread.ofVirtual() : Thread.ofPlatform();
+        this.serverThread = threadBuilder.name(BaseSmtpServerRunnable.class.getName() + " " + getDisplayableLocalSocketAddress()).start(serverThread);
+        this.baseSmtpServerRunnable = serverThread;
+
         this.started = true;
     }
 
@@ -193,11 +205,19 @@ public class BaseSmtpServer implements SmtpServer {
     @PreDestroy
     public synchronized void stop() {
         LOGGER.info("SMTP server {} stopping...", getDisplayableLocalSocketAddress());
-        if (this.serverThread != null) {
-            this.serverThread.shutdown();
-            this.serverThread = null;
-            LOGGER.info("SMTP server {} stopped", getDisplayableLocalSocketAddress());
+        if (this.baseSmtpServerRunnable != null) {
+            this.baseSmtpServerRunnable.shutdown();
+            this.baseSmtpServerRunnable = null;
         }
+        if(this.serverThread != null) {
+            this.serverThread.interrupt();
+            try {
+                this.serverThread.join();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        LOGGER.info("SMTP server {} stopped", getDisplayableLocalSocketAddress());
     }
 
     @SuppressWarnings("java:S2095")
