@@ -51,7 +51,8 @@ public class BaseSmtpServer implements SmtpServer {
     private final MessageHandlerFactory messageHandlerFactory;
     private AuthenticationHandlerFactory authenticationHandlerFactory;
     private final CommandHandler commandHandler;
-    private ServerThread serverThread;
+    private Thread serverThread;
+    private BaseSmtpServerRunnable baseSmtpServerRunnable;
 
     /**
      * True if this SMTPServer was started. It remains true even if the SMTPServer
@@ -181,8 +182,10 @@ public class BaseSmtpServer implements SmtpServer {
             throw new FailedToCreateServerSocketException(e);
         }
 
-        this.serverThread = new ServerThread(this, serverSocket);
-        this.serverThread.start();
+        final var serverThread = new BaseSmtpServerRunnable(this, serverSocket);
+        this.serverThread = Thread.ofVirtual().name(BaseSmtpServerRunnable.class.getName() + " " + getDisplayableLocalSocketAddress()).start(serverThread);
+        this.baseSmtpServerRunnable = serverThread;
+
         this.started = true;
     }
 
@@ -193,11 +196,19 @@ public class BaseSmtpServer implements SmtpServer {
     @PreDestroy
     public synchronized void stop() {
         LOGGER.info("SMTP server {} stopping...", getDisplayableLocalSocketAddress());
-        if (this.serverThread != null) {
-            this.serverThread.shutdown();
-            this.serverThread = null;
-            LOGGER.info("SMTP server {} stopped", getDisplayableLocalSocketAddress());
+        if (this.baseSmtpServerRunnable != null) {
+            this.baseSmtpServerRunnable.shutdown();
+            this.baseSmtpServerRunnable = null;
         }
+        if(this.serverThread != null) {
+            this.serverThread.interrupt();
+            try {
+                this.serverThread.join();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        LOGGER.info("SMTP server {} stopped", getDisplayableLocalSocketAddress());
     }
 
     @SuppressWarnings("java:S2095")

@@ -8,15 +8,28 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 
 import jakarta.mail.MessagingException;
 
+import java.util.concurrent.Executors;
+
 public class TestDataCreator {
 
+    private static final int NUMBER_OF_THREADS = 5;
     private static final int NUMBER_OF_TEST_EMAILS = 5;
 
     public static void main(String[] args) {
+        try(final var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+                final var thread = i;
+                executor.execute(() -> sendEmails(thread));
+            }
+        }
+    }
+
+    private static void sendEmails(int thread) {
+        final var idBase = thread * 1000;
         for(var i = 0; i < NUMBER_OF_TEST_EMAILS; i++){
-            createEmail(i);
-            createHtmlEmail(i);
-            createMimeAlternativeEmail(i);
+            createEmail(idBase + 100 + i);
+            createHtmlEmail(idBase + 200 + i);
+            createMimeAlternativeEmail(idBase + 300 + i);
         }
         createLongPlainEmail();
         createHtmlEmailWithoutHtmlStructure();
@@ -27,7 +40,7 @@ public class TestDataCreator {
         message.setTo("receiver@example.com");
         message.setFrom("sender@example.com");
         message.setSubject("Test-Plain-Mail " + i);
-        message.setText("This is the test mail number "+i);
+        message.setText("This is the test mail "+i);
         getEmailSender().send(message);
     }
 
@@ -53,7 +66,7 @@ public class TestDataCreator {
             helper.setTo("receiver@example.com");
             helper.setFrom("sender@example.com");
             helper.setSubject("Test-Html-Mail " + i);
-            helper.setText("<html><head><style>body {color: green; font-size:30px;}</style></head><body>This is the test mail number " + i + "</body>", true);
+            helper.setText("<html><head><style>body {color: green; font-size:30px;}</style></head><body>This is the test mail " + i + "</body>", true);
 
             sender.send(message);
         } catch (MessagingException e){
