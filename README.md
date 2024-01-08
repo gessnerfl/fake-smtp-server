@@ -25,7 +25,11 @@ and docker documentation (https://docs.docker.com/engine/reference/run/#env-envi
 
 # Running Fake SMTP Server locally
 
-**Note:** You need Java 17 installed to run Fake SMTP Server. 
+> [!NOTE]  
+> Starting with version 2.2.0 Java 21 is required to run Fake SMTP Server. 
+
+> [!NOTE]  
+> Starting with version 2.0.0 Java 17 is required to run Fake SMTP Server.
 
 ## Run from released JAR files
 
