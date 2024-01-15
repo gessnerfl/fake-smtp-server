@@ -21,6 +21,6 @@ jobs:
           java-version: 21
 
       - name: Run snapshot action
-        uses: mikepenz/gradle-dependency-submission@v0.9.1
+        uses: mikepenz/gradle-dependency-submission@v0.9.2
         with:
           use-gradlew: true
