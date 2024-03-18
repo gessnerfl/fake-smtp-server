@@ -35,7 +35,7 @@ CREATE TABLE email_inline_image (
     data CLOB NOT NULL,
     PRIMARY KEY (id)
 );
-ALTER TABLE email_attachment ADD FOREIGN KEY (email) REFERENCES email(id) ON DELETE CASCADE;
+ALTER TABLE email_inline_image ADD FOREIGN KEY (email) REFERENCES email(id) ON DELETE CASCADE;
 
 CREATE SEQUENCE email_sequence START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE email_content_sequence START WITH 1 INCREMENT BY 1;
