@@ -52,7 +52,7 @@ dependencies {
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.ow2.asm:asm:9.6")
+    testImplementation("org.ow2.asm:asm:9.7")
     testImplementation("org.apache.commons:commons-lang3:3.14.0")
     testImplementation("org.hamcrest:hamcrest-core:2.2")
 }
