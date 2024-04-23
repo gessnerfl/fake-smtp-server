@@ -2,7 +2,7 @@ version: '3'
 
 services:
   fake-smtp-server:
-    image: gessnerfl/fake-smtp-server:2.1.3
+    image: gessnerfl/fake-smtp-server:2.2.1
     hostname: "fake-smtp-server"
     restart: always
     environment:

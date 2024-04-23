@@ -1,8 +1,8 @@
 plugins {
     id "pl.allegro.tech.build.axion-release" version "1.17.0"
-    id "org.springframework.boot" version "3.2.3"
-    id "org.sonarqube" version "4.4.1.3373"
-    id 'com.google.cloud.tools.jib' version '3.4.1'
+    id "org.springframework.boot" version "3.2.5"
+    id "org.sonarqube" version "5.0.0.4638"
+    id 'com.google.cloud.tools.jib' version '3.4.2'
     id "com.github.node-gradle.node" version "7.0.2"
 }
 
@@ -41,7 +41,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("commons-io:commons-io:2.15.1")
+    implementation("commons-io:commons-io:2.16.1")
     implementation("org.yaml:snakeyaml:2.2")
     implementation('org.flywaydb:flyway-core')
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
@@ -52,7 +52,7 @@ dependencies {
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.ow2.asm:asm:9.6")
+    testImplementation("org.ow2.asm:asm:9.7")
     testImplementation("org.apache.commons:commons-lang3:3.14.0")
     testImplementation("org.hamcrest:hamcrest-core:2.2")
 }
@@ -155,7 +155,7 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:21.0.2-al2023-headless'
+        image = 'amazoncorretto:21.0.3-al2023-headless'
         container {
             ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'
