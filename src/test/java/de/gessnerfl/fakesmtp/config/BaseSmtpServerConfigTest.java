@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import de.gessnerfl.fakesmtp.smtp.AuthenticationHandlerFactory;
 import de.gessnerfl.fakesmtp.smtp.auth.EasyAuthenticationHandlerFactory;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.core.io.ResourceLoader;
 
 import java.net.InetAddress;
 import java.util.Collections;
@@ -34,6 +35,8 @@ class BaseSmtpServerConfigTest {
     @Mock
     private BasicUsernamePasswordValidator basicUsernamePasswordValidator;
     @Mock
+    private ResourceLoader resourceLoader;
+    @Mock
     private BaseSmtpServer smtpServer;
     @Mock
     private Logger logger;
@@ -43,7 +46,7 @@ class BaseSmtpServerConfigTest {
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
-        sut = spy(new BaseSmtpServerConfig(buildProperties, fakeSmtpConfigurationProperties, Collections.singletonList(baseMessageListener), basicUsernamePasswordValidator, commandHandler, true, logger));
+        sut = spy(new BaseSmtpServerConfig(buildProperties, resourceLoader, fakeSmtpConfigurationProperties, Collections.singletonList(baseMessageListener), basicUsernamePasswordValidator, commandHandler, true, logger));
         when(sut.createBaseSmtpServerFor(any(MessageListenerAdapter.class), any(SessionIdFactory.class))).thenReturn(smtpServer);
     }
 

@@ -1,5 +1,7 @@
 package de.gessnerfl.fakesmtp.config;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,8 @@ public class FakeSmtpConfigurationProperties {
 
     private DataSize maxMessageSize;
     private boolean requireTLS = false;
+    @Valid
+    private KeyStore tlsKeystore;
     private boolean forwardEmails = false;
 
     @NotNull
@@ -94,6 +98,14 @@ public class FakeSmtpConfigurationProperties {
         this.requireTLS = requireTLS;
     }
 
+    public KeyStore getTlsKeystore() {
+        return tlsKeystore;
+    }
+
+    public void setTlsKeystore(KeyStore tlsKeystore) {
+        this.tlsKeystore = tlsKeystore;
+    }
+
     public boolean isForwardEmails() {
         return forwardEmails;
     }
@@ -137,6 +149,43 @@ public class FakeSmtpConfigurationProperties {
 
         public void setMaxNumberEmails(Integer maxNumberEmails) {
             this.maxNumberEmails = maxNumberEmails;
+        }
+    }
+
+    public static enum KeyStoreType {
+        PKCS12, JKS
+    }
+
+    public static class KeyStore {
+        @NotEmpty
+        private String location;
+        @NotEmpty
+        private String password;
+        @NotNull
+        private KeyStoreType type = KeyStoreType.JKS;
+
+        public @NotEmpty String getLocation() {
+            return location;
+        }
+
+        public void setLocation(@NotEmpty String location) {
+            this.location = location;
+        }
+
+        public @NotEmpty String getPassword() {
+            return password;
+        }
+
+        public void setPassword(@NotEmpty String password) {
+            this.password = password;
+        }
+
+        public @NotNull KeyStoreType getType() {
+            return type;
+        }
+
+        public void setType(@NotNull KeyStoreType type) {
+            this.type = type;
         }
     }
 }

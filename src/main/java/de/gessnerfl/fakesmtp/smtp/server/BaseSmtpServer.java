@@ -7,8 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 
 import de.gessnerfl.fakesmtp.smtp.command.CommandHandler;
 import jakarta.annotation.PostConstruct;
@@ -67,6 +67,7 @@ public class BaseSmtpServer implements SmtpServer {
      * If true, TLS is enabled
      */
     private boolean enableTLS = false;
+    private SSLContext sslContext;
 
     /**
      * If true, a TLS handshake is required; ignored if enableTLS=false
@@ -252,12 +253,14 @@ public class BaseSmtpServer implements SmtpServer {
      * @throws IOException when creating the socket failed
      */
     public SSLSocket createSSLSocket(final Socket socket) throws IOException {
-        final SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-        final InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
-        final SSLSocket s = (SSLSocket) sf.createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
-        s.setUseClientMode(false);
-        s.setEnabledCipherSuites(s.getSupportedCipherSuites());
-        return s;
+        final var sf = sslContext.getSocketFactory();
+        final var remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
+        final var tlsSocket = (SSLSocket) sf.createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
+        tlsSocket.setUseClientMode(false);
+        tlsSocket.setEnabledProtocols(tlsSocket.getSupportedProtocols());
+        tlsSocket.setEnabledCipherSuites(tlsSocket.getSupportedCipherSuites());
+        tlsSocket.setNeedClientAuth(false);
+        return tlsSocket;
     }
 
     public String getDisplayableLocalSocketAddress() {
@@ -312,6 +315,10 @@ public class BaseSmtpServer implements SmtpServer {
 
     public boolean getEnableTLS() {
         return enableTLS;
+    }
+
+    public void setSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
     }
 
     public boolean getRequireTLS() {

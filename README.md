@@ -91,7 +91,7 @@ fakesmtp:
   #Default: no limit
   maxMessageSize: 10MB
 
-  #Configure if TLS is required to connect to the SMTP server. Defaults to false
+  #Configure if TLS is required to connect to the SMTP server. Defaults to false. See TLS section below
   requireTLS: false
 
   #When set to true emails will be forwarded to a configured target email system. Therefore
@@ -111,6 +111,21 @@ fakesmtp:
     username: myuser
     #Password of the client to be authenticated
     password: mysecretpassword 
+```
+
+
+### TLS
+Optionally TLS can be activated. To configure TLS support, a trust store needs to be provided 
+containing the TLS certificate used by the FakeSMTP Server.
+
+```yaml
+fakesmtp:
+  requireTLS: true
+  #configuration of the truststore used the TLS support
+  tlsKeystore:
+    location: /path/to/truststore.p12
+    password: changeit
+    type: PKCS12 # or JKS
 ```
            
 

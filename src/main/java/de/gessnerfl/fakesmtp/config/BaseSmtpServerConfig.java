@@ -11,8 +11,15 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.List;
 
 @Profile("default")
@@ -20,6 +27,7 @@ import java.util.List;
 public class BaseSmtpServerConfig implements SmtpServerConfig {
 
     private final BuildProperties buildProperties;
+    private final ResourceLoader resourceLoader;
     private final FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties;
     private final List<MessageListener> messageListeners;
     private final BasicUsernamePasswordValidator basicUsernamePasswordValidator;
@@ -29,6 +37,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
 
     @Autowired
     public BaseSmtpServerConfig(BuildProperties buildProperties,
+                                ResourceLoader resourceLoader,
                                 FakeSmtpConfigurationProperties fakeSmtpConfigurationProperties,
                                 List<MessageListener> messageListeners,
                                 BasicUsernamePasswordValidator basicUsernamePasswordValidator,
@@ -36,6 +45,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
                                 @Value("${spring.threads.virtual.enabled:false}") boolean virtualThreadsEnabled,
                                 Logger logger) {
         this.buildProperties = buildProperties;
+        this.resourceLoader = resourceLoader;
         this.fakeSmtpConfigurationProperties = fakeSmtpConfigurationProperties;
         this.messageListeners = messageListeners;
         this.basicUsernamePasswordValidator = basicUsernamePasswordValidator;
@@ -56,8 +66,38 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
         if (fakeSmtpConfigurationProperties.getMaxMessageSize() != null){
             smtpServer.setMaxMessageSizeInBytes(fakeSmtpConfigurationProperties.getMaxMessageSize().toBytes());
         }
+        if(fakeSmtpConfigurationProperties.isRequireTLS() && fakeSmtpConfigurationProperties.getTlsKeystore() == null){
+            throw new IllegalArgumentException("SMTP server TLS keystore configuration is missing");
+        }
         smtpServer.setRequireTLS(fakeSmtpConfigurationProperties.isRequireTLS());
         smtpServer.setEnableTLS(fakeSmtpConfigurationProperties.isRequireTLS());
+
+        var tlsKeystoreConfig = fakeSmtpConfigurationProperties.getTlsKeystore();
+        if (tlsKeystoreConfig != null) {
+            logger.info("Setup TLS keystore of SMTP server");
+            var keyStoreFileStream = resourceLoader.getResource(tlsKeystoreConfig.getLocation());
+            var keyStorePassphrase =tlsKeystoreConfig.getPassword().toCharArray();
+            try {
+                var keyStore = KeyStore.getInstance(tlsKeystoreConfig.getType().name());
+                keyStore.load(keyStoreFileStream.getInputStream(), keyStorePassphrase);
+
+                var kmf = KeyManagerFactory.getInstance("SunX509");
+                kmf.init(keyStore, keyStorePassphrase);
+
+                var tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init((KeyStore) null);
+
+                var sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+                smtpServer.setSslContext(sslContext);
+                logger.info("Setup of TLS keystore of SMTP server completed");
+            } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException |
+                     UnrecoverableKeyException | KeyManagementException e) {
+                throw new IllegalStateException("Failed to setup TLS keystore of SMTP server");
+            }
+        }
+
         return smtpServer;
     }
 
