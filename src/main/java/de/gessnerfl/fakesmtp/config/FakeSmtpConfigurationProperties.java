@@ -152,7 +152,7 @@ public class FakeSmtpConfigurationProperties {
         }
     }
 
-    public static enum KeyStoreType {
+    public enum KeyStoreType {
         PKCS12, JKS
     }
 
