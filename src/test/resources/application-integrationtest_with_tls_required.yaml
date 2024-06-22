@@ -10,3 +10,7 @@ fakesmtp:
   blockedRecipientAddresses:
     - blocked@example.com
   requireTLS: true
+  tls-keystore:
+    location: classpath:tls-keystore.p12
+    password: changeit
+    type: PKCS12
