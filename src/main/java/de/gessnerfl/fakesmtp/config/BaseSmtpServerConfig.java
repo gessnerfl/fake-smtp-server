@@ -70,7 +70,7 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
             throw new IllegalArgumentException("SMTP server TLS keystore configuration is missing");
         }
         smtpServer.setRequireTLS(fakeSmtpConfigurationProperties.isRequireTLS());
-        smtpServer.setEnableTLS(fakeSmtpConfigurationProperties.isRequireTLS());
+        smtpServer.setEnableTLS(fakeSmtpConfigurationProperties.isRequireTLS() || fakeSmtpConfigurationProperties.getTlsKeystore() != null);
 
         var tlsKeystoreConfig = fakeSmtpConfigurationProperties.getTlsKeystore();
         if (tlsKeystoreConfig != null) {

@@ -120,8 +120,9 @@ containing the TLS certificate used by the FakeSMTP Server.
 
 ```yaml
 fakesmtp:
+  # true when TLS is mandatory otherwise TLS is optional
   requireTLS: true
-  #configuration of the truststore used the TLS support
+  #configuration of the truststore to enable support for TLS.
   tlsKeystore:
     location: /path/to/truststore.p12
     password: changeit
