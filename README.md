@@ -144,7 +144,7 @@ fakesmtp:
     maxNumberEmails: 50
     #each 5 minutes from 'initialDelay' (see below), the parallel process will check if the deletion is necessary
     fixedDelay: 300000
-    #each 'initialDelay (see above)  after 2 minutes from the start, the parallel process will start checking if the deletion is necessary
+    #each 'initialDelay' (see above)  after 2 minutes from the start, the parallel process will start checking if the deletion is necessary
     initialDelay: 120000
 ```
 
