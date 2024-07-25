@@ -24,7 +24,7 @@ public class EmailRetentionTimer {
         this.logger = logger;
     }
 
-    @Scheduled(fixedDelay = "#{fakeSmtpConfigurationProperties.getPersistence().getFixedDelay()}", initialDelay = "${fakeSmtpConfigurationProperties.getPersistence().getInitialDelay()}")
+    @Scheduled(fixedDelayString = "${fakesmtp.persistence.fixedDelay:300000}", initialDelayString = "${fakesmtp.persistence.initialDelay:60000}")
     public void deleteOutdatedMails(){
         var persistence = fakeSmtpConfigurationProperties.getPersistence();
         if(isDataRetentionConfigured(persistence)){

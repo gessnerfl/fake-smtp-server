@@ -139,15 +139,15 @@ public class FakeSmtpConfigurationProperties {
 
     public static class Persistence {
         static final int DEFAULT_MAX_NUMBER_EMAILS = 100;
-        static final int DEFAULT_FIXED_DELAY = 300000;
-        static final int DEFAULT_INITIAL_DELAY = 60000;
+        static final long DEFAULT_FIXED_DELAY = 300000L;
+        static final long DEFAULT_INITIAL_DELAY = 60000L;
 
         @NotNull
         private Integer maxNumberEmails = DEFAULT_MAX_NUMBER_EMAILS;
         @NotNull
-        private Integer fixedDelay = DEFAULT_FIXED_DELAY;
+        private Long fixedDelay = DEFAULT_FIXED_DELAY;
         @NotNull
-        private Integer initialDelay = DEFAULT_INITIAL_DELAY;
+        private Long initialDelay = DEFAULT_INITIAL_DELAY;
 
         public Integer getMaxNumberEmails() {
             return maxNumberEmails;
@@ -157,19 +157,19 @@ public class FakeSmtpConfigurationProperties {
             this.maxNumberEmails = maxNumberEmails;
         }
 
-        public Integer getFixedDelay() {
+        public Long getFixedDelay() {
             return fixedDelay;
         }
 
-        public void setFixedDelay(Integer fixedDelay) {
+        public void setFixedDelay(Long fixedDelay) {
             this.fixedDelay = fixedDelay;
         }
 
-        public Integer getInitialDelay() {
+        public Long getInitialDelay() {
             return initialDelay;
         }
 
-        public void setInitialDelay(Integer initialDelay) {
+        public void setInitialDelay(Long initialDelay) {
             this.initialDelay = initialDelay;
         }
     }
