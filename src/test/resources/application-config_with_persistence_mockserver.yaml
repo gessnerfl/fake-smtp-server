@@ -10,3 +10,5 @@ fakesmtp:
   bindAddress: 127.0.0.1
   persistence:
     maxNumberEmails: 5
+    fixedDelay: 100000
+    initialDelay: 100000

@@ -129,6 +129,24 @@ fakesmtp:
     type: PKCS12 # or JKS
 ```
            
+### SCHEDULE THE DELETION OF RECEIVED EMAILS
+
+To keep memory resources under control, there is a parallel process that deletes the oldest emails considering the maximum number of emails to retain and the time span to periodically recheck this maximum number of emails, controlling also the initial time to wait to start this parallel process. The default values are:
+
+- maxNumberEmails: 100
+- fixedDelay: 300000 # 5 minutes
+- initialDelay: 60000 # 1 minute
+
+```yaml
+fakesmtp:
+  persistence:
+    #max numbers of most recent emails to retain and not deleted by the parallel process
+    maxNumberEmails: 50
+    #each 5 minutes from 'initialDelay' (see below), the parallel process will check if the deletion is necessary
+    fixedDelay: 300000
+    #each 'initialDelay' (see above)  after 2 minutes from the start, the parallel process will start checking if the deletion is necessary
+    initialDelay: 120000
+```
 
 ## Web UI
 The following snippet shows the pre-defined web application configuration

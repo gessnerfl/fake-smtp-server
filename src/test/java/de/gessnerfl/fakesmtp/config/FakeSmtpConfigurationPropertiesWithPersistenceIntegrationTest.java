@@ -25,5 +25,7 @@ class FakeSmtpConfigurationPropertiesWithPersistenceIntegrationTest {
         Assertions.assertNull(sut.getAuthentication());
         Assertions.assertNotNull(sut.getPersistence());
         Assertions.assertEquals(5, sut.getPersistence().getMaxNumberEmails().intValue());
+        Assertions.assertEquals(100000, sut.getPersistence().getFixedDelay().intValue());
+        Assertions.assertEquals(100000, sut.getPersistence().getInitialDelay().intValue());
     }
 }
