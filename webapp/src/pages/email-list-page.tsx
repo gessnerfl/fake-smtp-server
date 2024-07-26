@@ -110,7 +110,7 @@ function EmailListPage() {
     }, [searchParams, refetch])
 
     function toSelectedRow(selection: GridRowSelectionModel): number {
-        const rowId = selection.pop()
+        const rowId = selection.length > 0 ? selection.at(0) : undefined
         return rowId ? parseInt(rowId.toString()) : noRowSelected
     }
 
