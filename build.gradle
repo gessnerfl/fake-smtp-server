@@ -155,7 +155,7 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:21.0.3-al2023-headless'
+        image = 'amazoncorretto:21.0.4-al2023-headless'
         container {
             ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'
