@@ -10,6 +10,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.InetAddress;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @ActiveProfiles({"mockserver", "config_with_auth_mockserver"})
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -26,6 +29,12 @@ class FakeSmtpConfigurationPropertiesWithAuthenticationIntegrationTest {
         Assertions.assertEquals("user", sut.getAuthentication().getUsername());
         Assertions.assertEquals("password", sut.getAuthentication().getPassword());
         Assertions.assertNotNull(sut.getPersistence());
-        Assertions.assertEquals(FakeSmtpConfigurationProperties.Persistence.DEFAULT_MAX_NUMBER_EMAILS, sut.getPersistence().getMaxNumberEmails().intValue());
+        assertNotNull(sut.getPersistence().getDataRetention());
+        assertNotNull(sut.getPersistence().getDataRetention().getEmails());
+        assertNotNull(sut.getPersistence().getDataRetention().getEmails().getTimer());
+        assertTrue(sut.getPersistence().getDataRetention().getEmails().isEnabled());
+        assertEquals(FakeSmtpConfigurationProperties.DataRetentionSetting.DEFAULT_MAX_NUMBER_RECORDS, sut.getPersistence().getDataRetention().getEmails().getMaxNumberOfRecords());
+        assertEquals(FakeSmtpConfigurationProperties.FixedDelayTimerSettings.DEFAULT_FIXED_DELAY, sut.getPersistence().getDataRetention().getEmails().getTimer().getFixedDelay());
+        assertEquals(FakeSmtpConfigurationProperties.FixedDelayTimerSettings.DEFAULT_INITIAL_DELAY, sut.getPersistence().getDataRetention().getEmails().getTimer().getInitialDelay());
     }
 }

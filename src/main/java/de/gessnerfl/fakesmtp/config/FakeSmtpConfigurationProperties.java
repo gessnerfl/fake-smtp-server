@@ -32,6 +32,7 @@ public class FakeSmtpConfigurationProperties {
     private boolean forwardEmails = false;
 
     @NotNull
+    @Valid
     private Persistence persistence = new Persistence();
 
     public Integer getPort() {
@@ -137,40 +138,90 @@ public class FakeSmtpConfigurationProperties {
         }
     }
 
-    public static class Persistence {
-        static final int DEFAULT_MAX_NUMBER_EMAILS = 100;
+    public static class FixedDelayTimerSettings {
         static final long DEFAULT_FIXED_DELAY = 300000L;
         static final long DEFAULT_INITIAL_DELAY = 60000L;
 
-        @NotNull
-        private Integer maxNumberEmails = DEFAULT_MAX_NUMBER_EMAILS;
-        @NotNull
-        private Long fixedDelay = DEFAULT_FIXED_DELAY;
-        @NotNull
-        private Long initialDelay = DEFAULT_INITIAL_DELAY;
+        private long fixedDelay = DEFAULT_FIXED_DELAY;
+        private long initialDelay = DEFAULT_INITIAL_DELAY;
 
-        public Integer getMaxNumberEmails() {
-            return maxNumberEmails;
-        }
-
-        public void setMaxNumberEmails(Integer maxNumberEmails) {
-            this.maxNumberEmails = maxNumberEmails;
-        }
-
-        public Long getFixedDelay() {
+        public long getFixedDelay() {
             return fixedDelay;
         }
 
-        public void setFixedDelay(Long fixedDelay) {
+        public void setFixedDelay(long fixedDelay) {
             this.fixedDelay = fixedDelay;
         }
 
-        public Long getInitialDelay() {
+        public long getInitialDelay() {
             return initialDelay;
         }
 
-        public void setInitialDelay(Long initialDelay) {
+        public void setInitialDelay(long initialDelay) {
             this.initialDelay = initialDelay;
+        }
+    }
+    
+    public static class DataRetentionSetting {
+        static final int DEFAULT_MAX_NUMBER_RECORDS = 100;
+
+        private boolean enabled = true;
+        private int maxNumberOfRecords = DEFAULT_MAX_NUMBER_RECORDS;
+        @NotNull
+        @Valid
+        private FixedDelayTimerSettings timer = new FixedDelayTimerSettings();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public int getMaxNumberOfRecords() {
+            return maxNumberOfRecords;
+        }
+
+        public void setMaxNumberOfRecords(int maxNumberOfRecords) {
+            this.maxNumberOfRecords = maxNumberOfRecords;
+        }
+
+        public @NotNull @Valid FixedDelayTimerSettings getTimer() {
+            return timer;
+        }
+
+        public void setTimer(@NotNull @Valid FixedDelayTimerSettings timer) {
+            this.timer = timer;
+        }
+    }
+
+    public static class DataRetention {
+        @NotNull
+        @Valid
+        private DataRetentionSetting emails = new DataRetentionSetting();
+
+        public @NotNull @Valid DataRetentionSetting getEmails() {
+            return emails;
+        }
+
+        public void setEmails(@NotNull @Valid DataRetentionSetting emails) {
+            this.emails = emails;
+        }
+    }
+
+    public static class Persistence {
+
+        @NotNull
+        @Valid
+        private DataRetention dataRetention = new DataRetention();
+
+        public DataRetention getDataRetention() {
+            return dataRetention;
+        }
+
+        public void setDataRetention(DataRetention dataRetention) {
+            this.dataRetention = dataRetention;
         }
     }
 
