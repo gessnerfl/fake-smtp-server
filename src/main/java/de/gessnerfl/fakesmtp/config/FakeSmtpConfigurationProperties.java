@@ -161,67 +161,31 @@ public class FakeSmtpConfigurationProperties {
             this.initialDelay = initialDelay;
         }
     }
-    
-    public static class DataRetentionSetting {
-        static final int DEFAULT_MAX_NUMBER_RECORDS = 100;
-
-        private boolean enabled = true;
-        private int maxNumberOfRecords = DEFAULT_MAX_NUMBER_RECORDS;
-        @NotNull
-        @Valid
-        private FixedDelayTimerSettings timer = new FixedDelayTimerSettings();
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public int getMaxNumberOfRecords() {
-            return maxNumberOfRecords;
-        }
-
-        public void setMaxNumberOfRecords(int maxNumberOfRecords) {
-            this.maxNumberOfRecords = maxNumberOfRecords;
-        }
-
-        public @NotNull @Valid FixedDelayTimerSettings getTimer() {
-            return timer;
-        }
-
-        public void setTimer(@NotNull @Valid FixedDelayTimerSettings timer) {
-            this.timer = timer;
-        }
-    }
-
-    public static class DataRetention {
-        @NotNull
-        @Valid
-        private DataRetentionSetting emails = new DataRetentionSetting();
-
-        public @NotNull @Valid DataRetentionSetting getEmails() {
-            return emails;
-        }
-
-        public void setEmails(@NotNull @Valid DataRetentionSetting emails) {
-            this.emails = emails;
-        }
-    }
 
     public static class Persistence {
+        public static final int DEFAULT_MAX_NUMBER_EMAILS = 100;
+
+        @NotNull
+        private Integer maxNumberEmails = DEFAULT_MAX_NUMBER_EMAILS;
 
         @NotNull
         @Valid
-        private DataRetention dataRetention = new DataRetention();
+        private FixedDelayTimerSettings emailDataRetentionTimer = new FixedDelayTimerSettings();
 
-        public DataRetention getDataRetention() {
-            return dataRetention;
+        public @NotNull Integer getMaxNumberEmails() {
+            return maxNumberEmails;
         }
 
-        public void setDataRetention(DataRetention dataRetention) {
-            this.dataRetention = dataRetention;
+        public void setMaxNumberEmails(@NotNull Integer maxNumberEmails) {
+            this.maxNumberEmails = maxNumberEmails;
+        }
+
+        public @NotNull @Valid FixedDelayTimerSettings getEmailDataRetentionTimer() {
+            return emailDataRetentionTimer;
+        }
+
+        public void setEmailDataRetentionTimer(@NotNull @Valid FixedDelayTimerSettings emailDataRetentionTimer) {
+            this.emailDataRetentionTimer = emailDataRetentionTimer;
         }
     }
 

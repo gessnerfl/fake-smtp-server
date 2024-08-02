@@ -141,11 +141,12 @@ To keep memory resources under control, there is a parallel process that deletes
 ```yaml
 fakesmtp:
   persistence:
-    dataRetention:
+    maxNumberEmails:
       emails:
         #max numbers of most recent emails to retain and not deleted by the parallel process
-        maxNumberOfRecords: 10
-        timer:
+        maxNumberEmails: 10
+        # configuration settings of the background process (timer) responsible to delete the oldest emails
+        emailDataRetentionTimer:
           #each 5 minutes from 'initialDelay' (see below), the parallel process will check if the deletion is necessary
           fixedDelay: 300000
           #each 'initialDelay' (see above)  after 2 minutes from the start, the parallel process will start checking if the deletion is necessary

@@ -25,12 +25,9 @@ class FakeSmtpConfigurationPropertiesIntegrationTest {
         assertEquals(InetAddress.getByName("127.0.0.1"), sut.getBindAddress());
         assertNull(sut.getAuthentication());
         assertNotNull(sut.getPersistence());
-        assertNotNull(sut.getPersistence().getDataRetention());
-        assertNotNull(sut.getPersistence().getDataRetention().getEmails());
-        assertNotNull(sut.getPersistence().getDataRetention().getEmails().getTimer());
-        assertTrue(sut.getPersistence().getDataRetention().getEmails().isEnabled());
-        assertEquals(FakeSmtpConfigurationProperties.DataRetentionSetting.DEFAULT_MAX_NUMBER_RECORDS, sut.getPersistence().getDataRetention().getEmails().getMaxNumberOfRecords());
-        assertEquals(FakeSmtpConfigurationProperties.FixedDelayTimerSettings.DEFAULT_FIXED_DELAY, sut.getPersistence().getDataRetention().getEmails().getTimer().getFixedDelay());
-        assertEquals(FakeSmtpConfigurationProperties.FixedDelayTimerSettings.DEFAULT_INITIAL_DELAY, sut.getPersistence().getDataRetention().getEmails().getTimer().getInitialDelay());
+        assertNotNull(sut.getPersistence().getEmailDataRetentionTimer());
+        assertEquals(FakeSmtpConfigurationProperties.Persistence.DEFAULT_MAX_NUMBER_EMAILS, sut.getPersistence().getMaxNumberEmails());
+        assertEquals(FakeSmtpConfigurationProperties.FixedDelayTimerSettings.DEFAULT_FIXED_DELAY, sut.getPersistence().getEmailDataRetentionTimer().getFixedDelay());
+        assertEquals(FakeSmtpConfigurationProperties.FixedDelayTimerSettings.DEFAULT_INITIAL_DELAY, sut.getPersistence().getEmailDataRetentionTimer().getInitialDelay());
     }
 }

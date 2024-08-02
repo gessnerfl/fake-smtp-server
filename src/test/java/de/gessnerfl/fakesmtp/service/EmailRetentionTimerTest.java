@@ -28,12 +28,7 @@ class EmailRetentionTimerTest {
     void shouldTriggerDeletionWhenDataRetentionIsConfigured(){
         var maxNumber = 5;
         var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
-        var dataRetention = mock(FakeSmtpConfigurationProperties.DataRetention.class);
-        var emailRetention = mock(FakeSmtpConfigurationProperties.DataRetentionSetting.class);
-        when(persistence.getDataRetention()).thenReturn(dataRetention);
-        when(dataRetention.getEmails()).thenReturn(emailRetention);
-        when(emailRetention.isEnabled()).thenReturn(true);
-        when(emailRetention.getMaxNumberOfRecords()).thenReturn(maxNumber);
+        when(persistence.getMaxNumberEmails()).thenReturn(maxNumber);
         when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
 
         sut.deleteOutdatedMails();
@@ -42,30 +37,9 @@ class EmailRetentionTimerTest {
     }
 
     @Test
-    void shouldNotTriggerDeletionWhenEmailDataRetentionIsInActive(){
-        var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
-        var dataRetention = mock(FakeSmtpConfigurationProperties.DataRetention.class);
-        var emailRetention = mock(FakeSmtpConfigurationProperties.DataRetentionSetting.class);
-        when(persistence.getDataRetention()).thenReturn(dataRetention);
-        when(dataRetention.getEmails()).thenReturn(emailRetention);
-        when(emailRetention.isEnabled()).thenReturn(false);
-        when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
-
-        sut.deleteOutdatedMails();
-
-        verify(emailRepository, never()).deleteEmailsExceedingDateRetentionLimit(anyInt());
-    }
-
-    @Test
     void shouldNotTriggerDeletionWhenConfiguredMaxNumberIsLessOrEqualToZero(){
-        var maxNumber = 0;
         var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
-        var dataRetention = mock(FakeSmtpConfigurationProperties.DataRetention.class);
-        var emailRetention = mock(FakeSmtpConfigurationProperties.DataRetentionSetting.class);
-        when(persistence.getDataRetention()).thenReturn(dataRetention);
-        when(dataRetention.getEmails()).thenReturn(emailRetention);
-        when(emailRetention.isEnabled()).thenReturn(true);
-        when(emailRetention.getMaxNumberOfRecords()).thenReturn(maxNumber);
+        when(persistence.getMaxNumberEmails()).thenReturn(0);
         when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
 
         sut.deleteOutdatedMails();

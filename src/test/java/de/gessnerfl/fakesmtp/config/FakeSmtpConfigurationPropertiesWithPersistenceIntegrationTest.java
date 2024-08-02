@@ -27,12 +27,9 @@ class FakeSmtpConfigurationPropertiesWithPersistenceIntegrationTest {
         Assertions.assertEquals(InetAddress.getByName("127.0.0.1"), sut.getBindAddress());
         Assertions.assertNull(sut.getAuthentication());
         Assertions.assertNotNull(sut.getPersistence());
-        assertNotNull(sut.getPersistence().getDataRetention());
-        assertNotNull(sut.getPersistence().getDataRetention().getEmails());
-        assertNotNull(sut.getPersistence().getDataRetention().getEmails().getTimer());
-        assertTrue(sut.getPersistence().getDataRetention().getEmails().isEnabled());
-        assertEquals(5, sut.getPersistence().getDataRetention().getEmails().getMaxNumberOfRecords());
-        assertEquals(100000, sut.getPersistence().getDataRetention().getEmails().getTimer().getFixedDelay());
-        assertEquals(10000, sut.getPersistence().getDataRetention().getEmails().getTimer().getInitialDelay());
+        assertNotNull(sut.getPersistence().getEmailDataRetentionTimer());
+        assertEquals(5, sut.getPersistence().getMaxNumberEmails());
+        assertEquals(100000, sut.getPersistence().getEmailDataRetentionTimer().getFixedDelay());
+        assertEquals(10000, sut.getPersistence().getEmailDataRetentionTimer().getInitialDelay());
     }
 }

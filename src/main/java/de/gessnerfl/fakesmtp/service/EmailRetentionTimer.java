@@ -24,11 +24,11 @@ public class EmailRetentionTimer {
         this.logger = logger;
     }
 
-    @Scheduled(fixedDelayString = "${fakesmtp.persistence.dataRetention.email.timer.fixedDelay:300000}", initialDelayString = "${fakesmtp.persistence.dataRetention.email.timer.initialDelay:60000}")
+    @Scheduled(fixedDelayString = "${fakesmtp.persistence.emailDataRetentionTimer.fixedDelay:300000}", initialDelayString = "${fakesmtp.persistence.emailDataRetentionTimer.initialDelay:60000}")
     public void deleteOutdatedMails(){
-        final var emailDataRetention = fakeSmtpConfigurationProperties.getPersistence().getDataRetention().getEmails();
-        if(emailDataRetention.isEnabled() && emailDataRetention.getMaxNumberOfRecords() > 0){
-            var maxNumber = emailDataRetention.getMaxNumberOfRecords();
+        final var persistence = fakeSmtpConfigurationProperties.getPersistence();
+        if(persistence.getMaxNumberEmails() > 0){
+            var maxNumber = persistence.getMaxNumberEmails();
             var count = emailRepository.deleteEmailsExceedingDateRetentionLimit(maxNumber);
             logger.info("Deleted {} emails which exceeded the maximum number {} of emails to be stored", count, maxNumber);
         }

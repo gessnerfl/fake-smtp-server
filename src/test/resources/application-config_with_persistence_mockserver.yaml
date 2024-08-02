@@ -9,9 +9,7 @@ fakesmtp:
   port: 1234
   bindAddress: 127.0.0.1
   persistence:
-    dataRetention:
-      emails:
-        maxNumberOfRecords: 5
-        timer:
-          fixedDelay: 100000
-          initialDelay: 10000
+    maxNumberEmails: 5
+    emailDataRetentionTimer:
+        fixedDelay: 100000
+        initialDelay: 10000
