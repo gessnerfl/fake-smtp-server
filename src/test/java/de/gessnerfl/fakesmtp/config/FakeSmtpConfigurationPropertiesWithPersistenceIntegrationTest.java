@@ -10,6 +10,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.InetAddress;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @ActiveProfiles({"mockserver","config_with_persistence_mockserver"})
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -24,8 +27,9 @@ class FakeSmtpConfigurationPropertiesWithPersistenceIntegrationTest {
         Assertions.assertEquals(InetAddress.getByName("127.0.0.1"), sut.getBindAddress());
         Assertions.assertNull(sut.getAuthentication());
         Assertions.assertNotNull(sut.getPersistence());
-        Assertions.assertEquals(5, sut.getPersistence().getMaxNumberEmails().intValue());
-        Assertions.assertEquals(100000, sut.getPersistence().getFixedDelay().intValue());
-        Assertions.assertEquals(100000, sut.getPersistence().getInitialDelay().intValue());
+        assertNotNull(sut.getPersistence().getEmailDataRetentionTimer());
+        assertEquals(5, sut.getPersistence().getMaxNumberEmails());
+        assertEquals(100000, sut.getPersistence().getEmailDataRetentionTimer().getFixedDelay());
+        assertEquals(10000, sut.getPersistence().getEmailDataRetentionTimer().getInitialDelay());
     }
 }

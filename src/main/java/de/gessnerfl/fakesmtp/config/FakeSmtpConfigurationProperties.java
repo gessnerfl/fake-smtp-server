@@ -32,6 +32,7 @@ public class FakeSmtpConfigurationProperties {
     private boolean forwardEmails = false;
 
     @NotNull
+    @Valid
     private Persistence persistence = new Persistence();
 
     public Integer getPort() {
@@ -137,40 +138,54 @@ public class FakeSmtpConfigurationProperties {
         }
     }
 
-    public static class Persistence {
-        static final int DEFAULT_MAX_NUMBER_EMAILS = 100;
+    public static class FixedDelayTimerSettings {
         static final long DEFAULT_FIXED_DELAY = 300000L;
         static final long DEFAULT_INITIAL_DELAY = 60000L;
 
-        @NotNull
-        private Integer maxNumberEmails = DEFAULT_MAX_NUMBER_EMAILS;
-        @NotNull
-        private Long fixedDelay = DEFAULT_FIXED_DELAY;
-        @NotNull
-        private Long initialDelay = DEFAULT_INITIAL_DELAY;
+        private long fixedDelay = DEFAULT_FIXED_DELAY;
+        private long initialDelay = DEFAULT_INITIAL_DELAY;
 
-        public Integer getMaxNumberEmails() {
-            return maxNumberEmails;
-        }
-
-        public void setMaxNumberEmails(Integer maxNumberEmails) {
-            this.maxNumberEmails = maxNumberEmails;
-        }
-
-        public Long getFixedDelay() {
+        public long getFixedDelay() {
             return fixedDelay;
         }
 
-        public void setFixedDelay(Long fixedDelay) {
+        public void setFixedDelay(long fixedDelay) {
             this.fixedDelay = fixedDelay;
         }
 
-        public Long getInitialDelay() {
+        public long getInitialDelay() {
             return initialDelay;
         }
 
-        public void setInitialDelay(Long initialDelay) {
+        public void setInitialDelay(long initialDelay) {
             this.initialDelay = initialDelay;
+        }
+    }
+
+    public static class Persistence {
+        public static final int DEFAULT_MAX_NUMBER_EMAILS = 100;
+
+        @NotNull
+        private Integer maxNumberEmails = DEFAULT_MAX_NUMBER_EMAILS;
+
+        @NotNull
+        @Valid
+        private FixedDelayTimerSettings emailDataRetentionTimer = new FixedDelayTimerSettings();
+
+        public @NotNull Integer getMaxNumberEmails() {
+            return maxNumberEmails;
+        }
+
+        public void setMaxNumberEmails(@NotNull Integer maxNumberEmails) {
+            this.maxNumberEmails = maxNumberEmails;
+        }
+
+        public @NotNull @Valid FixedDelayTimerSettings getEmailDataRetentionTimer() {
+            return emailDataRetentionTimer;
+        }
+
+        public void setEmailDataRetentionTimer(@NotNull @Valid FixedDelayTimerSettings emailDataRetentionTimer) {
+            this.emailDataRetentionTimer = emailDataRetentionTimer;
         }
     }
 

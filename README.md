@@ -31,6 +31,9 @@ and docker documentation (https://docs.docker.com/engine/reference/run/#env-envi
 > [!NOTE]  
 > Starting with version 2.0.0 Java 17 is required to run Fake SMTP Server.
 
+> [!NOTE]
+> With version 2.4.0 the email data configuration parameter setting was changed. See also [Data Retention Settings for Emails](#Emails)
+
 ## Run from released JAR files
 
 1. Download the latest `fake-smtp-server-<version>.jar` from 
@@ -73,10 +76,6 @@ fakesmtp:
 
   #The binding address of the Fake SMTP Server; Bound to all interfaces by default / no value
   bindAddress: 127.0.0.1
-
-  persistence:
-    #The maximum number of emails which should be stored in the database; Defaults to 100
-    maxNumberEmails: 100
 
   #List of recipient addresses which should be blocked/rejected
   blockedRecipientAddresses:
@@ -129,7 +128,9 @@ fakesmtp:
     type: PKCS12 # or JKS
 ```
            
-### SCHEDULE THE DELETION OF RECEIVED EMAILS
+### Data Retention Settings
+
+#### Emails
 
 To keep memory resources under control, there is a parallel process that deletes the oldest emails considering the maximum number of emails to retain and the time span to periodically recheck this maximum number of emails, controlling also the initial time to wait to start this parallel process. The default values are:
 
@@ -140,12 +141,16 @@ To keep memory resources under control, there is a parallel process that deletes
 ```yaml
 fakesmtp:
   persistence:
-    #max numbers of most recent emails to retain and not deleted by the parallel process
-    maxNumberEmails: 50
-    #each 5 minutes from 'initialDelay' (see below), the parallel process will check if the deletion is necessary
-    fixedDelay: 300000
-    #each 'initialDelay' (see above)  after 2 minutes from the start, the parallel process will start checking if the deletion is necessary
-    initialDelay: 120000
+    maxNumberEmails:
+      emails:
+        #max numbers of most recent emails to retain and not deleted by the parallel process
+        maxNumberEmails: 10
+        # configuration settings of the background process (timer) responsible to delete the oldest emails
+        emailDataRetentionTimer:
+          #each 5 minutes from 'initialDelay' (see below), the parallel process will check if the deletion is necessary
+          fixedDelay: 300000
+          #each 'initialDelay' (see above)  after 2 minutes from the start, the parallel process will start checking if the deletion is necessary
+          initialDelay: 120000
 ```
 
 ## Web UI
