@@ -3,8 +3,14 @@ import {EmailDetailsProperties} from "./email-details-properties";
 import {Button, Divider} from "@mui/material";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import {EmailAttachment} from "../../models/email";
+import {getBasePath} from "../../utils";
 
 export const EmailAttachmentPanel: FunctionComponent<EmailDetailsProperties> = ({email}) => {
+    const getBasePathString = () =>  {
+        const path = getBasePath();
+        return path ? path : ""
+    }
+
     const renderAttachment = function (attachment: EmailAttachment) {
         return (
             <Button key={attachment.id}
@@ -12,7 +18,7 @@ export const EmailAttachmentPanel: FunctionComponent<EmailDetailsProperties> = (
                     variant="text"
                     size="small"
                     startIcon={<AttachFileIcon/>}
-                    href={`/api/emails/${email.id}/attachments/${attachment.id}`}>
+                    href={`${getBasePath()}/api/emails/${email.id}/attachments/${attachment.id}`}>
                 {attachment.filename}
             </Button>
         )
