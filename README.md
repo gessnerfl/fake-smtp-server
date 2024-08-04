@@ -31,9 +31,6 @@ and docker documentation (https://docs.docker.com/engine/reference/run/#env-envi
 > [!NOTE]  
 > Starting with version 2.0.0 Java 17 is required to run Fake SMTP Server.
 
-> [!NOTE]
-> With version 2.4.0 the email data configuration parameter setting was changed. See also [Data Retention Settings for Emails](#Emails)
-
 ## Run from released JAR files
 
 1. Download the latest `fake-smtp-server-<version>.jar` from 
