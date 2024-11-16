@@ -3,7 +3,7 @@ import {DataGrid, GridColDef, GridRowSelectionModel} from '@mui/x-data-grid';
 import {useGetEmailsQuery} from "../store/rest-api";
 import {Email} from "../models/email";
 import {useSearchParams} from "react-router-dom";
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import {EmailCard} from "../components/email/email-card";
 import {Alert, Card, CardContent, CardHeader} from "@mui/material";
 import {parseJSON} from "date-fns";
@@ -158,8 +158,8 @@ function EmailListPage() {
 
     function renderSplitView() {
         return <Grid container spacing={2}>
-            <Grid xs={12} xl={6}>{renderGrid()}</Grid>
-            <Grid xs={12} xl={6}>{renderEmail()}</Grid>
+            <Grid size={{xs:12, xl:6}}>{renderGrid()}</Grid>
+            <Grid size={{xs:12, xl:6}}>{renderEmail()}</Grid>
         </Grid>
     }
 

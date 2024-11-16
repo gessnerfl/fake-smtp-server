@@ -1,13 +1,13 @@
 import * as React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import {renderWithProviders} from "../test-utils";
+import { renderWithProviders } from "../test-utils";
 import App from "../app";
-import {MemoryRouter} from "react-router-dom";
-import {testData, originalTestData} from "../setupTests";
+import { MemoryRouter } from "react-router-dom";
+import { testData, originalTestData } from "../setupTests";
 import userEvent from "@testing-library/user-event";
-import {act} from "react-dom/test-utils";
-import {Email} from "../models/email";
+import { act } from "react";
+import { Email } from "../models/email";
 
 function shouldContainPage(data: Email[]) {
     data.forEach(mail => {
@@ -17,7 +17,7 @@ function shouldContainPage(data: Email[]) {
 
 describe('EmailListPage', () => {
     it('render first page of email list', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/"]}><App /></MemoryRouter>);
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
@@ -39,7 +39,7 @@ describe('EmailListPage', () => {
         })
     })
     it('render second page of email list', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/?page=1"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/?page=1"]}><App /></MemoryRouter>);
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
@@ -47,7 +47,7 @@ describe('EmailListPage', () => {
         })
     })
     it('render first page of size 25', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/?pageSize=25"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/?pageSize=25"]}><App /></MemoryRouter>);
 
         expect(screen.getByText("Inbox")).toBeInTheDocument()
         await waitFor(() => {
@@ -55,7 +55,7 @@ describe('EmailListPage', () => {
         })
     })
     it('should render email details on selection', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/"]}><App /></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
@@ -68,7 +68,7 @@ describe('EmailListPage', () => {
         })
     })
     it('should not allow to open delete dialog when no email is selected', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/"]}><App /></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
@@ -77,7 +77,7 @@ describe('EmailListPage', () => {
         expect(screen.getByText("Delete")).toBeDisabled()
     })
     it('should not delete selected email when delete is not confirmed', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/"]}><App /></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
@@ -102,7 +102,7 @@ describe('EmailListPage', () => {
         })
     })
     it('should delete selected email when delete is confirmed', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/"]}><App /></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
@@ -129,7 +129,7 @@ describe('EmailListPage', () => {
         })
     })
     it('should not delete all emails when delete is not confirmed', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/"]}><App /></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("5")).toBeInTheDocument()
@@ -148,7 +148,7 @@ describe('EmailListPage', () => {
         })
     })
     it('should delete all emails when delete is confirmed', async () => {
-        renderWithProviders(<MemoryRouter initialEntries={["/"]}><App/></MemoryRouter>);
+        renderWithProviders(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={["/"]}><App /></MemoryRouter>);
 
         await waitFor(() => {
             expect(screen.getByTitle("5")).toBeInTheDocument()

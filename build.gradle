@@ -1,9 +1,10 @@
 plugins {
-    id "pl.allegro.tech.build.axion-release" version "1.18.2"
-    id "org.springframework.boot" version "3.3.2"
+    id "pl.allegro.tech.build.axion-release" version "1.18.15"
+    id "org.springframework.boot" version "3.3.5"
     id "org.sonarqube" version "5.1.0.4882"
-    id 'com.google.cloud.tools.jib' version '3.4.3'
-    id "com.github.node-gradle.node" version "7.0.2"
+    id 'com.google.cloud.tools.jib' version '3.4.4'
+    id "com.github.node-gradle.node" version "7.1.0"
+    id "com.github.ben-manes.versions" version "0.51.0"
 }
 
 apply plugin: "java"
@@ -41,19 +42,19 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("commons-io:commons-io:2.16.1")
-    implementation("org.yaml:snakeyaml:2.2")
-    implementation('org.flywaydb:flyway-core')
+    implementation("commons-io:commons-io:2.17.0")
+    implementation("org.yaml:snakeyaml:2.3")
+    implementation('org.flywaydb:flyway-core:10.21.0')
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.1")
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0')
 
-    runtimeOnly("com.h2database:h2:2.3.230")
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    runtimeOnly("com.h2database:h2:2.3.232")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.14.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.ow2.asm:asm:9.7")
-    testImplementation("org.apache.commons:commons-lang3:3.15.0")
+    testImplementation("org.ow2.asm:asm:9.7.1")
+    testImplementation("org.apache.commons:commons-lang3:3.17.0")
     testImplementation("org.hamcrest:hamcrest:3.0")
 }
 
@@ -72,8 +73,8 @@ node {
     nodeProjectDir = file("${project.projectDir}/webapp")
     npmInstallCommand = System.getenv("CI") ? 'ci' : 'install'
     download = true
-    version = "20.10.0"
-    npmVersion = "10.2.5"
+    version = "20.18.0"
+    npmVersion = "10.9.0"
 }
 
 tasks.register('webappClean', Delete) {
@@ -155,7 +156,7 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:21.0.4-al2023-headless'
+        image = 'amazoncorretto:21.0.5-al2023-headless'
         container {
             ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'
