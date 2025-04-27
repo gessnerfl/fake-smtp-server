@@ -2,6 +2,8 @@ interface BasePath {
     path?: string
 }
 
+export const TEST_BASE_PATH = "https://example.com"
+
 let basePath: BasePath
 
 export function getBasePath() {
@@ -13,6 +15,9 @@ export function getBasePath() {
 }
 
 function resolveBasePath() {
+    if (process.env.NODE_ENV === "test") {
+        return TEST_BASE_PATH
+    }
     const path = window.location.pathname;
     if (path) {
         return path.substring(0, path.lastIndexOf("/"));

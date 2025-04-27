@@ -7,7 +7,7 @@ import { MemoryRouter } from "react-router-dom";
 
 describe('EmailCard', () => {
     it('render email card component with raw data only', () => {
-        render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><EmailCard email={testEmail1} /></MemoryRouter>);
+        render(<MemoryRouter><EmailCard email={testEmail1} /></MemoryRouter>);
 
         //card header in document
         expect(screen.getByText("Email " + testEmail1.id)).toBeInTheDocument()

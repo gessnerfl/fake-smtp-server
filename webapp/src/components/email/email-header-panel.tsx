@@ -1,6 +1,6 @@
 import React, {FunctionComponent} from "react";
 import {EmailDetailsProperties} from "./email-details-properties";
-import {Typography, Grid2 as Grid} from "@mui/material";
+import {Typography, Grid} from "@mui/material";
 import {parseJSON, formatISO9075} from "date-fns";
 
 export const EmailHeaderPanel: FunctionComponent<EmailDetailsProperties> = ({email}) => {

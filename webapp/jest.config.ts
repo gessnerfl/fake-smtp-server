@@ -1,6 +1,9 @@
 export default {
     //preset: 'ts-jest',
-    testEnvironment: 'jest-environment-jsdom',
+    testEnvironment: 'jest-fixed-jsdom',
+    testEnvironmentOptions: {
+        customExportConditions: [''],
+    },
     transform: {
         "^.+\\.tsx?$": "ts-jest"
     },

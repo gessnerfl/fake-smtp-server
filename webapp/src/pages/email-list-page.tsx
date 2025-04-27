@@ -3,7 +3,7 @@ import {DataGrid, GridColDef, GridRowSelectionModel} from '@mui/x-data-grid';
 import {useGetEmailsQuery} from "../store/rest-api";
 import {Email} from "../models/email";
 import {useSearchParams} from "react-router-dom";
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import {EmailCard} from "../components/email/email-card";
 import {Alert, Card, CardContent, CardHeader} from "@mui/material";
 import {parseJSON} from "date-fns";
@@ -14,12 +14,11 @@ import {DeleteAllEmailsButton} from "../components/email/delete-all-emails-butto
 function EmailListPage() {
     const pageQueryParameter = "page";
     const pageSizeQueryParameter = "pageSize";
-    const noRowSelected = -1;
 
     const [pageSizeOptions, setPageSizeOptions] = useState([10, 25, 50, 100])
     const [pageSize, setPageSize] = useState(10)
     const [page, setPage] = useState(0)
-    const [selectedRow, setSelectedRow] = useState(noRowSelected)
+    const [selectedRow, setSelectedRow] = useState<GridRowSelectionModel>({type: 'include', ids: new Set([])})
     const [searchParams, setSearchParams] = useSearchParams()
     const {data, isLoading, refetch} = useGetEmailsQuery({page: page, pageSize: pageSize})
     const columns: GridColDef[] = [
@@ -109,43 +108,43 @@ function EmailListPage() {
         }
     }, [searchParams, refetch])
 
-    function toSelectedRow(selection: GridRowSelectionModel): number {
-        const rowId = selection.length > 0 ? selection.at(0) : undefined
-        return rowId ? parseInt(rowId.toString()) : noRowSelected
-    }
-
     function renderGrid() {
         return <div>
             <div className={"toolbar"}>
                 <DeleteEmailButton selectedEmail={getSelectedEmail()}/>
                 <DeleteAllEmailsButton emailsAvailable={data !== undefined && data.numberOfElements > 0}/>
             </div>
-            <DataGrid
-                columns={columns}
-                rows={data!.content.map(e => transformEmail(e))}
-                initialState={{
-                    pagination: {
-                        paginationModel: {
-                            pageSize: pageSize,
-                            page: page
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <DataGrid
+                    columns={columns}
+                    rows={data!.content.map(e => transformEmail(e))}
+                    initialState={{
+                        pagination: {
+                            paginationModel: {
+                                pageSize: pageSize,
+                                page: page
+                            },
                         },
-                    },
-                }}
-                rowSelectionModel={selectedRow > 0 ? [selectedRow] : []}
-                rowCount={data!.totalElements}
-                pageSizeOptions={pageSizeOptions}
-                loading={isLoading}
-                paginationMode={'server'}
-                autoHeight={true}
-                density={'compact'}
-                onPaginationModelChange={(m, _) => navigateTo(m.page, m.pageSize)}
-                onRowSelectionModelChange={(m, _) => setSelectedRow(toSelectedRow(m))}
-            />
+                    }}
+                    rowSelectionModel={selectedRow}
+                    rowCount={data!.totalElements}
+                    pageSizeOptions={pageSizeOptions}
+                    loading={isLoading}
+                    paginationMode={'server'}
+                    density={'compact'}
+                    onPaginationModelChange={(m, _) => navigateTo(m.page, m.pageSize)}
+                    onRowSelectionModelChange={(m, _) => setSelectedRow(m)}
+                />
+            </div>
         </div>;
     }
 
     function getSelectedEmail(): Email | undefined {
-        return data?.content.find(e => e.id === selectedRow);
+        if(selectedRow.ids.size === 1) {
+            const selectedRowId = Array.from(selectedRow.ids)[0]
+            return data?.content.find(e => e.id+"" === selectedRowId.toString());
+        }
+        return undefined;
     }
 
     function renderEmail() {
@@ -165,7 +164,7 @@ function EmailListPage() {
 
     function renderData() {
         if (data) {
-            if (selectedRow && selectedRow !== noRowSelected) {
+            if (selectedRow && selectedRow.ids.size === 1) {
                 return renderSplitView()
             }
             return (
