@@ -47,7 +47,7 @@ dependencies {
     implementation('org.flywaydb:flyway-core:11.8.0')
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
-    implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6')
+    implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8')
 
     runtimeOnly("com.h2database:h2:2.3.232")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.14.6")
