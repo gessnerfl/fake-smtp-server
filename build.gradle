@@ -54,7 +54,7 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.ow2.asm:asm:9.8")
-    testImplementation("org.apache.commons:commons-lang3:3.17.0")
+    testImplementation("org.apache.commons:commons-lang3:3.18.0")
     testImplementation("org.hamcrest:hamcrest:3.0")
 }
 
