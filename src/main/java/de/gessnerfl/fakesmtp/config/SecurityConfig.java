@@ -18,10 +18,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final FakeSmtpAuthenticationProperties authProperties;
+    private final WebappAuthenticationProperties authProperties;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfig(FakeSmtpAuthenticationProperties authProperties,
+    public SecurityConfig(WebappAuthenticationProperties authProperties,
                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.authProperties = authProperties;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;

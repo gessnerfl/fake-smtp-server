@@ -1,6 +1,6 @@
 package de.gessnerfl.fakesmtp.controller;
 
-import de.gessnerfl.fakesmtp.config.FakeSmtpAuthenticationProperties;
+import de.gessnerfl.fakesmtp.config.WebappAuthenticationProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ class MetaDataControllerTest {
     private BuildProperties buildProperties;
 
     @Mock
-    private FakeSmtpAuthenticationProperties authProperties;
+    private WebappAuthenticationProperties authProperties;
 
     @InjectMocks
     private MetaDataController sut;

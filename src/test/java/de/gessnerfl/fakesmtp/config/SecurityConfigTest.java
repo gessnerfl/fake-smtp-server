@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 class SecurityConfigTest {
 
     @Mock
-    private FakeSmtpAuthenticationProperties authProperties;
+    private WebappAuthenticationProperties authProperties;
 
     @InjectMocks
     private SecurityConfig sut;
