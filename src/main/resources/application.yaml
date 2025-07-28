@@ -57,4 +57,7 @@ springdoc:
 
 fakesmtp:
   port: 8025
+  authentication:
+    username: ${FAKESMTP_AUTH_USERNAME:admin}
+    password: ${FAKESMTP_AUTH_PASSWORD:admin}
 

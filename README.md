@@ -163,6 +163,35 @@ management:
   server:
     port: 8081 
 ```
+
+### Web UI Authentication
+
+You can optionally enable Basic Authentication for the web interface and REST API. When authentication is enabled, users will need to log in to access the web interface and API endpoints.
+
+To enable authentication, set the username and password in the application.yml file:
+
+```yaml
+fakesmtp:
+  authentication:
+    # Username for web UI and API authentication
+    username: admin
+    # Password for web UI and API authentication
+    password: password
+```
+
+You can also set these values using environment variables:
+
+```
+FAKESMTP_AUTH_USERNAME=admin
+FAKESMTP_AUTH_PASSWORD=password
+```
+
+If both username and password are not set, authentication will be disabled and the web interface and API endpoints will be accessible without authentication.
+
+When authentication is enabled:
+- The web interface will show a custom login form
+- API endpoints will require Basic Authentication
+- A logout button will be available in the navigation bar
     
 
 ## REST API

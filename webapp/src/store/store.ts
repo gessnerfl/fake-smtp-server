@@ -1,9 +1,11 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit";
 import {restApi} from "./rest-api";
 import {setupListeners} from "@reduxjs/toolkit/query";
+import authReducer from "./auth-slice";
 
 const rootReducer = combineReducers({
     [restApi.reducerPath]: restApi.reducer,
+    auth: authReducer,
 })
 
 export function setupStore() {

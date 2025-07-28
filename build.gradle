@@ -42,6 +42,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("commons-io:commons-io:2.19.0")
     implementation("org.yaml:snakeyaml:2.4")
     implementation('org.flywaydb:flyway-core:11.8.0')
@@ -60,6 +61,14 @@ dependencies {
 
 java {
     withSourcesJar()
+    toolchain { languageVersion = JavaLanguageVersion.of(21) }
+}
+
+bootRun {
+    // für Spring Boot Gradle Plugin >=2.5
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 gradle.projectsEvaluated {

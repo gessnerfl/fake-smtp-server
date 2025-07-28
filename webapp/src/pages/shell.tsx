@@ -4,6 +4,10 @@ import Navigation from "../components/navigation";
 import {Outlet} from "react-router-dom";
 import {Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import {lightBlue, orange, yellow} from "@mui/material/colors";
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import Login from '../components/login';
+import { useGetMetaDataQuery } from '../store/rest-api';
 
 const lightTheme = createTheme({
     palette: {
@@ -32,14 +36,23 @@ const lightTheme = createTheme({
 });
 
 function Shell() {
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+    const { data } = useGetMetaDataQuery();
+
+    const showLogin = data?.authenticationEnabled && !isAuthenticated;
+    const showContent = !data?.authenticationEnabled || isAuthenticated;
+
     return (
         <ThemeProvider theme={lightTheme}>
             <CssBaseline/>
             <div className="Shell">
                 <Navigation/>
-                <Container className="content" maxWidth="xl">
-                    <Outlet/>
-                </Container>
+                {showLogin && <Login />}
+                {showContent && (
+                    <Container className="content" maxWidth="xl">
+                        <Outlet/>
+                    </Container>
+                )}
             </div>
         </ThemeProvider>
     );

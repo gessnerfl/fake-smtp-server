@@ -3,17 +3,44 @@ import {Email, EmailPage} from "../models/email";
 import {Pageable} from "../models/pageable";
 import {MetaData} from "../models/meta-data";
 import {getBasePath} from "../base-path";
+import {RootState} from "./store";
+import {Credentials} from "../models/auth";
 
 function getBasePathString() {
     const path = getBasePath();
-    return path ? path : ""
+    return path ?? ""
 }
 
 export const restApi = createApi({
     reducerPath: 'restApi',
-    baseQuery: fetchBaseQuery({baseUrl: `${(getBasePathString())}/api`}),
+    baseQuery: fetchBaseQuery({
+        baseUrl: `${(getBasePathString())}/api`,
+        prepareHeaders: (headers, { getState }) => {
+            const state = getState() as RootState;
+            const { credentials, isAuthenticated } = state.auth;
+
+            if (isAuthenticated && credentials) {
+                const auth = btoa(`${credentials.username}:${credentials.password}`);
+                headers.set('Authorization', `Basic ${auth}`);
+            }
+
+            return headers;
+        },
+    }),
     tagTypes: ['Emails'],
     endpoints: (builder) => ({
+        login: builder.mutation<void, Credentials>({
+            query: (credentials) => {
+                const auth = btoa(`${credentials.username}:${credentials.password}`);
+                return {
+                    url: '/emails?page=0&size=1',
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Basic ${auth}`,
+                    },
+                };
+            },
+        }),
         getEmails: builder.query<EmailPage, Pageable>({
             query: (p) => `/emails?page=${p.page}&size=${p.pageSize}`,
             providesTags: (result) =>
@@ -55,3 +82,4 @@ export const {useGetEmailQuery} = restApi
 export const {useDeleteAllEmailsMutation} = restApi
 export const {useDeleteEmailMutation} = restApi
 export const {useGetMetaDataQuery} = restApi
+export const {useLoginMutation} = restApi

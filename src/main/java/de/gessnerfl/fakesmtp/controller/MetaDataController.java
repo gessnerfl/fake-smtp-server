@@ -1,5 +1,6 @@
 package de.gessnerfl.fakesmtp.controller;
 
+import de.gessnerfl.fakesmtp.config.FakeSmtpAuthenticationProperties;
 import de.gessnerfl.fakesmtp.model.ApplicationMetaData;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,14 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class MetaDataController {
 
     private final BuildProperties buildProperties;
+    private final FakeSmtpAuthenticationProperties authProperties;
 
-    public MetaDataController(BuildProperties buildProperties) {
+    public MetaDataController(BuildProperties buildProperties, FakeSmtpAuthenticationProperties authProperties) {
         this.buildProperties = buildProperties;
+        this.authProperties = authProperties;
     }
 
     @GetMapping
     public ApplicationMetaData get() {
-        return new ApplicationMetaData(buildProperties.getVersion());
+        return new ApplicationMetaData(buildProperties.getVersion(), authProperties.isAuthenticationEnabled());
     }
 
 }
