@@ -72,7 +72,7 @@ export const restApi = createApi({
             invalidatesTags: (result, error, id) => [{ type: 'Emails', id }],
         }),
         getMetaData: builder.query<MetaData, void>({
-            query: (p) => `/meta-data`,
+            query: () => `/meta-data`,
         }),
     }),
 })
