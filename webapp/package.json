@@ -22,7 +22,7 @@
     "dompurify": "^3.1.0",
     "nth-check": "^2.1.1",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react-dom": "^19.1.1",
     "react-redux": "^9.0.4",
     "react-router-dom": "^7.5.2"
   },
@@ -35,7 +35,7 @@
     "@types/jest": "^29.5.11",
     "@types/node": "^22.15.3",
     "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
+    "@types/react-dom": "^19.1.7",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^4.2.0",
