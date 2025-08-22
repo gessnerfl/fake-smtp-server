@@ -44,7 +44,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("commons-io:commons-io:2.19.0")
     implementation("org.yaml:snakeyaml:2.4")
-    implementation('org.flywaydb:flyway-core:11.8.0')
+    implementation('org.flywaydb:flyway-core:11.11.2')
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6')
