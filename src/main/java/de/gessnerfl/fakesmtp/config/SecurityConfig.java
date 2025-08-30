@@ -45,7 +45,9 @@ public class SecurityConfig {
                     exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
                 .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(customAuthenticationEntryPoint))
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf
+                    .ignoringRequestMatchers("/api/**", "/h2-console/**")
+                )
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         } else {
             http
@@ -54,7 +56,9 @@ public class SecurityConfig {
                     .anyRequest().permitAll()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf
+                    .ignoringRequestMatchers("/api/**", "/h2-console/**")
+                )
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         }
         return http.build();
