@@ -21,5 +21,9 @@ export default {
     coverageReporters: [
         "text",
         "lcov"
-    ]
+    ],
+    globals: {
+        // Suppress React act() warnings from third-party components
+        IS_REACT_ACT_ENVIRONMENT: true
+    }
 }

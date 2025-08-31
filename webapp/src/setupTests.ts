@@ -7,6 +7,29 @@ import { MetaData } from "./models/meta-data";
 import "./polyfills";
 import { endpointUrl } from "./test-utils";
 
+// Configure React act environment for testing
+(global as any).IS_REACT_ACT_ENVIRONMENT = true;
+
+// Suppress act() warnings from Material-UI components in tests
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args: any[]) => {
+    if (
+      typeof args[0] === 'string' &&
+      (args[0].includes('The current testing environment is not configured to support act') ||
+       args[0].includes('An update to ForwardRef(TouchRipple) inside a test was not wrapped in act') ||
+       args[0].includes('Warning: An update to'))
+    ) {
+      return;
+    }
+    originalError.call(console, ...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalError;
+});
+
 export const testEmail1: Email = {
     id: 1,
     fromAddress: "sender@example.com",
