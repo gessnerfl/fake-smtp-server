@@ -50,7 +50,7 @@ dependencies {
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.11')
 
     runtimeOnly("com.h2database:h2:2.3.232")
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.14.6")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.15.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.ow2.asm:asm:9.8")
