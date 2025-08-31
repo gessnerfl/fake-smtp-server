@@ -35,3 +35,42 @@ if (!globalThis.Headers) {
   // @ts-ignore
   globalThis.Headers = require('undici').Headers;
 }
+
+// Mock EventSource for tests
+if (!globalThis.EventSource) {
+  class MockEventSource {
+    url: string;
+    readyState: number = 1; // OPEN
+    
+    static readonly CONNECTING = 0;
+    static readonly OPEN = 1;
+    static readonly CLOSED = 2;
+    
+    constructor(url: string) {
+      this.url = url;
+      // Simulate connection opening after a microtask
+      setTimeout(() => {
+        this.dispatchEvent(new Event('open'));
+      }, 0);
+    }
+    
+    addEventListener(type: string, listener: any) {
+      // No-op for tests - events aren't fired in test environment
+    }
+    
+    removeEventListener(type: string, listener: any) {
+      // No-op for tests
+    }
+    
+    dispatchEvent(event: Event): boolean {
+      return true;
+    }
+    
+    close() {
+      this.readyState = 2; // CLOSED
+    }
+  }
+  
+  // @ts-ignore
+  globalThis.EventSource = MockEventSource;
+}
