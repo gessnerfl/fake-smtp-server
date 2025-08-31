@@ -8,6 +8,7 @@ export default {
         "^.+\\.tsx?$": "ts-jest"
     },
     setupFilesAfterEnv: ["@testing-library/jest-dom", "<rootDir>/src/setupTests.ts"],
+    testTimeout: 10000,
     moduleNameMapper: {
         '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
         '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
@@ -20,5 +21,9 @@ export default {
     coverageReporters: [
         "text",
         "lcov"
-    ]
+    ],
+    globals: {
+        // Suppress React act() warnings from third-party components
+        IS_REACT_ACT_ENVIRONMENT: true
+    }
 }

@@ -1,4 +1,4 @@
-import {render, screen, waitFor} from "@testing-library/react";
+import {act, render, screen, waitFor} from "@testing-library/react";
 import {testEmail1} from "../../setupTests";
 import * as React from "react";
 import '@testing-library/jest-dom'
@@ -22,7 +22,10 @@ describe('DeleteEmailDialog', () => {
         const closeCallback = (c: boolean) => confirmed = c
 
         render(<DeleteEmailDialog email={testEmail1} open={true} onClose={closeCallback}/>);
-        userEvent.click(screen.getByText("Yes"))
+        
+        await act(async () => {
+            await userEvent.click(screen.getByText("Yes"))
+        })
 
         await waitFor(() => {
             expect(confirmed).toBeTruthy()
@@ -33,7 +36,10 @@ describe('DeleteEmailDialog', () => {
         const closeCallback = (c: boolean) => confirmed = c
 
         render(<DeleteEmailDialog email={testEmail1} open={true} onClose={closeCallback}/>);
-        userEvent.click(screen.getByText("No"))
+        
+        await act(async () => {
+            await userEvent.click(screen.getByText("No"))
+        })
 
         await waitFor(() => {
             expect(confirmed).toBeFalsy()
