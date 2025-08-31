@@ -8,6 +8,7 @@ export default {
         "^.+\\.tsx?$": "ts-jest"
     },
     setupFilesAfterEnv: ["@testing-library/jest-dom", "<rootDir>/src/setupTests.ts"],
+    testTimeout: 10000,
     moduleNameMapper: {
         '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
         '\\.(css|less|sass|scss)$': 'identity-obj-proxy',

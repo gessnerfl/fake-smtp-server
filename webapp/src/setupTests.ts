@@ -1,9 +1,10 @@
+import { formatRFC3339 } from "date-fns";
+import { delay, http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
 import "whatwg-fetch";
 import { Email, EmailPage } from "./models/email";
-import { setupServer } from 'msw/node'
-import { http, HttpResponse, delay } from 'msw'
-import { formatRFC3339 } from "date-fns";
 import { MetaData } from "./models/meta-data";
+import "./polyfills";
 import { endpointUrl } from "./test-utils";
 
 export const testEmail1: Email = {
@@ -74,28 +75,29 @@ export const handlers = [
     http.get(endpointUrl('/api/emails/:emailId'), async ({ params }) => {
         const { emailId } = params
         const id = typeof emailId === "string" ? parseInt(emailId) : undefined
-        if (id) {
+        if (id !== undefined) {
             const emails = testData.filter(e => e.id === id)
             if (emails.length > 0) {
-                delay(150)
+                await delay(150)
                 return HttpResponse.json(emails[0])
             }
         }
         return new HttpResponse("Not found", { status: 404 })
     }),
-    http.delete(endpointUrl('/api/emails'), () => {
+    http.delete(endpointUrl('/api/emails'), async () => {
         testData = []
-        return new HttpResponse("Not found", { status: 404 })
+        await delay(150)
+        return HttpResponse.json({ success: true })
     }),
     http.delete(endpointUrl('/api/emails/:emailId'), async ({ params }) => {
         const { emailId } = params
         const id = typeof emailId === "string" ? parseInt(emailId) : undefined
-        if (id) {
+        if (id !== undefined) {
             const idx = testData.findIndex(e => e.id === id)
-            if (idx > 0) {
+            if (idx >= 0) {
                 testData.splice(idx, 1)
                 await delay(150)
-                return new HttpResponse("Deleted", { status: 200 })
+                return HttpResponse.json({ success: true, id: id.toString() })
             }
         }
         return new HttpResponse("Not found", { status: 404 })
@@ -109,8 +111,8 @@ export const handlers = [
 
 const server = setupServer(...handlers)
 
-beforeAll(() => { 
-    server.listen() 
+beforeAll(() => {
+    server.listen({ onUnhandledRequest: 'bypass' })
 })
 afterEach(() => {
     server.resetHandlers()

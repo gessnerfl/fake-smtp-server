@@ -125,7 +125,8 @@ describe('EmailListPage', () => {
         })
 
         await waitFor(() => {
-            shouldContainPage(originalTestData.splice(1, 1).slice(0, 10))
+            expect(screen.queryByTitle("1")).not.toBeInTheDocument()
+            shouldContainPage(testData.slice(0, 10))
         })
     })
     it('should not delete all emails when delete is not confirmed', async () => {
