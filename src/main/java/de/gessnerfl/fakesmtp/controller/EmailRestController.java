@@ -5,6 +5,7 @@ import de.gessnerfl.fakesmtp.model.query.SearchRequest;
 import de.gessnerfl.fakesmtp.model.query.SearchSpecification;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
+import de.gessnerfl.fakesmtp.service.EmailSseEmitterService;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,9 +19,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/emails")
@@ -33,16 +38,19 @@ public class EmailRestController {
     private final EmailAttachmentRepository emailAttachmentRepository;
     private final MediaTypeUtil mediaTypeUtil;
     private final ServletContext servletContext;
+    private final EmailSseEmitterService emailSseEmitterService;
 
     @Autowired
     public EmailRestController(EmailRepository emailRepository,
                                EmailAttachmentRepository emailAttachmentRepository,
                                MediaTypeUtil mediaTypeUtil,
-                               ServletContext servletContext) {
+                               ServletContext servletContext,
+                               EmailSseEmitterService emailSseEmitterService) {
         this.emailRepository = emailRepository;
         this.emailAttachmentRepository = emailAttachmentRepository;
         this.mediaTypeUtil = mediaTypeUtil;
         this.servletContext = servletContext;
+        this.emailSseEmitterService = emailSseEmitterService;
     }
 
     @GetMapping()
@@ -62,7 +70,6 @@ public class EmailRestController {
     }
 
     @GetMapping("/{mailId}/attachments/{attachmentId}")
-    @ResponseBody
     public ResponseEntity<ByteArrayResource> getEmailAttachmentById(@PathVariable Long mailId, @PathVariable Long attachmentId) {
         var attachment = emailAttachmentRepository.findById(attachmentId)
                 .filter(a -> a.getEmail().getId().equals(mailId))
@@ -88,6 +95,23 @@ public class EmailRestController {
         emailAttachmentRepository.deleteAllInBatch();
         emailRepository.deleteAllInBatch();
         emailRepository.flush();
+    }
+
+    @GetMapping(value = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribeToEmailEvents() {
+        SseEmitter emitter = new SseEmitter(3600000L);
+
+        emailSseEmitterService.add(emitter);
+
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("connection-established")
+                    .data("Connected to email events"));
+        } catch (IOException e) {
+            emitter.complete();
+        }
+
+        return emitter;
     }
 
     @PostMapping(value = "/search")

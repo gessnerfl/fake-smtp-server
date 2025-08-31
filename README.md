@@ -163,7 +163,70 @@ management:
   server:
     port: 8081 
 ```
+
+### Web UI Authentication
+
+You can optionally enable Basic Authentication for the web interface and REST API. When authentication is enabled, users will need to log in to access the web interface and API endpoints.
+
+To enable authentication, set the username and password in the application.yml file:
+
+```yaml
+fakesmtp:
+  webapp:
+    authentication:
+      # Username for web UI and API authentication
+      username: admin
+      # Password for web UI and API authentication
+      password: password
+```
+
+You can also set these values using environment variables:
+
+```
+FAKESMTP_WEBAPP_AUTH_USERNAME=admin
+FAKESMTP_WEBAPP_AUTH_PASSWORD=password
+```
+
+If both username and password are not set, authentication will be disabled and the web interface and API endpoints will be accessible without authentication.
+
+When authentication is enabled:
+- The web interface will show a custom login form
+- API endpoints will require Basic Authentication
+- A logout button will be available in the navigation bar
+- The following endpoints are protected and require authentication:
+  - Main web UI routes (`/`, `/emails/**`)
+  - API endpoints (`/api/**`) except for `/api/meta-data`
+- The following endpoints remain public and do not require authentication:
+  - `/api/meta-data` (provides application metadata including authentication status)
+  - Swagger UI (`/swagger-ui.html`, `/swagger-ui/**`, `/v3/api-docs/**`)
+  - Actuator endpoints (`/actuator/**`)
+  - H2 console (`/h2-console/**`)
+  - Static resources (`/static/**`, `/css/**`, `/js/**`, `/images/**`, `/webjars/**`, `/favicon.ico`)
+
+> [!NOTE]  
+> The Web UI authentication is separate from the SMTP server authentication. The SMTP server authentication is configured under `fakesmtp.authentication` and is used for authenticating SMTP clients, while the Web UI authentication is configured under `fakesmtp.webapp.authentication` and is used for authenticating users accessing the web interface and API endpoints.
     
+
+## Real-Time Email Notifications
+
+The Fake SMTP Server supports real-time email notifications using Server-Sent Events (SSE). This feature eliminates the need for polling and provides instant updates when new emails are received.
+
+### How It Works
+
+1. The web interface automatically establishes an SSE connection to the server
+2. When a new email is received by the SMTP server, an event is sent to all connected clients
+3. The web interface updates the email list in real-time without refreshing the page
+
+### Benefits
+
+- **Instant Updates**: See new emails as soon as they arrive
+- **Reduced Server Load**: Eliminates the need for frequent polling
+- **Improved User Experience**: No delay in seeing new emails
+- **Efficient Resource Usage**: SSE is more efficient than WebSockets for one-way communication
+
+### Authentication Considerations
+
+When Web UI Authentication is enabled, the SSE connection is only established after successful login. This ensures that only authenticated users receive real-time notifications.
 
 ## REST API
 

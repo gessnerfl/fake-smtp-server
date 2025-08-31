@@ -1,5 +1,6 @@
 package de.gessnerfl.fakesmtp.controller;
 
+import de.gessnerfl.fakesmtp.config.WebappAuthenticationProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,18 +17,42 @@ class MetaDataControllerTest {
 
     @Mock
     private BuildProperties buildProperties;
+
+    @Mock
+    private WebappAuthenticationProperties authProperties;
+
     @InjectMocks
     private MetaDataController sut;
 
     @Test
-    void shouldReturnApplicationVersion() {
+    void shouldReturnApplicationVersionAndAuthenticationStatus() {
         final var version = "app-version";
+        final var authEnabled = true;
+
         when(buildProperties.getVersion()).thenReturn(version);
+        when(authProperties.isAuthenticationEnabled()).thenReturn(authEnabled);
 
         final var meta = sut.get();
 
         assertEquals(version, meta.getVersion());
+        assertEquals(authEnabled, meta.isAuthenticationEnabled());
         verify(buildProperties).getVersion();
+        verify(authProperties).isAuthenticationEnabled();
     }
 
+    @Test
+    void shouldReturnApplicationVersionAndAuthenticationDisabled() {
+        final var version = "app-version";
+        final var authEnabled = false;
+
+        when(buildProperties.getVersion()).thenReturn(version);
+        when(authProperties.isAuthenticationEnabled()).thenReturn(authEnabled);
+
+        final var meta = sut.get();
+
+        assertEquals(version, meta.getVersion());
+        assertEquals(authEnabled, meta.isAuthenticationEnabled());
+        verify(buildProperties).getVersion();
+        verify(authProperties).isAuthenticationEnabled();
+    }
 }
