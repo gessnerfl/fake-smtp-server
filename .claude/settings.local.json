@@ -6,7 +6,8 @@
       "Bash(npm view:*)",
       "Bash(npm test)",
       "Bash(npm run build:*)",
-      "Bash(./gradlew build:*)"
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew:*)"
     ],
     "deny": [],
     "ask": []

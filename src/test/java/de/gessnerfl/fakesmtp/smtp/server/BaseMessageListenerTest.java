@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.smtp.server;
 
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
+import de.gessnerfl.fakesmtp.service.EmailSseEmitterService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,6 +31,8 @@ class BaseMessageListenerTest {
     private MessageForwarder messageForwarder;
     @Mock
     private BlockedRecipientAddresses blockedRecipientAddresses;
+    @Mock
+    private EmailSseEmitterService emailSseEmitterService;
     @Mock
     private Logger logger;
 
@@ -65,8 +68,10 @@ class BaseMessageListenerTest {
         var content = contentString.getBytes(StandardCharsets.UTF_8);
         var contentStream = new ByteArrayInputStream(content);
         var mail = mock(Email.class);
+        var savedMail = mock(Email.class);
 
         when(emailFactory.convert(any(RawData.class))).thenReturn(mail);
+        when(emailRepository.save(mail)).thenReturn(savedMail);
 
         sut.deliver(from, to, contentStream);
 
@@ -77,6 +82,7 @@ class BaseMessageListenerTest {
         assertEquals(to, rawData.getTo());
         assertEquals(contentString, rawData.getContentAsString());
         verify(emailRepository).save(mail);
+        verify(emailSseEmitterService).sendEmailReceivedEvent(savedMail);
         verify(messageForwarder).forward(rawData);
     }
 
@@ -94,6 +100,7 @@ class BaseMessageListenerTest {
             sut.deliver(from, to, contentStream);
 
             verify(emailRepository, never()).save(any(Email.class));
+            verify(emailSseEmitterService, never()).sendEmailReceivedEvent(any(Email.class));
             verify(messageForwarder, never()).forward(any(RawData.class));
         });
     }

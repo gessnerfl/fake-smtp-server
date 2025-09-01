@@ -1,11 +1,23 @@
 package de.gessnerfl.fakesmtp.controller;
 
-import de.gessnerfl.fakesmtp.model.Email;
-import de.gessnerfl.fakesmtp.model.EmailAttachment;
-import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
-import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import de.gessnerfl.fakesmtp.service.EmailSseEmitterService;
-import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -21,14 +33,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.model.EmailAttachment;
+import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailRepository;
+import de.gessnerfl.fakesmtp.service.EmailSseEmitterService;
+import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import jakarta.servlet.ServletContext;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EmailRestControllerTest {
@@ -48,7 +59,8 @@ class EmailRestControllerTest {
 
 	@Test
 	void shouldReturnListOfEmails() {
-		@SuppressWarnings("unchecked") final Page<Email> page = mock(Page.class);
+		@SuppressWarnings("unchecked")
+		final Page<Email> page = mock(Page.class);
 		when(emailRepository.findAll(any(Pageable.class))).thenReturn(page);
 
 		var pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "receivedOn");
@@ -148,43 +160,73 @@ class EmailRestControllerTest {
 	}
 
 	@Test
-	void shouldReturnSseEmitterWhenSubscribingToEmailEvents() {
-		when(emailSseEmitterService.add(any(SseEmitter.class))).thenAnswer(invocation -> invocation.getArgument(0));
+	void shouldReturnSseEmitterWhenSubscribingToEmailEvents() throws IOException {
+		final var emitter = mock(SseEmitter.class);
+		when(emailSseEmitterService.createAndAddEmitter()).thenReturn(emitter);
 
 		SseEmitter result = sut.subscribeToEmailEvents();
 
-		assertNotNull(result);
-		assertEquals(3600000L, result.getTimeout());
-
-		ArgumentCaptor<SseEmitter> emitterCaptor = ArgumentCaptor.forClass(SseEmitter.class);
-		verify(emailSseEmitterService).add(emitterCaptor.capture());
-		assertEquals(result, emitterCaptor.getValue());
+		assertSame(result, emitter);
+		verify(emitter).send(any(SseEmitter.SseEventBuilder.class));
+		verify(emitter, never()).complete();
+		verifyNoMoreInteractions(emailSseEmitterService, emitter);
 	}
 
 	@Test
 	void shouldSendInitialEventWhenSubscribingToEmailEvents() throws IOException {
-		when(emailSseEmitterService.add(any(SseEmitter.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		final var emitter = mock(SseEmitter.class);
+		when(emailSseEmitterService.createAndAddEmitter()).thenReturn(emitter);
 
 		SseEmitter result = sut.subscribeToEmailEvents();
 
-		ArgumentCaptor<SseEmitter.SseEventBuilder> eventCaptor = ArgumentCaptor.forClass(SseEmitter.SseEventBuilder.class);
+		assertNotNull(result);
+		ArgumentCaptor<SseEmitter.SseEventBuilder> eventCaptor = ArgumentCaptor
+				.forClass(SseEmitter.SseEventBuilder.class);
 		verify(result).send(eventCaptor.capture());
+		verify(emitter, never()).complete();
+		verifyNoMoreInteractions(emailSseEmitterService, emitter);
+
+		var eventBuilder = eventCaptor.getValue();
+		assertNotNull(eventBuilder);
+		var event = eventBuilder.build();
+		assertEquals(3, event.size());
+		var containsEventElement = false;
+		var containsDataElement = false;
+		var containsEmptyElement = false;
+		for (var element : event) {
+			var dataRaw = element.getData();
+			assertTrue(dataRaw instanceof String);
+			var data = (String) dataRaw;
+			if (data.startsWith("event:")) {
+				assertEquals("event:connection-established\ndata:", data);
+				containsEventElement = true;
+			} else {
+				if (data.isBlank()) {
+					assertEquals("\n\n", data);
+					containsEmptyElement = true;
+				} else {
+					assertEquals("Connected to email events", data);
+					containsDataElement = true;
+				}
+			}
+		}
+		assertTrue(containsEventElement);
+		assertTrue(containsDataElement);
+		assertTrue(containsEmptyElement);
 	}
 
 	@Test
 	void shouldCompleteEmitterWhenSendingInitialEventFails() throws IOException {
-		SseEmitter emitter = new SseEmitter(3600000L);
-
-		when(emailSseEmitterService.add(any(SseEmitter.class))).thenReturn(emitter);
-
-		SseEmitter spyEmitter = spy(emitter);
-		doThrow(new IOException("Test exception")).when(spyEmitter).send(any(SseEmitter.SseEventBuilder.class));
-		when(emailSseEmitterService.add(any(SseEmitter.class))).thenReturn(spyEmitter);
+		final var emitter = mock(SseEmitter.class);
+		doThrow(new IOException("Test exception")).when(emitter).send(any(SseEmitter.SseEventBuilder.class));
+		when(emailSseEmitterService.createAndAddEmitter()).thenReturn(emitter);
 
 		SseEmitter result = sut.subscribeToEmailEvents();
 
-		verify(spyEmitter).complete();
-		assertEquals(spyEmitter, result);
+		assertNotNull(result);
+		verify(emitter).send(any(SseEmitter.SseEventBuilder.class));
+		verify(emitter).complete();
+		verifyNoMoreInteractions(emailSseEmitterService, emitter);
 	}
 
 }

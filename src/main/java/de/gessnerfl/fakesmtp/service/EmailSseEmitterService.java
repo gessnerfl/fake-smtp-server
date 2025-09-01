@@ -1,14 +1,15 @@
 package de.gessnerfl.fakesmtp.service;
 
-import de.gessnerfl.fakesmtp.model.Email;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import de.gessnerfl.fakesmtp.model.Email;
 
 @Service
 public class EmailSseEmitterService {
@@ -18,6 +19,24 @@ public class EmailSseEmitterService {
     @Autowired
     public EmailSseEmitterService(Logger logger) {
         this.logger = logger;
+    }
+
+    public SseEmitter createEmitter() {
+        return createEmitter(3600000L);
+    }
+
+    public SseEmitter createEmitter(long timeout) {
+        return new SseEmitter(timeout);
+    }
+
+    public SseEmitter createAndAddEmitter() {
+        return createAndAddEmitter(3600000L);
+    }
+
+    public SseEmitter createAndAddEmitter(long timeout) {
+        var emitter = new SseEmitter(timeout);
+        add(emitter);
+        return emitter;
     }
 
     /**
