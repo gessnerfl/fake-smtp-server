@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;
@@ -122,5 +123,43 @@ class EmailSseEmitterServiceTest {
 
 		verify(emitter).complete();
 		verify(logger).warn(contains("SSE emitter failed and removed"), anyInt(), eq(testException));
+	}
+
+	@Test
+	void shouldCreateEmitterWithDefaultTimeout() {
+		SseEmitter result = sut.createEmitter();
+
+		assertNotNull(result);
+		assertEquals(3600000L, result.getTimeout());
+	}
+
+	@Test
+	void shouldCreateEmitterWithSpecifiedTimeout() {
+		long customTimeout = 1800000L; // 30 minutes
+
+		SseEmitter result = sut.createEmitter(customTimeout);
+
+		assertNotNull(result);
+		assertEquals(customTimeout, result.getTimeout());
+	}
+
+	@Test
+	void shouldCreateAndAddEmitterWithDefaultTimeout() {
+		SseEmitter result = sut.createAndAddEmitter();
+
+		assertNotNull(result);
+		assertEquals(3600000L, result.getTimeout());
+		verify(logger).debug(contains("SSE emitter added"), anyInt());
+	}
+
+	@Test
+	void shouldCreateAndAddEmitterWithSpecifiedTimeout() {
+		long customTimeout = 1800000L; // 30 minutes
+
+		SseEmitter result = sut.createAndAddEmitter(customTimeout);
+
+		assertNotNull(result);
+		assertEquals(customTimeout, result.getTimeout());
+		verify(logger).debug(contains("SSE emitter added"), anyInt());
 	}
 }
