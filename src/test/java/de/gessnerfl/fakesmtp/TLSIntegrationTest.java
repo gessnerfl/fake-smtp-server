@@ -1,8 +1,9 @@
 package de.gessnerfl.fakesmtp;
 
-import de.gessnerfl.fakesmtp.repository.EmailRepository;
-import de.gessnerfl.fakesmtp.smtp.server.SmtpServer;
-import jakarta.transaction.Transactional;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,15 +15,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import de.gessnerfl.fakesmtp.repository.EmailRepository;
+import de.gessnerfl.fakesmtp.smtp.server.SmtpServer;
+import jakarta.transaction.Transactional;
 
 @DirtiesContext
 @Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ActiveProfiles({"integrationtest_with_tls_required", "integrationtest", "default"})
+@ActiveProfiles({ "integrationtest_with_tls_required", "integrationtest", "default" })
 class TLSIntegrationTest {
 
     @Autowired
@@ -44,7 +45,7 @@ class TLSIntegrationTest {
         props.setProperty("mail.smtp.ssl.trust", "*");
         props.setProperty("mail.debug", "false");
 
-        var uniqueRandomName = "Test-Mail-" + RandomStringUtils.randomAlphanumeric(24);
+        var uniqueRandomName = "Test-Mail-" + RandomStringUtils.insecure().nextAlphanumeric(24);
         var message = new SimpleMailMessage();
         message.setTo("receiver@example.com");
         message.setFrom("sender@example.com");

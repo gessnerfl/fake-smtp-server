@@ -33,12 +33,12 @@ class EmailRepositoryIntegrationTest {
     private EmailRepository sut;
 
     @BeforeEach
-    void init(){
+    void init() {
         sut.deleteAll();
     }
 
     @Test
-    void shouldDeleteEmailsWhichExceedTheRetentionLimitOfMaximumNumberOfEmails(){
+    void shouldDeleteEmailsWhichExceedTheRetentionLimitOfMaximumNumberOfEmails() {
         var mail1 = createRandomEmail(5);
         var mail2 = createRandomEmail(4);
         var mail3 = createRandomEmail(3);
@@ -58,7 +58,7 @@ class EmailRepositoryIntegrationTest {
     }
 
     @Test
-    void shouldNotDeleteAnyEmailWhenTheNumberOfEmailsDoesNotExceedTheRetentionLimitOfMaximumNumberOfEmails(){
+    void shouldNotDeleteAnyEmailWhenTheNumberOfEmailsDoesNotExceedTheRetentionLimitOfMaximumNumberOfEmails() {
         var mail1 = createRandomEmail(5);
         var mail2 = createRandomEmail(4);
         var mail3 = createRandomEmail(3);
@@ -76,16 +76,16 @@ class EmailRepositoryIntegrationTest {
     }
 
     private Email createRandomEmail(int minusMinutes) {
-        var randomToken = RandomStringUtils.randomAlphanumeric(6);
+        var randomToken = RandomStringUtils.insecure().nextAlphanumeric(6);
         var receivedOn = ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes(minusMinutes);
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);
-        content.setData("Test Content "+randomToken);
+        content.setData("Test Content " + randomToken);
 
         var mail = new Email();
-        mail.setSubject("Test Subject "+randomToken);
-        mail.setRawData("Test Content "+randomToken);
+        mail.setSubject("Test Subject " + randomToken);
+        mail.setRawData("Test Content " + randomToken);
         mail.setReceivedOn(receivedOn);
         mail.setFromAddress("sender@example.com");
         mail.setToAddress("receiver@example.com");

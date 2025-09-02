@@ -12,10 +12,11 @@ import java.time.ZonedDateTime;
 
 class EmailControllerUtil {
 
-    private EmailControllerUtil() { }
+    private EmailControllerUtil() {
+    }
 
     public static Email prepareRandomEmail(int minusMinutes) {
-        var randomToken = RandomStringUtils.randomAlphanumeric(6);
+        var randomToken = RandomStringUtils.insecure().nextAlphanumeric(6);
         var receivedOn = getUtcNow().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
@@ -25,13 +26,14 @@ class EmailControllerUtil {
         var attachment = new EmailAttachment();
         attachment.setFilename("test.txt");
         attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
-        
-        return prepareEmail(attachment, content, "Test Subject " + randomToken, "Test Content " + randomToken, receivedOn,
-            "sender@example.com", "receiver@example.com", "<message-id>");
+
+        return prepareEmail(attachment, content, "Test Subject " + randomToken, "Test Content " + randomToken,
+                receivedOn,
+                "sender@example.com", "receiver@example.com", "<message-id>");
     }
 
     public static Email prepareEmail(String subject, String toAdress, int minusMinutes) {
-        var randomToken = RandomStringUtils.randomAlphanumeric(6);
+        var randomToken = RandomStringUtils.insecure().nextAlphanumeric(6);
         var receivedOn = getUtcNow().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
@@ -42,12 +44,12 @@ class EmailControllerUtil {
         attachment.setFilename("test.txt");
         attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
 
-        return prepareEmail(attachment, content, subject, "Test Content " + randomToken, 
-            receivedOn, "sender@example.com", toAdress, "<message-id>");
+        return prepareEmail(attachment, content, subject, "Test Content " + randomToken,
+                receivedOn, "sender@example.com", toAdress, "<message-id>");
     }
 
     public static Email prepareEmail(String subject, String toAdress, int minusMinutes, String messageId) {
-        var randomToken = RandomStringUtils.randomAlphanumeric(6);
+        var randomToken = RandomStringUtils.insecure().nextAlphanumeric(6);
         var receivedOn = getUtcNow().minusMinutes(minusMinutes);
 
         var content = new EmailContent();
@@ -58,8 +60,8 @@ class EmailControllerUtil {
         attachment.setFilename("test.txt");
         attachment.setData("This is some test data".getBytes(StandardCharsets.UTF_8));
 
-        return prepareEmail(attachment, content, subject, "Test Content " + randomToken, 
-            receivedOn, "sender@example.com", toAdress, messageId);
+        return prepareEmail(attachment, content, subject, "Test Content " + randomToken,
+                receivedOn, "sender@example.com", toAdress, messageId);
     }
 
     private static ZonedDateTime getUtcNow() {
@@ -67,14 +69,14 @@ class EmailControllerUtil {
     }
 
     public static Email prepareEmail(
-        EmailAttachment emailAttachment,
-        EmailContent emailContent, 
-        String subject,
-        String rawData,
-        ZonedDateTime receivedOn,
-        String fromAddress,
-        String toAdress, 
-        String messageId) {
+            EmailAttachment emailAttachment,
+            EmailContent emailContent,
+            String subject,
+            String rawData,
+            ZonedDateTime receivedOn,
+            String fromAddress,
+            String toAdress,
+            String messageId) {
         var mail = new Email();
         mail.setSubject(subject);
         mail.setRawData(rawData);
