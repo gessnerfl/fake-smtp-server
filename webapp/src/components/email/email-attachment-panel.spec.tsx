@@ -1,8 +1,7 @@
-import {render, screen} from "@testing-library/react";
-import {testEmail1, testEmailWithAttachment} from "../../setupTests";
-import * as React from "react";
-import '@testing-library/jest-dom'
-import {EmailAttachmentPanel} from "./email-attachment-panel";
+import '@testing-library/jest-dom';
+import { render, screen } from "@testing-library/react";
+import { testEmailWithAttachment } from "../../setupTests";
+import { EmailAttachmentPanel } from "./email-attachment-panel";
 
 describe('EmailAttachmentPanel', () => {
     it('render all attachments', () => {
