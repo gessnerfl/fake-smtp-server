@@ -20,6 +20,11 @@ jobs:
           distribution: 'corretto'
           java-version: 21
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          dependency-graph: ${{ github.ref == 'refs/heads/main' && 'generate-and-submit' || 'disabled' }}
+
       - name: Build with Gradle
         run: ./gradlew build jacocoTestReport sonarqube --info
         env:
