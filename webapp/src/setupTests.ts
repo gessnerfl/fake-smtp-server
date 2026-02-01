@@ -26,6 +26,12 @@ beforeAll(() => {
   };
 });
 
+beforeEach(() => {
+  if (typeof window !== "undefined") {
+    window.sessionStorage.clear();
+  }
+});
+
 afterAll(() => {
   console.error = originalError;
 });
@@ -126,7 +132,7 @@ export const handlers = [
         return new HttpResponse("Not found", { status: 404 })
     }),
     http.get(endpointUrl('/api/meta-data'), async () => {
-        const metaData: MetaData = { version: "local", authenticationEnabled: false }
+        const metaData: MetaData = { version: "local", authenticationEnabled: false, authenticated: false }
         await delay(150)
         return HttpResponse.json(metaData)
     }),

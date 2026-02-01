@@ -71,6 +71,12 @@ bootRun {
     }
 }
 
+// Ensure the SPA assets are generated before bootRun serves "/" and "/emails/**",
+// otherwise Spring fails to resolve the "index" template once authentication is enabled.
+tasks.named('bootRun') {
+    dependsOn('copyStaticAssets', 'copyTemplateAssets')
+}
+
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
         options.compilerArgs << "-Xlint:deprecation"
@@ -103,7 +109,7 @@ tasks.register('webappNpmTest', NpmTask) {
     args = ["run", "test", "--", "--coverage", "--watchAll=false"]
 }
 
-tasks.register('copyStaticAssets', Copy) {
+tasks.register('copyStaticAssets', Sync) {
     dependsOn(compileJava, compileTestJava, webappNpmTest, resolveMainClassName)
     from(file('webapp/dist'))
     into(file('build/resources/main/static/'))

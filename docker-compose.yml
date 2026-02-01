@@ -2,12 +2,16 @@ version: '3'
 
 services:
   fake-smtp-server:
-    image: gessnerfl/fake-smtp-server:2.2.1
+    image: gessnerfl/fake-smtp-server:latest
     hostname: "fake-smtp-server"
     restart: always
     environment:
-      - FAKESMTP_AUTHENTICATION_USERNAME=myuser
-      - FAKESMTP_AUTHENTICATION_PASSWORD=mysecretpassword
+#      - FAKESMTP_AUTHENTICATION_USERNAME=myuser
+#      - FAKESMTP_AUTHENTICATION_PASSWORD=mysecretpassword
+      - FAKESMTP_WEBAPP_AUTH_USERNAME=myuser
+      - FAKESMTP_WEBAPP_AUTH_PASSWORD=mysecretpassword
+      - FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES=2
+      - FAKESMTP_WEBAPP_AUTHENTICATION_CONCURRENT_SESSIONS=2
     ports:
       - 8025:8025      #expose smtp port
       - 8080:8080      #expose web ui
