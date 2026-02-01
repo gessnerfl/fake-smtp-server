@@ -3,6 +3,7 @@ import { screen, waitFor } from "@testing-library/react";
 import { renderWithProviders } from "../test-utils";
 import Login from "./login";
 import { useGetMetaDataQuery, useLoginMutation } from "../store/rest-api";
+import userEvent from "@testing-library/user-event";
 
 jest.mock("../store/rest-api", () => {
   return {
@@ -17,7 +18,8 @@ describe("Login Component", () => {
 
     (useGetMetaDataQuery as jest.Mock).mockReturnValue({
       data: {version: "test", authenticationEnabled: true},
-      isLoading: false
+      isLoading: false,
+      refetch: jest.fn()
     });
 
     const mockUnwrap = jest.fn().mockResolvedValue({});
@@ -32,7 +34,8 @@ describe("Login Component", () => {
   test("does not render when authentication is disabled", async () => {
     (useGetMetaDataQuery as jest.Mock).mockReturnValue({
       data: {version: "test", authenticationEnabled: false},
-      isLoading: false
+      isLoading: false,
+      refetch: jest.fn()
     });
 
     const {container} = renderWithProviders(<Login/>);
@@ -45,7 +48,8 @@ describe("Login Component", () => {
   test("shows loading state when fetching metadata", async () => {
     (useGetMetaDataQuery as jest.Mock).mockReturnValue({
       data: undefined,
-      isLoading: true
+      isLoading: true,
+      refetch: jest.fn()
     });
 
     renderWithProviders(<Login/>);
@@ -83,5 +87,34 @@ describe("Login Component", () => {
 
     expect(screen.getByRole("button", {name: "Signing In..."})).toBeInTheDocument();
     expect(screen.getByRole("button", {name: "Signing In..."})).toBeDisabled();
+  });
+
+  test("shows error message when login fails", async () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const user = userEvent.setup();
+    const mockUnwrap = jest.fn().mockRejectedValue(new Error("Unauthorized"));
+    const mockLogin = jest.fn().mockReturnValue({unwrap: mockUnwrap});
+
+    (useLoginMutation as jest.Mock).mockReturnValue([
+      mockLogin,
+      {isLoading: false}
+    ]);
+
+    renderWithProviders(<Login/>);
+
+    await waitFor(() => {
+      expect(screen.getByText("Login to FakeSMTP Server")).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/username/i), "baduser");
+    await user.type(screen.getByLabelText(/password/i), "badpass");
+    await user.click(screen.getByRole("button", {name: "Sign In"}));
+
+    await waitFor(() => {
+      expect(screen.getByText("Invalid username or password. Please try again.")).toBeInTheDocument();
+    });
+
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 });

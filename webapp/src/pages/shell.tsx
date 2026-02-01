@@ -4,10 +4,11 @@ import Navigation from "../components/navigation";
 import {Outlet} from "react-router-dom";
 import {Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import {lightBlue, orange, yellow} from "@mui/material/colors";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import Login from '../components/login';
 import { useGetMetaDataQuery } from '../store/rest-api';
+import { setAuthenticated, setAuthenticationRequired } from '../store/auth-slice';
 
 const lightTheme = createTheme({
     palette: {
@@ -37,16 +38,33 @@ const lightTheme = createTheme({
 
 function Shell() {
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-    const { data } = useGetMetaDataQuery();
+    const dispatch = useDispatch();
+    const { data, isLoading } = useGetMetaDataQuery();
 
-    const showLogin = data?.authenticationEnabled && !isAuthenticated;
-    const showContent = !data?.authenticationEnabled || isAuthenticated;
+    React.useEffect(() => {
+        if (data) {
+            dispatch(setAuthenticationRequired(data.authenticationEnabled));
+            if (typeof data.authenticated === "boolean") {
+                dispatch(setAuthenticated(data.authenticated));
+            }
+        }
+    }, [data, dispatch]);
+
+    const metaLoaded = !!data;
+    const showLogin = metaLoaded && data.authenticationEnabled && !isAuthenticated;
+    const showContent = metaLoaded && (!data.authenticationEnabled || isAuthenticated);
+    const showLoading = isLoading;
 
     return (
         <ThemeProvider theme={lightTheme}>
             <CssBaseline/>
             <div className="Shell">
                 <Navigation/>
+                {showLoading && (
+                    <Container className="content" maxWidth="xl">
+                        Loading...
+                    </Container>
+                )}
                 {showLogin && <Login />}
                 {showContent && (
                     <Container className="content" maxWidth="xl">
