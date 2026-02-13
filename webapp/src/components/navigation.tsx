@@ -14,6 +14,7 @@ import { clearAuthentication } from '../store/auth-slice';
 
 type ConnectionStatus = 'connected' | 'disconnected' | 'reconnecting';
 type EventType = 'ping' | 'email' | null;
+const CONNECTION_POLL_INTERVAL_MS = 1000;
 
 function Navigation() {
     const {data} = useGetMetaDataQuery();
@@ -30,30 +31,40 @@ function Navigation() {
 
     // Monitor connection status and ping timestamp
     useEffect(() => {
+        const updateConnectionStatus = (nextStatus: ConnectionStatus) => {
+            setConnectionStatus((previousStatus) => previousStatus === nextStatus ? previousStatus : nextStatus);
+        };
+
+        const updateLastPingSeconds = (nextLastPingSeconds: number) => {
+            setLastPingSeconds((previousLastPingSeconds) => previousLastPingSeconds === nextLastPingSeconds
+                ? previousLastPingSeconds
+                : nextLastPingSeconds);
+        };
+
         const interval = setInterval(() => {
             const eventSource = window.emailEventSource;
             if (!eventSource) {
-                setConnectionStatus('disconnected');
-                setLastPingSeconds(0);
+                updateConnectionStatus('disconnected');
+                updateLastPingSeconds(0);
                 return;
             }
 
             // Check connection state
             if (eventSource.readyState === 1) { // OPEN
-                setConnectionStatus('connected');
+                updateConnectionStatus('connected');
             } else if (eventSource.readyState === 0) { // CONNECTING
-                setConnectionStatus('reconnecting');
+                updateConnectionStatus('reconnecting');
             } else {
-                setConnectionStatus('disconnected');
+                updateConnectionStatus('disconnected');
             }
 
             // Calculate seconds since last ping from global timestamp
             const lastPingTimestamp = window.sseLastPingTimestamp;
             if (lastPingTimestamp) {
                 const secondsSincePing = Math.floor((Date.now() - lastPingTimestamp) / 1000);
-                setLastPingSeconds(secondsSincePing);
+                updateLastPingSeconds(secondsSincePing);
             } else {
-                setLastPingSeconds(0);
+                updateLastPingSeconds(0);
             }
 
             // Check for new events to trigger animation
@@ -71,7 +82,7 @@ function Navigation() {
                     setIsPulsing(false);
                 }, animationDuration);
             }
-        }, 100);
+        }, CONNECTION_POLL_INTERVAL_MS);
 
         return () => clearInterval(interval);
     }, []);
@@ -120,7 +131,7 @@ function Navigation() {
                                     color={getStatusColor()}
                                     sx={{
                                         fontSize: 12,
-                                        color: '#00ff00',
+                                        color: connectionStatus === 'connected' ? '#39ff14' : undefined,
                                         animation: isPulsing && connectionStatus === 'connected'
                                             ? `${animationName} ${animationDuration} ease-in-out`
                                             : 'none',

@@ -2,17 +2,24 @@ package de.gessnerfl.fakesmtp.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.model.EmailPartProcessingStatus;
 import de.gessnerfl.fakesmtp.model.RestResponsePage;
 import de.gessnerfl.fakesmtp.model.query.*;
+import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailContentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailInlineImageRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,9 +28,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,21 +49,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("mockserver")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 class EmailRestControllerMVCIntegrationTest {
 
     @Autowired
     private EmailRepository emailRepository;
+
     @Autowired
-    private ObjectMapper objectMapper;
+    private EmailAttachmentRepository emailAttachmentRepository;
+
+    @Autowired
+    private EmailContentRepository emailContentRepository;
+
+    @Autowired
+    private EmailInlineImageRepository emailInlineImageRepository;
+
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .registerModule(new Jdk8Module())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @Autowired
     private MockMvc mockMvc;
 
     @BeforeEach
     void init() {
-        emailRepository.deleteAll();
+        emailAttachmentRepository.deleteAllInBatch();
+        emailContentRepository.deleteAllInBatch();
+        emailInlineImageRepository.deleteAllInBatch();
+        emailRepository.deleteAllInBatch();
     }
 
     @Test
@@ -140,13 +164,25 @@ class EmailRestControllerMVCIntegrationTest {
     @Test
     void shouldReturnAttachmentForEmail() throws Exception {
         var email = createRandomEmail(1);
-        var attachment = email.getAttachments().get(0);
+        var attachment = email.getAttachments().getFirst();
 
         this.mockMvc.perform(get("/api/emails/" + email.getId() + "/attachments/" + attachment.getId()))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + attachment.getFilename()))
                 .andExpect(header().string(HttpHeaders.CONTENT_LENGTH, String.valueOf(attachment.getData().length)))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE))
                 .andExpect(content().bytes(attachment.getData()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnInlineImageForEmail() throws Exception {
+        var email = save(EmailControllerUtil.prepareEmailWithAllChildren(1));
+        var inlineImage = email.getInlineImages().getFirst();
+        var expectedImageData = Base64.getDecoder().decode(inlineImage.getData().getBytes(StandardCharsets.UTF_8));
+
+        this.mockMvc.perform(get("/api/emails/" + email.getId() + "/inline-images/" + inlineImage.getId()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, startsWith(MediaType.IMAGE_PNG_VALUE)))
+                .andExpect(content().bytes(expectedImageData))
                 .andExpect(status().isOk());
     }
 
@@ -162,8 +198,23 @@ class EmailRestControllerMVCIntegrationTest {
     void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
 
-        this.mockMvc.perform(get("/api/emails/123/attachments/" + email.getAttachments().get(0).getId()))
+        this.mockMvc.perform(get("/api/emails/123/attachments/" + email.getAttachments().getFirst().getId()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn413WhenAttachmentWasSkippedDuringProcessing() throws Exception {
+        var message = "SKIPPED_TOO_LARGE: Attachment exceeded configured max attachment size";
+        var email = EmailControllerUtil.prepareRandomEmail(1);
+        var attachment = email.getAttachments().getFirst();
+        attachment.setProcessingStatus(EmailPartProcessingStatus.SKIPPED_TOO_LARGE);
+        attachment.setProcessingMessage(message);
+        var savedEmail = save(email);
+
+        this.mockMvc.perform(get("/api/emails/" + savedEmail.getId() + "/attachments/" + attachment.getId()))
+                .andExpect(status().is(413))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, startsWith(MediaType.TEXT_PLAIN_VALUE)))
+                .andExpect(content().string(message));
     }
 
     @Test
@@ -547,6 +598,44 @@ class EmailRestControllerMVCIntegrationTest {
         assertEquals(0, emailSearchResult.getNumberOfElements());
     }
 
+    @Test
+    void shouldDeleteAllEmailsWithAttachmentsContentAndInlineImages() throws Exception {
+        save(EmailControllerUtil.prepareEmailWithAllChildren(1));
+        save(EmailControllerUtil.prepareEmailWithAllChildren(2));
+        save(EmailControllerUtil.prepareEmailWithAllChildren(3));
+
+        assertThat(emailRepository.findAll(), hasSize(3));
+        assertThat(emailAttachmentRepository.findAll(), hasSize(3));
+        assertThat(emailContentRepository.findAll(), hasSize(3));
+        assertThat(emailInlineImageRepository.findAll(), hasSize(3));
+
+        this.mockMvc.perform(delete("/api/emails"))
+                .andExpect(status().is2xxSuccessful());
+
+        assertThat(emailRepository.findAll(), empty());
+        assertThat(emailAttachmentRepository.findAll(), empty());
+        assertThat(emailContentRepository.findAll(), empty());
+        assertThat(emailInlineImageRepository.findAll(), empty());
+    }
+
+    @Test
+    void shouldDeleteSingleEmailWithCascade() throws Exception {
+        var email = save(EmailControllerUtil.prepareEmailWithAllChildren(1));
+        var emailId = email.getId();
+
+        assertThat(emailRepository.findAll(), hasSize(1));
+        assertThat(emailAttachmentRepository.findAll(), hasSize(1));
+        assertThat(emailContentRepository.findAll(), hasSize(1));
+        assertThat(emailInlineImageRepository.findAll(), hasSize(1));
+
+        this.mockMvc.perform(delete("/api/emails/" + emailId))
+                .andExpect(status().is2xxSuccessful());
+
+        assertThat(emailRepository.findAll(), empty());
+        assertThat(emailAttachmentRepository.findAll(), empty());
+        assertThat(emailContentRepository.findAll(), empty());
+        assertThat(emailInlineImageRepository.findAll(), empty());
+    }
 
     private Email mapFromJson(String json) throws IOException {
         return objectMapper.readValue(json, Email.class);
@@ -557,7 +646,7 @@ class EmailRestControllerMVCIntegrationTest {
     }
 
     private List<Email> createRandomEmails(int numberOfEmails, int minusMinutes) {
-        return IntStream.range(0, numberOfEmails).mapToObj(i -> createRandomEmail(minusMinutes)).collect(Collectors.toList());
+        return IntStream.range(0, numberOfEmails).mapToObj(_ -> createRandomEmail(minusMinutes)).collect(Collectors.toList());
     }
 
     private Email createRandomEmail(int minusMinutes) {

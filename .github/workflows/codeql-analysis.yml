@@ -38,11 +38,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v5
 
-    - name: Set up JDK 21
+    - name: Set up JDK 25
       uses: actions/setup-java@v5
       with:
         distribution: 'corretto'
-        java-version: 21
+        java-version: 25
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3

@@ -50,10 +50,11 @@ function Shell() {
         }
     }, [data, dispatch]);
 
-    const metaLoaded = !!data;
-    const showLogin = metaLoaded && data.authenticationEnabled && !isAuthenticated;
-    const showContent = metaLoaded && (!data.authenticationEnabled || isAuthenticated);
+    const authenticationEnabled = data?.authenticationEnabled ?? false;
+    const metaDataLoadFailed = !isLoading && !data;
     const showLoading = isLoading;
+    const showLogin = !showLoading && !metaDataLoadFailed && authenticationEnabled && !isAuthenticated;
+    const showContent = !showLoading && (metaDataLoadFailed || !authenticationEnabled || isAuthenticated);
 
     return (
         <ThemeProvider theme={lightTheme}>

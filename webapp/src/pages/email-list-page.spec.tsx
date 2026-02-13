@@ -26,16 +26,20 @@ describe('EmailListPage', () => {
             shouldContainPage(testData.slice(0, 10))
         })
 
-        userEvent.click(screen.getByTitle("Go to next page"))
+        await act(async () => {
+            await userEvent.click(screen.getByTitle("Go to next page"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Inbox")).toBeInTheDocument()
         })
         await waitFor(() => {
-            shouldContainPage(testData.slice(10, 10))
+            shouldContainPage(testData.slice(10, 20))
         })
 
-        userEvent.click(screen.getByTitle("Go to previous page"))
+        await act(async () => {
+            await userEvent.click(screen.getByTitle("Go to previous page"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Inbox")).toBeInTheDocument()
@@ -51,7 +55,7 @@ describe('EmailListPage', () => {
             expect(screen.getByText("Inbox")).toBeInTheDocument()
         })
         await waitFor(() => {
-            shouldContainPage(testData.slice(10, 10))
+            shouldContainPage(testData.slice(10, 20))
         })
     })
     it('render first page of size 25', async () => {
@@ -71,7 +75,9 @@ describe('EmailListPage', () => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
         })
 
-        userEvent.click(screen.getByTitle("1"))
+        await act(async () => {
+            await userEvent.click(screen.getByTitle("1"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Email 1")).toBeInTheDocument()
@@ -93,19 +99,25 @@ describe('EmailListPage', () => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
         })
 
-        userEvent.click(screen.getByTitle("1"))
+        await act(async () => {
+            await userEvent.click(screen.getByTitle("1"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Delete")).toBeEnabled()
         })
 
-        userEvent.click(screen.getByText("Delete"))
+        await act(async () => {
+            await userEvent.click(screen.getByText("Delete"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Delete Email 1")).toBeInTheDocument()
         })
 
-        userEvent.click(screen.getByText("No"))
+        await act(async () => {
+            await userEvent.click(screen.getByText("No"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Email 1")).toBeInTheDocument()
@@ -118,20 +130,24 @@ describe('EmailListPage', () => {
             expect(screen.getByTitle("1")).toBeInTheDocument()
         })
 
-        userEvent.click(screen.getByTitle("1"))
+        await act(async () => {
+            await userEvent.click(screen.getByTitle("1"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Delete")).toBeEnabled()
         })
 
-        userEvent.click(screen.getByText("Delete"))
+        await act(async () => {
+            await userEvent.click(screen.getByText("Delete"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Delete Email 1")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByText("Yes"))
+        await act(async () => {
+            await userEvent.click(screen.getByText("Yes"))
         })
 
         await waitFor(() => {
@@ -146,13 +162,17 @@ describe('EmailListPage', () => {
             expect(screen.getByTitle("5")).toBeInTheDocument()
         })
 
-        userEvent.click(screen.getByText("Delete All"))
+        await act(async () => {
+            await userEvent.click(screen.getByText("Delete All"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Delete All Emails")).toBeInTheDocument()
         })
 
-        userEvent.click(screen.getByText("No"))
+        await act(async () => {
+            await userEvent.click(screen.getByText("No"))
+        })
 
         await waitFor(() => {
             shouldContainPage(originalTestData.splice(1, 1).slice(0, 10))
@@ -165,14 +185,16 @@ describe('EmailListPage', () => {
             expect(screen.getByTitle("5")).toBeInTheDocument()
         })
 
-        userEvent.click(screen.getByText("Delete All"))
+        await act(async () => {
+            await userEvent.click(screen.getByText("Delete All"))
+        })
 
         await waitFor(() => {
             expect(screen.getByText("Delete All Emails")).toBeInTheDocument()
         })
 
-        act(() => {
-            userEvent.click(screen.getByText("Yes"))
+        await act(async () => {
+            await userEvent.click(screen.getByText("Yes"))
         })
 
         await waitFor(() => {

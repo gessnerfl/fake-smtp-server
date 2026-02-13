@@ -1,17 +1,23 @@
-version: '3'
+version: '3.8'
 
 services:
+  # ./gradlew jibDockerBuild
   fake-smtp-server:
     image: gessnerfl/fake-smtp-server:latest
     hostname: "fake-smtp-server"
     restart: always
     environment:
+      # Spring Profile (leer = default, "develop" für Entwicklung)
+      - SPRING_PROFILES_ACTIVE=develop
 #      - FAKESMTP_AUTHENTICATION_USERNAME=myuser
 #      - FAKESMTP_AUTHENTICATION_PASSWORD=mysecretpassword
       - FAKESMTP_WEBAPP_AUTH_USERNAME=myuser
       - FAKESMTP_WEBAPP_AUTH_PASSWORD=mysecretpassword
       - FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES=2
       - FAKESMTP_WEBAPP_AUTHENTICATION_CONCURRENT_SESSIONS=2
+      # Maximum attachment/inline image size (default: 10MB)
+      # Increase for development if needed: FAKESMTP_MAX_ATTACHMENT_SIZE=50MB
+      - FAKESMTP_MAX_ATTACHMENT_SIZE=10MB
     ports:
       - 8025:8025      #expose smtp port
       - 8080:8080      #expose web ui

@@ -1,11 +1,14 @@
 package de.gessnerfl.fakesmtp.config;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.util.unit.DataSize;
 
 import java.net.InetAddress;
@@ -14,10 +17,13 @@ import java.util.List;
 
 @Component
 @ConfigurationProperties(prefix = "fakesmtp")
+@Validated
 public class FakeSmtpConfigurationProperties {
 
     private static final int DEFAULT_PORT = 25;
 
+    @Min(1)
+    @Max(65535)
     @NotNull
     private Integer port = DEFAULT_PORT;
     private InetAddress bindAddress;
@@ -26,6 +32,7 @@ public class FakeSmtpConfigurationProperties {
     private String filteredEmailRegexList;
 
     private DataSize maxMessageSize;
+    private DataSize maxAttachmentSize = DataSize.ofMegabytes(10);
     private boolean requireTLS = false;
     @Valid
     private KeyStore tlsKeystore;
@@ -89,6 +96,14 @@ public class FakeSmtpConfigurationProperties {
 
     public void setMaxMessageSize(DataSize maxMessageSize) {
         this.maxMessageSize = maxMessageSize;
+    }
+
+    public DataSize getMaxAttachmentSize() {
+        return maxAttachmentSize;
+    }
+
+    public void setMaxAttachmentSize(DataSize maxAttachmentSize) {
+        this.maxAttachmentSize = maxAttachmentSize;
     }
 
     public boolean isRequireTLS() {

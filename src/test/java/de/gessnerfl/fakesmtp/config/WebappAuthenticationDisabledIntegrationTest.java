@@ -4,11 +4,14 @@ import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.model.EmailContent;
+import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailContentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailInlineImageRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,9 +45,21 @@ class WebappAuthenticationDisabledIntegrationTest {
     @Autowired
     private EmailRepository emailRepository;
 
+    @Autowired
+    private EmailAttachmentRepository emailAttachmentRepository;
+
+    @Autowired
+    private EmailContentRepository emailContentRepository;
+
+    @Autowired
+    private EmailInlineImageRepository emailInlineImageRepository;
+
     @BeforeEach
     void setUp() {
-        emailRepository.deleteAll();
+        emailAttachmentRepository.deleteAllInBatch();
+        emailContentRepository.deleteAllInBatch();
+        emailInlineImageRepository.deleteAllInBatch();
+        emailRepository.deleteAllInBatch();
     }
 
     @Test

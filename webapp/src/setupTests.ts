@@ -18,6 +18,7 @@ beforeAll(() => {
       typeof args[0] === 'string' &&
       (args[0].includes('The current testing environment is not configured to support act') ||
        args[0].includes('An update to ForwardRef(TouchRipple) inside a test was not wrapped in act') ||
+       args[0].includes('not wrapped in act') ||
        args[0].includes('Warning: An update to'))
     ) {
       return;
@@ -85,7 +86,7 @@ export const handlers = [
         const pageSizeStr = url.searchParams.get('size')
         const pageSize = pageSizeStr !== null ? parseInt(pageSizeStr) : 10
         if (page < 2) {
-            const data = testData.slice(page * pageSize, pageSize)
+            const data = testData.slice(page * pageSize, (page + 1) * pageSize)
             const totalEntries = testData.length
             const totalPages = (testData.length / pageSize) + (testData.length % pageSize > 0 ? 1 : 0)
             const pageData: EmailPage = {
@@ -138,7 +139,7 @@ export const handlers = [
     }),
 ]
 
-const server = setupServer(...handlers)
+export const server = setupServer(...handlers)
 
 beforeAll(() => {
     server.listen({ onUnhandledRequest: 'bypass' })

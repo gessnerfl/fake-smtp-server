@@ -27,6 +27,9 @@ class ReceiptTest extends AbstractCommandIntegrationTest {
 
 		this.send("RCPT");
 		this.expect("501 Syntax: RCPT TO: <address>  Error in parameters:");
+
+		this.send("QUIT");
+		this.expect("221 Bye");
 	}
 
 	@Test

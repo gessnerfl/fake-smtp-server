@@ -1,0 +1,59 @@
+[versions]
+# Plugins
+axion-release = "1.21.1"
+spring-boot = "4.0.2"
+sonarqube = "7.2.2.6593"
+jib = "3.5.3"
+node-gradle = "7.1.0"
+ben-manes-versions = "0.53.0"
+
+# Java
+java = "25"
+
+# Node.js (LTS)
+nodejs = "24.13.1"
+npmVersion = "11.8.0"
+
+# Docker Base Image
+# Using BellSoft Liberica JDK with Alpaquita Linux (musl) - optimized for cloud-native Java
+docker-base-image = "bellsoft/liberica-runtime-container:jdk-25-slim-musl"
+
+[libraries]
+# Spring Boot Starters
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+
+# Third-party libraries with explicit versions
+commons-io = { module = "commons-io:commons-io", version = "2.21.0" }
+springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version = "3.0.1" }
+
+# Spring Boot managed (no version needed)
+snakeyaml = { module = "org.yaml:snakeyaml" }
+spring-boot-starter-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }
+jaxb-runtime = { module = "org.glassfish.jaxb:jaxb-runtime" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+jackson-datatype-jdk8 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8" }
+
+# Runtime
+h2 = { module = "com.h2database:h2" }
+prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
+
+# Test
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+asm = { module = "org.ow2.asm:asm" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3" }
+hamcrest = { module = "org.hamcrest:hamcrest" }
+
+[plugins]
+axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axion-release" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
+node-gradle = { id = "com.github.node-gradle.node", version.ref = "node-gradle" }
+ben-manes-versions = { id = "com.github.ben-manes.versions", version.ref = "ben-manes-versions" }

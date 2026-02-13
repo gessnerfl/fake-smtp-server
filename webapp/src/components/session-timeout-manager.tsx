@@ -100,7 +100,7 @@ const SessionTimeoutManager: React.FC = () => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       clearLogoutTimer();
     };
-  }, [dispatch, isAuthenticated, sessionTimeoutMs, triggerLogout]);
+  }, [dispatch, isAuthenticated, sessionTimeoutMs, triggerLogout, data]);
 
   return null;
 };

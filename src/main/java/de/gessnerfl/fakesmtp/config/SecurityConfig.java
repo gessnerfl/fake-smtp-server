@@ -83,6 +83,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling ->
                     exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(formLogin -> formLogin
                     .loginProcessingUrl("/api/auth/login")
                     .successHandler((request, response, authentication) -> {
@@ -115,7 +116,6 @@ public class SecurityConfig {
         } else {
             http
                 .authorizeHttpRequests(authorize -> authorize
-                    .requestMatchers("/api/auth/status").permitAll()
                     .anyRequest().permitAll()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)

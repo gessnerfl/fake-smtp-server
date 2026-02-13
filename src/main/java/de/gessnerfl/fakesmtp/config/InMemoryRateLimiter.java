@@ -73,18 +73,12 @@ public class InMemoryRateLimiter {
             return true;
         }
         
-        RateLimitEntry entry = attempts.get(ip);
+        Instant now = Instant.now();
+        RateLimitEntry entry = getActiveEntry(ip, now);
         if (entry == null) {
             return true;
         }
-        
-        Instant now = Instant.now();
-        Instant windowStart = now.minusSeconds(properties.getWindowMinutes() * 60L);
-        
-        if (entry.getFirstAttempt().isBefore(windowStart)) {
-            return true;
-        }
-        
+
         if (entry.isBlocked()) {
             return false;
         }
@@ -92,57 +86,122 @@ public class InMemoryRateLimiter {
         return entry.getAttemptCount().get() < properties.getMaxAttempts();
     }
     
-    public void recordAttempt(String ip) {
+    public FailedAttemptResult recordFailedAttempt(String ip) {
         if (!properties.isEnabled() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
-            return;
+            return new FailedAttemptResult(false, Integer.MAX_VALUE, 0);
         }
-        
+
         Instant now = Instant.now();
         Instant windowStart = now.minusSeconds(properties.getWindowMinutes() * 60L);
-        
+        AtomicInteger attemptCount = new AtomicInteger();
+        AtomicInteger remainingAttempts = new AtomicInteger();
+        AtomicInteger shouldBlockCurrentRequest = new AtomicInteger(0);
+
         attempts.compute(ip, (key, existingEntry) -> {
             if (existingEntry == null || existingEntry.getFirstAttempt().isBefore(windowStart)) {
+                int newCount = 1;
+                attemptCount.set(newCount);
+                remainingAttempts.set(Math.max(0, properties.getMaxAttempts() - newCount));
+                shouldBlockCurrentRequest.set(0);
                 return new RateLimitEntry(now);
             } else {
+                int previousCount = existingEntry.getAttemptCount().get();
                 int newCount = existingEntry.getAttemptCount().incrementAndGet();
+                attemptCount.set(newCount);
+                remainingAttempts.set(Math.max(0, properties.getMaxAttempts() - newCount));
+                shouldBlockCurrentRequest.set(newCount > properties.getMaxAttempts() ? 1 : 0);
+
                 if (newCount >= properties.getMaxAttempts()) {
+                    if (previousCount < properties.getMaxAttempts()) {
+                        logger.warn("IP {} has been blocked due to too many login attempts ({} attempts)", ip, newCount);
+                    }
                     existingEntry.block();
-                    logger.warn("IP {} has been blocked due to too many login attempts ({} attempts)", ip, newCount);
                 }
                 return existingEntry;
             }
         });
+
+        RateLimitEntry entry = attempts.get(ip);
+        long retryAfterSeconds = entry == null ? 0 : getSecondsUntilReset(entry, now);
+
+        return new FailedAttemptResult(
+                shouldBlockCurrentRequest.get() == 1,
+                remainingAttempts.get(),
+                retryAfterSeconds
+        );
+    }
+
+    public void recordAttempt(String ip) {
+        recordFailedAttempt(ip);
     }
     
     public int getRemainingAttempts(String ip) {
         if (!properties.isEnabled() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
             return Integer.MAX_VALUE;
         }
-        
-        RateLimitEntry entry = attempts.get(ip);
+
+        Instant now = Instant.now();
+        RateLimitEntry entry = getActiveEntry(ip, now);
         if (entry == null) {
             return properties.getMaxAttempts();
         }
-        
+
         if (entry.isBlocked()) {
             return 0;
         }
-        
+
         int remaining = properties.getMaxAttempts() - entry.getAttemptCount().get();
         return Math.max(0, remaining);
+    }
+    
+    public long getSecondsUntilReset(String ip) {
+        if (!properties.isEnabled() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
+            return 0;
+        }
+        
+        Instant now = Instant.now();
+        RateLimitEntry entry = getActiveEntry(ip, now);
+        if (entry == null) {
+            return 0;
+        }
+
+        return getSecondsUntilReset(entry, now);
+    }
+
+    private RateLimitEntry getActiveEntry(String ip, Instant now) {
+        RateLimitEntry entry = attempts.get(ip);
+        if (entry == null) {
+            return null;
+        }
+
+        Instant windowStart = now.minusSeconds(properties.getWindowMinutes() * 60L);
+        if (entry.getFirstAttempt().isBefore(windowStart)) {
+            attempts.computeIfPresent(ip, (key, existingEntry) ->
+                    existingEntry.getFirstAttempt().isBefore(windowStart) ? null : existingEntry
+            );
+            return null;
+        }
+
+        return entry;
+    }
+
+    private long getSecondsUntilReset(RateLimitEntry entry, Instant now) {
+        Instant windowEnd = entry.getFirstAttempt().plusSeconds(properties.getWindowMinutes() * 60L);
+
+        if (windowEnd.isAfter(now)) {
+            return windowEnd.getEpochSecond() - now.getEpochSecond();
+        }
+
+        return 0;
     }
     
     private void cleanup() {
         Instant now = Instant.now();
         Instant windowStart = now.minusSeconds(properties.getWindowMinutes() * 60L);
         
-        int removedCount = 0;
-        for (Map.Entry<String, RateLimitEntry> entry : attempts.entrySet()) {
-            if (entry.getValue().getFirstAttempt().isBefore(windowStart)) {
-                attempts.remove(entry.getKey());
-                removedCount++;
-            }
-        }
+        int removedCount = attempts.size();
+        attempts.entrySet().removeIf(entry -> entry.getValue().getFirstAttempt().isBefore(windowStart));
+        removedCount -= attempts.size();
         
         if (removedCount > 0) {
             logger.debug("Cleaned up {} expired rate limit entries", removedCount);
@@ -181,6 +240,30 @@ public class InMemoryRateLimiter {
         
         void block() {
             this.blocked = true;
+        }
+    }
+
+    static class FailedAttemptResult {
+        private final boolean shouldBlockCurrentRequest;
+        private final int remainingAttempts;
+        private final long retryAfterSeconds;
+
+        FailedAttemptResult(boolean shouldBlockCurrentRequest, int remainingAttempts, long retryAfterSeconds) {
+            this.shouldBlockCurrentRequest = shouldBlockCurrentRequest;
+            this.remainingAttempts = remainingAttempts;
+            this.retryAfterSeconds = retryAfterSeconds;
+        }
+
+        boolean shouldBlockCurrentRequest() {
+            return shouldBlockCurrentRequest;
+        }
+
+        int remainingAttempts() {
+            return remainingAttempts;
+        }
+
+        long retryAfterSeconds() {
+            return retryAfterSeconds;
         }
     }
 }

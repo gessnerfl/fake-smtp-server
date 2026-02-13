@@ -33,4 +33,13 @@ describe('Navigation', () => {
         expect(screen.getByText("Version:")).toBeInTheDocument()
         expect(screen.getByText("local")).toBeInTheDocument()
     })
+
+    it('polls connection status every second', () => {
+        const setIntervalSpy = jest.spyOn(global, 'setInterval')
+
+        renderWithProviders(<Navigation />)
+
+        expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 1000)
+        setIntervalSpy.mockRestore()
+    })
 })

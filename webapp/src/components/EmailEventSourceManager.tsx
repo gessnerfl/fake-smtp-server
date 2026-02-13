@@ -16,16 +16,24 @@ const EmailEventSourceManager: React.FC = () => {
     const { data: metaData, isLoading } = useGetMetaDataQuery();
 
     useEffect(() => {
-        if (!isLoading && metaData) {
-            setupEmailEventSource(store, metaData.authenticationEnabled);
-            return () => {
-                if (window.emailEventSource) {
-                    window.emailEventSource.close();
-                    delete window.emailEventSource;
-                }
-            };
+        if (isLoading || !metaData) {
+            return;
         }
-    }, [isAuthenticated, metaData, isLoading]);
+
+        // Defer connection setup by one tick so StrictMode's mount/unmount probe
+        // can cancel the first attempt before opening a second SSE connection.
+        const setupTimer = window.setTimeout(() => {
+            setupEmailEventSource(store, metaData.authenticationEnabled);
+        }, 0);
+
+        return () => {
+            window.clearTimeout(setupTimer);
+            if (window.emailEventSource) {
+                window.emailEventSource.close();
+                delete window.emailEventSource;
+            }
+        };
+    }, [isAuthenticated, metaData?.authenticationEnabled, isLoading]);
 
     return null;
 };

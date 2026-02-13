@@ -33,7 +33,6 @@ public class Email {
 
     @Column(name = "received_on", nullable = false)
     @Basic(optional = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone="UTC")
     private ZonedDateTime receivedOn;
 

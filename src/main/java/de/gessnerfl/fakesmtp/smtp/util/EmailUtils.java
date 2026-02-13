@@ -35,9 +35,27 @@ public class EmailUtils {
      * Extracts the email address within a &lt;&gt; after a specified offset.
      */
     public static String extractEmailAddress(final String args, final int offset) {
-        String address = args.substring(offset).trim();
+        if (args == null) {
+            return "";
+        }
+
+        final int startIndex = Math.max(0, offset);
+        if (startIndex >= args.length()) {
+            return "";
+        }
+
+        String address = args.substring(startIndex).trim();
+        if (address.isEmpty()) {
+            return "";
+        }
+
         if (address.indexOf('<') == 0) {
-            address = address.substring(1, address.indexOf('>'));
+            final int closingBracketIndex = address.indexOf('>');
+            if (closingBracketIndex > -1) {
+                address = address.substring(1, closingBracketIndex);
+            } else {
+                address = address.substring(1);
+            }
             // spaces within the <> are also possible, Postfix apparently
             // trims these away:
             return address.trim();

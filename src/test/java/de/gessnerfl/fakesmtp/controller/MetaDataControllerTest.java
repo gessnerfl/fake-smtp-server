@@ -1,6 +1,7 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.config.WebappAuthenticationProperties;
+import de.gessnerfl.fakesmtp.config.WebappSessionProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
@@ -11,9 +12,6 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.DefaultCsrfToken;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -32,6 +30,9 @@ class MetaDataControllerTest {
     private CsrfTokenRepository csrfTokenRepository;
 
     @Mock
+    private WebappSessionProperties sessionProperties;
+
+    @Mock
     private HttpServletRequest request;
 
     @Mock
@@ -45,9 +46,9 @@ class MetaDataControllerTest {
 
         when(buildProperties.getVersion()).thenReturn(version);
         when(authProperties.isAuthenticationEnabled()).thenReturn(authEnabled);
+        when(sessionProperties.getSessionTimeoutMinutes()).thenReturn(timeoutMinutes);
 
-        MetaDataController sut = new MetaDataController(buildProperties, authProperties, csrfTokenRepository);
-        ReflectionTestUtils.setField(sut, "sessionTimeout", Duration.ofMinutes(timeoutMinutes));
+        MetaDataController sut = new MetaDataController(buildProperties, authProperties, csrfTokenRepository, sessionProperties);
 
         final var authentication = new UsernamePasswordAuthenticationToken("user", "pass", java.util.Collections.emptyList());
         final var csrfToken = new DefaultCsrfToken("X-XSRF-TOKEN", "XSRF-TOKEN", "token");
@@ -69,9 +70,9 @@ class MetaDataControllerTest {
 
         when(buildProperties.getVersion()).thenReturn(version);
         when(authProperties.isAuthenticationEnabled()).thenReturn(authEnabled);
+        when(sessionProperties.getSessionTimeoutMinutes()).thenReturn(timeoutMinutes);
 
-        MetaDataController sut = new MetaDataController(buildProperties, authProperties, csrfTokenRepository);
-        ReflectionTestUtils.setField(sut, "sessionTimeout", Duration.ofMinutes(timeoutMinutes));
+        MetaDataController sut = new MetaDataController(buildProperties, authProperties, csrfTokenRepository, sessionProperties);
 
         final var meta = sut.get(null, null, request, response);
 

@@ -125,6 +125,13 @@ class EmailSseEmitterServiceTest {
 		when(taskScheduler.scheduleAtFixedRate(any(Runnable.class), any(Instant.class), any(Duration.class)))
 			.thenReturn(scheduledFuture);
 		doThrow(new IOException("Connection closed")).when(emitter).send(any(SseEmitter.SseEventBuilder.class));
+		
+		// Capture the onError callback to trigger it manually
+		ArgumentCaptor<java.util.function.Consumer<Throwable>> errorCaptor = ArgumentCaptor.forClass(java.util.function.Consumer.class);
+		doAnswer(invocation -> {
+			// Don't actually trigger callback - the service now triggers it via complete()
+			return null;
+		}).when(emitter).onError(errorCaptor.capture());
 
 		sut.add(emitter);
 
@@ -134,8 +141,12 @@ class EmailSseEmitterServiceTest {
 		Runnable heartbeatTask = heartbeatCaptor.getValue();
 		heartbeatTask.run();
 
-		verify(scheduledFuture).cancel(false);
-		verify(logger).debug("Failed to send heartbeat - client likely disconnected");
+		verify(emitter).complete();
+		// With the new implementation, the onError callback is triggered via complete()
+		// which then calls stopHeartbeat, so we need to verify the callback was registered
+		verify(emitter).onError(any());
+		
+		// Don't verify no interactions since emitter had interactions (send, complete)
 	}
 
 	@Test

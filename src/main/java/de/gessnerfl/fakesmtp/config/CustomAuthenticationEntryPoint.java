@@ -59,8 +59,22 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             return false;
         }
 
-        String requestUri = request.getRequestURI();
-        return "/".equals(requestUri) || requestUri.startsWith("/emails");
+        String path = normalizePath(request);
+        return "/".equals(path)
+                || "/index.html".equals(path)
+                || path.startsWith("/emails");
+    }
+
+    private String normalizePath(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (contextPath != null && !contextPath.isEmpty() && path != null && path.startsWith(contextPath)) {
+            path = path.substring(contextPath.length());
+        }
+        if (path == null || path.isEmpty()) {
+            return "/";
+        }
+        return path;
     }
 
     private boolean renderSpa(HttpServletRequest request, HttpServletResponse response) throws ServletException {

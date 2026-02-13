@@ -11,7 +11,7 @@ export const HtmlContentTabPanel: FunctionComponent<EmailContentTabPanelProperti
 
     function getInlineImage(cid: string): (string | undefined) {
         const image = email.inlineImages.find(i => i.contentId === cid)
-        if (image) {
+        if (image && image.processingStatus !== "SKIPPED_TOO_LARGE" && image.data) {
             return `data:${image.contentType};base64,${image.data}`
         }
     }

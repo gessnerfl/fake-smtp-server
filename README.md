@@ -23,10 +23,17 @@ To change configuration parameters the corresponding configuration values have t
 For details check the Spring Boot (http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config)
 and docker documentation (https://docs.docker.com/engine/reference/run/#env-environment-variables).
 
+> [!NOTE]
+> Starting with version 2.6.0 the Docker image is based on `bellsoft/liberica-runtime-container:jdk-25-slim-musl` (Alpaquita Linux with musl libc).
+> This change significantly reduces the image size and improves startup performance.
+
 # Running Fake SMTP Server locally
 
 > [!NOTE]  
-> Starting with version 2.2.0 Java 21 is required to run Fake SMTP Server. 
+> Starting with version 2.6.0 Java 25 is required to run Fake SMTP Server.
+
+> [!NOTE]  
+> Starting with version 2.2.0 Java 21 is required to run Fake SMTP Server.
 
 > [!NOTE]  
 > Starting with version 2.0.0 Java 17 is required to run Fake SMTP Server.
@@ -87,6 +94,12 @@ fakesmtp:
   #Default: no limit
   maxMessageSize: 10MB
 
+  #Optional configuration option to specify the maximum allowed attachment/inline image size.
+  #This prevents OutOfMemoryError when processing large email attachments.
+  #The size can be defined using Spring Boot DataSize value type.
+  #Default: 10MB
+  maxAttachmentSize: 10MB
+
   #Configure if TLS is required to connect to the SMTP server. Defaults to false. See TLS section below
   requireTLS: false
 
@@ -95,6 +108,15 @@ fakesmtp:
   # https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-email
   forwardEmails: false
 ```
+
+#### Attachment Size Limit Behavior
+
+If an attachment or inline image exceeds `fakesmtp.maxAttachmentSize`:
+
+- the part is skipped (not truncated),
+- the email remains processable and visible in the UI/API,
+- metadata is exposed via `processingStatus=SKIPPED_TOO_LARGE` and `processingMessage`,
+- downloading a skipped attachment from `/api/emails/{mailId}/attachments/{attachmentId}` returns HTTP `413`.
     
 ### Authentication
 Optionally authentication can be turned on. Configuring authentication does not mean the authentication is enforced. It
@@ -157,8 +179,26 @@ The following snippet shows the pre-defined web application configuration
 #Port of the web interface
 server:
   port: 8080
+  shutdown: graceful
+  servlet:
+    # Async timeout for SSE connections - set to 5s for faster graceful shutdown
+    async-timeout: 5000
+    session:
+      cookie:
+        http-only: true
+        same-site: Lax
 
-#Port of the http management api
+fakesmtp:
+  webapp:
+    session:
+      # Session timeout: 10 minutes default, maximum 24 hours (1440 minutes)
+      session-timeout-minutes: ${FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES:10}
+
+spring:
+  # Shutdown timeout - reduces graceful shutdown time from 30s to 5s
+  lifecycle:
+    timeout-per-shutdown-phase: 5s
+
 management:
   server:
     port: 8081 
@@ -192,10 +232,12 @@ FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES=10
 FAKESMTP_WEBAPP_AUTHENTICATION_CONCURRENT_SESSIONS=1
 FAKESMTP_WEBAPP_SSE_HEARTBEAT_INTERVAL_SECONDS=30
 FAKESMTP_WEBAPP_SSE_EVENT_SEND_TIMEOUT_SECONDS=5
-FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED=true
+FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED=false
 FAKESMTP_WEBAPP_RATE_LIMITING_MAX_ATTEMPTS=5
 FAKESMTP_WEBAPP_RATE_LIMITING_WINDOW_MINUTES=1
+FAKESMTP_WEBAPP_RATE_LIMITING_CLEANUP_INTERVAL_MINUTES=1
 FAKESMTP_WEBAPP_RATE_LIMITING_WHITELIST_LOCALHOST=true
+FAKESMTP_WEBAPP_RATE_LIMITING_TRUST_PROXY_HEADERS=false
 ```
 
 If both username and password are not set, authentication will be disabled and the web interface and API endpoints will be accessible without authentication. Setting both values enables Web UI authentication; the UI presents a login form and email data is served exclusively from `/api/**`, guarded by a session cookie (HttpOnly).
@@ -222,14 +264,14 @@ When authentication is enabled:
 
 ### Rate Limiting for Login
 
-To protect against brute-force attacks on the login endpoint, rate limiting is enabled by default when Web UI authentication is active. The rate limiter tracks login attempts per client IP address and blocks further attempts after exceeding the configured limit.
+To protect against brute-force attacks on the login endpoint, you can enable optional rate limiting. The rate limiter tracks login attempts per client IP address and blocks further attempts after exceeding the configured limit. It is configured independently from Web UI authentication.
 
 ```yaml
 fakesmtp:
   webapp:
     rate-limiting:
-      # Enable/disable rate limiting (default: true)
-      enabled: true
+      # Enable/disable rate limiting (default: false)
+      enabled: false
       # Maximum number of login attempts per time window (default: 5, max: 100)
       max-attempts: 5
       # Time window in minutes (default: 1, max: 60)
@@ -238,14 +280,19 @@ fakesmtp:
       cleanup-interval-minutes: 1
       # Exempt localhost/loopback addresses from rate limiting (default: true)
       whitelist-localhost: true
+      # Trust X-Forwarded-For/X-Real-IP headers (default: false)
+      trust-proxy-headers: false
 ```
 
 **Features:**
 - Returns HTTP 429 (Too Many Requests) with `Retry-After` header when limit is exceeded
 - Includes `X-RateLimit-Remaining` header in responses to show remaining attempts
-- Supports `X-Forwarded-For` and `X-Real-IP` headers for correct client IP detection behind proxies
+- Supports `X-Forwarded-For` and `X-Real-IP` headers when `trust-proxy-headers` is enabled
 - Localhost addresses (127.0.0.1, ::1, localhost) are whitelisted by default
 - Thread-safe in-memory storage with automatic cleanup of expired entries
+
+> [!IMPORTANT]
+> Leave `trust-proxy-headers` disabled unless the application runs behind a trusted reverse proxy that sanitizes forwarding headers.
 
 ### API Clients & CSRF
 
@@ -304,6 +351,12 @@ Documentation of exposed services is available at:
 This requires to have docker installed.
 If you need to implement a new feature, you will probably need an correct JDK version setup in an environement.
 
+> [!NOTE]
+> **Build Requirements:**
+> - Java 25 (JDK)
+> - Node.js 24.13.1 (LTS)
+> - npm 11.8.0
+
 ```sh
 sh/dev
 ```
@@ -320,6 +373,10 @@ Run UI & Backend tests
 ```bash
 sh/test
 ```
+
+Current baseline in this branch:
+- Backend tests: 281 passed
+- Frontend tests: 52 passed
 
 Build UI & Backend
 ```bash

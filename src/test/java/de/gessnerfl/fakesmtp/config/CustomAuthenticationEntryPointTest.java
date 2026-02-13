@@ -84,4 +84,20 @@ class CustomAuthenticationEntryPointTest {
 
         verify(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }
+
+    @Test
+    void shouldRenderSpaWhenHtmlRequestTargetsSpaRouteUnderContextPath() throws Exception {
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Accept")).thenReturn(MediaType.TEXT_HTML_VALUE);
+        when(request.getContextPath()).thenReturn("/fake-smtp");
+        when(request.getRequestURI()).thenReturn("/fake-smtp/emails/42");
+        when(viewResolver.resolveViewName(eq("index"), any())).thenReturn(view);
+
+        sut.commence(request, response, authException);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        verify(response).setContentType(MediaType.TEXT_HTML_VALUE);
+        verify(view).render(eq(Collections.emptyMap()), eq(request), eq(response));
+        verify(response, never()).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+    }
 }

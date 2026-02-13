@@ -1,7 +1,12 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.Principal;
+import java.util.Base64;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
@@ -11,6 +16,8 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +28,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import de.gessnerfl.fakesmtp.config.WebappAuthenticationProperties;
 import de.gessnerfl.fakesmtp.model.Email;
+import de.gessnerfl.fakesmtp.model.EmailPartProcessingStatus;
 import de.gessnerfl.fakesmtp.model.query.SearchRequest;
 import de.gessnerfl.fakesmtp.model.query.SearchSpecification;
 import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailContentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailInlineImageRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
+import de.gessnerfl.fakesmtp.service.EmailDeletionService;
 import de.gessnerfl.fakesmtp.service.EmailSseEmitterService;
 import de.gessnerfl.fakesmtp.util.MediaTypeUtil;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,25 +50,38 @@ import jakarta.servlet.ServletContext;
 @Validated
 public class EmailRestController {
 
+    private static final Logger logger = LoggerFactory.getLogger(EmailRestController.class);
     private static final String DEFAULT_SORT_PROPERTY = "receivedOn";
 
     private final EmailRepository emailRepository;
     private final EmailAttachmentRepository emailAttachmentRepository;
+    private final EmailContentRepository emailContentRepository;
+    private final EmailInlineImageRepository emailInlineImageRepository;
     private final MediaTypeUtil mediaTypeUtil;
     private final ServletContext servletContext;
+    private final EmailDeletionService emailDeletionService;
     private final EmailSseEmitterService emailSseEmitterService;
+    private final WebappAuthenticationProperties authProperties;
 
     @Autowired
     public EmailRestController(EmailRepository emailRepository,
             EmailAttachmentRepository emailAttachmentRepository,
+            EmailContentRepository emailContentRepository,
+            EmailInlineImageRepository emailInlineImageRepository,
             MediaTypeUtil mediaTypeUtil,
             ServletContext servletContext,
-            EmailSseEmitterService emailSseEmitterService) {
+            EmailDeletionService emailDeletionService,
+            EmailSseEmitterService emailSseEmitterService,
+            WebappAuthenticationProperties authProperties) {
         this.emailRepository = emailRepository;
         this.emailAttachmentRepository = emailAttachmentRepository;
+        this.emailContentRepository = emailContentRepository;
+        this.emailInlineImageRepository = emailInlineImageRepository;
         this.mediaTypeUtil = mediaTypeUtil;
         this.servletContext = servletContext;
+        this.emailDeletionService = emailDeletionService;
         this.emailSseEmitterService = emailSseEmitterService;
+        this.authProperties = authProperties;
     }
 
     @GetMapping()
@@ -83,6 +108,15 @@ public class EmailRestController {
 
         var mediaType = mediaTypeUtil.getMediaTypeForFileName(this.servletContext, attachment.getFilename());
 
+        if (attachment.getProcessingStatus() == EmailPartProcessingStatus.SKIPPED_TOO_LARGE) {
+            var message = attachment.getProcessingMessage() != null
+                    ? attachment.getProcessingMessage()
+                    : "SKIPPED_TOO_LARGE: Attachment was skipped during email processing";
+            return ResponseEntity.status(413)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(new ByteArrayResource(message.getBytes(StandardCharsets.UTF_8)));
+        }
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + attachment.getFilename())
                 .contentType(mediaType)
@@ -90,27 +124,60 @@ public class EmailRestController {
                 .body(new ByteArrayResource(attachment.getData()));
     }
 
+    @GetMapping("/{mailId}/inline-images/{inlineImageId}")
+    public ResponseEntity<ByteArrayResource> getEmailInlineImageById(@PathVariable Long mailId,
+            @PathVariable Long inlineImageId) {
+        var inlineImage = emailInlineImageRepository.findById(inlineImageId)
+                .filter(i -> i.getEmail().getId().equals(mailId))
+                .orElseThrow(() -> new InlineImageNotFoundException(
+                        "Inline image with id " + inlineImageId + " not found for mail " + mailId));
+
+        if (inlineImage.getProcessingStatus() == EmailPartProcessingStatus.SKIPPED_TOO_LARGE) {
+            var message = inlineImage.getProcessingMessage() != null
+                    ? inlineImage.getProcessingMessage()
+                    : "SKIPPED_TOO_LARGE: Inline image was skipped during email processing";
+            return ResponseEntity.status(413)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(new ByteArrayResource(message.getBytes(StandardCharsets.UTF_8)));
+        }
+
+        var mediaType = MediaType.parseMediaType(inlineImage.getContentType());
+        var imageData = Base64.getDecoder().decode(inlineImage.getData());
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(new ByteArrayResource(imageData));
+    }
+
     @DeleteMapping("/{id}")
     public void deleteEmailById(@PathVariable Long id) {
-        emailRepository.deleteById(id);
-        emailRepository.flush();
+        emailDeletionService.deleteEmailById(id);
     }
 
     @DeleteMapping()
     public void deleteAllEmails() {
-        emailAttachmentRepository.deleteAllInBatch();
-        emailRepository.deleteAllInBatch();
-        emailRepository.flush();
+        emailDeletionService.deleteAllEmails();
     }
 
     @GetMapping(value = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribeToEmailEvents() {
+    public SseEmitter subscribeToEmailEvents(Principal principal) {
+        // If authentication is enabled, require authentication for SSE
+        // If authentication is disabled, allow anonymous SSE connections
+        if (authProperties.isAuthenticationEnabled()) {
+            if (principal == null) {
+                final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null) {
+                    throw new SecurityException("Authentication required for SSE connection");
+                }
+            }
+        }
+        
         final var emitter = emailSseEmitterService.createAndAddEmitter();
 
         try {
             emitter.send(SseEmitter.event()
                     .name("connection-established")
                     .data("Connected to email events"));
+            logger.debug("SSE connection established for client");
         } catch (IOException e) {
             emitter.complete();
         }

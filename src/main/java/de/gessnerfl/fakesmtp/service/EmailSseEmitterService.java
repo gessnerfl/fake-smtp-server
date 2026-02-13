@@ -40,7 +40,7 @@ import jakarta.annotation.PreDestroy;
  *   <li>Automatic cleanup of dead connections</li>
  *   <li>Thread-safe operations using concurrent collections</li>
  * </ul>
- * 
+ *
  * @see WebappSessionProperties for configuration options
  */
 @Service
@@ -63,16 +63,25 @@ public class EmailSseEmitterService {
         this.executor = Executors.newVirtualThreadPerTaskExecutor();
     }
 
-    /**
-     * Gracefully shuts down the executor service when the application stops.
-     * Waits up to 60 seconds for pending tasks to complete before forcing shutdown.
-     */
     @PreDestroy
     public void shutdown() {
-        logger.debug("Shutting down SSE emitter service executor");
+        logger.info("Shutting down SSE emitter service - closing {} active connections", emitters.size());
+
+        // Close all active emitters to release HTTP connections
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.complete();
+            } catch (Exception e) {
+                // Expected - emitter may already be closed
+                logger.debug("Error completing emitter during shutdown: {}", e.getMessage());
+            }
+        }
+        emitters.clear();
+        heartbeatTasks.clear();
+
         executor.shutdown();
         try {
-            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+            if (!executor.awaitTermination(3, TimeUnit.SECONDS)) {
                 logger.warn("Executor did not terminate in time, forcing shutdown");
                 executor.shutdownNow();
             }
@@ -81,6 +90,7 @@ public class EmailSseEmitterService {
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
+        logger.debug("SSE emitter service shutdown complete");
     }
 
     public SseEmitter createEmitter() {
@@ -166,7 +176,9 @@ public class EmailSseEmitterService {
             logger.debug("Sent heartbeat ping to emitter");
         } catch (IOException e) {
             logger.debug("Failed to send heartbeat - client likely disconnected");
-            stopHeartbeat(emitter);
+            // Only call complete() - the onError callback will handle cleanup
+            // This avoids double cleanup when both sendHeartbeat and onError try to remove
+            emitter.complete();
         }
     }
 

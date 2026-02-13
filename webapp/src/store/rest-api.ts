@@ -81,6 +81,7 @@ const isAuthFailure = (status?: number): boolean => status === 401 || status ===
 
 const BASE_SSE_RETRY_DELAY_MS = 1000;
 const MAX_SSE_RETRY_DELAY_MS = 30000;
+const MAX_SSE_RETRY_COUNT = 10;
 let sseRetryCount = 0;
 let sseRetryTimer: number | null = null;
 
@@ -100,6 +101,13 @@ const scheduleSseReconnect = (store: any, authenticationEnabled?: boolean) => {
   if (typeof window === "undefined") {
     return;
   }
+  
+  if (sseRetryCount >= MAX_SSE_RETRY_COUNT) {
+    console.error(`SSE reconnect limit of ${MAX_SSE_RETRY_COUNT} reached. Stopping reconnection attempts.`);
+    resetSseRetry();
+    return;
+  }
+  
   clearSseRetryTimer();
   const attempt = Math.min(sseRetryCount, 5);
   const baseDelay = Math.min(MAX_SSE_RETRY_DELAY_MS, BASE_SSE_RETRY_DELAY_MS * 2 ** attempt);
@@ -155,7 +163,7 @@ class AuthenticatedEventSource implements EmailEventSourceLike {
         }
         buffer += decoder.decode(value, {stream: true});
 
-        const segments = buffer.split("\n\n");
+        const segments = buffer.split(/\r?\n\r?\n/);
         buffer = segments.pop() ?? "";
 
         for (const segment of segments) {
@@ -446,6 +454,10 @@ export const setupEmailEventSource = (store: any, authenticationEnabled?: boolea
   startHealthCheck();
 
   eventSource.onerror = (event: Event) => {
+    if (window.emailEventSource !== eventSource) {
+      return;
+    }
+
     const { status, detail } = resolveSseError(event);
     if (isAuthFailure(status)) {
       console.warn("SSE authentication failed; logging out.");
@@ -458,8 +470,18 @@ export const setupEmailEventSource = (store: any, authenticationEnabled?: boolea
     }
     console.error("SSE connection error:", detail);
     stopHealthCheck();
+
+    const isAuthenticatedStream = authenticationEnabled === true;
     const closedState = typeof EventSource !== "undefined" ? EventSource.CLOSED : AuthenticatedEventSource.CLOSED;
-    if (eventSource.readyState === undefined || eventSource.readyState === closedState) {
+    const shouldReconnect = eventSource.readyState === undefined
+      || eventSource.readyState === closedState
+      || isAuthenticatedStream;
+
+    if (shouldReconnect) {
+      window.emailEventSource = undefined;
+      if (eventSource.readyState !== closedState) {
+        eventSource.close();
+      }
       scheduleSseReconnect(store, authenticationEnabled);
     }
   };

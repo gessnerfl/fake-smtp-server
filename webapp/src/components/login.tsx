@@ -4,6 +4,7 @@ import { setAuthenticated, setAuthError, clearAuthError } from '../store/auth-sl
 import { useGetMetaDataQuery, useLoginMutation } from '../store/rest-api';
 import { Box, Button, Card, CardContent, Container, TextField, Typography, Alert } from '@mui/material';
 import { RootState } from '../store/store';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 const Login: React.FC = () => {
   const dispatch = useDispatch();
@@ -25,8 +26,25 @@ const Login: React.FC = () => {
       await login({ username, password }).unwrap();
       refetch();
       dispatch(setAuthenticated(true));
-    } catch (error) {
-      dispatch(setAuthError('Invalid username or password. Please try again.'));
+    } catch (err) {
+      if (err && typeof err === 'object' && 'status' in err) {
+        const fetchErr = err as FetchBaseQueryError;
+        if (fetchErr.status === 401) {
+          dispatch(setAuthError('Invalid username or password. Please try again.'));
+        } else if (fetchErr.status === 0 || fetchErr.status === 'FETCH_ERROR') {
+          dispatch(setAuthError('Network error. Please check your connection.'));
+        } else {
+          dispatch(setAuthError('Login failed. Please try again.'));
+        }
+      } else if (err instanceof Error) {
+        if (err.message.includes('401') || err.message.toLowerCase().includes('unauthorized')) {
+          dispatch(setAuthError('Invalid username or password. Please try again.'));
+        } else {
+          dispatch(setAuthError('An unexpected error occurred.'));
+        }
+      } else {
+        dispatch(setAuthError('An unexpected error occurred.'));
+      }
     }
   };
 

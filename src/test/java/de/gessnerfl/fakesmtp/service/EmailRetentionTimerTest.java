@@ -47,4 +47,43 @@ class EmailRetentionTimerTest {
         verify(emailRepository, never()).deleteEmailsExceedingDateRetentionLimit(anyInt());
     }
 
+    @Test
+    void shouldDeleteEmailsWithCascade(){
+        var maxNumber = 5;
+        var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
+        when(persistence.getMaxNumberEmails()).thenReturn(maxNumber);
+        when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
+        when(emailRepository.deleteEmailsExceedingDateRetentionLimit(maxNumber)).thenReturn(3);
+
+        sut.deleteOutdatedMails();
+
+        verify(emailRepository).deleteEmailsExceedingDateRetentionLimit(maxNumber);
+        verify(logger).info("Deleted {} emails which exceeded the maximum number {} of emails to be stored", 3, maxNumber);
+    }
+
+    @Test
+    void shouldNotTriggerDeletionWhenMaxNumberIsNegative(){
+        var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
+        when(persistence.getMaxNumberEmails()).thenReturn(-1);
+        when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
+
+        sut.deleteOutdatedMails();
+
+        verify(emailRepository, never()).deleteEmailsExceedingDateRetentionLimit(anyInt());
+    }
+
+    @Test
+    void shouldLogZeroEmailsDeletedWhenNoEmailsExceedLimit(){
+        var maxNumber = 5;
+        var persistence = mock(FakeSmtpConfigurationProperties.Persistence.class);
+        when(persistence.getMaxNumberEmails()).thenReturn(maxNumber);
+        when(fakeSmtpConfigurationProperties.getPersistence()).thenReturn(persistence);
+        when(emailRepository.deleteEmailsExceedingDateRetentionLimit(maxNumber)).thenReturn(0);
+
+        sut.deleteOutdatedMails();
+
+        verify(emailRepository).deleteEmailsExceedingDateRetentionLimit(maxNumber);
+        verify(logger).info("Deleted {} emails which exceeded the maximum number {} of emails to be stored", 0, maxNumber);
+    }
+
 }

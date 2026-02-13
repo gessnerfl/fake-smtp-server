@@ -4,11 +4,14 @@ import de.gessnerfl.fakesmtp.model.ContentType;
 import de.gessnerfl.fakesmtp.model.Email;
 import de.gessnerfl.fakesmtp.model.EmailAttachment;
 import de.gessnerfl.fakesmtp.model.EmailContent;
+import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailContentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailInlineImageRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Base64;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -43,14 +47,35 @@ class WebappAuthenticationSecurityIntegrationTest {
     @Autowired
     private EmailRepository emailRepository;
 
+    @Autowired
+    private EmailAttachmentRepository emailAttachmentRepository;
+
+    @Autowired
+    private EmailContentRepository emailContentRepository;
+
+    @Autowired
+    private EmailInlineImageRepository emailInlineImageRepository;
+
     @BeforeEach
     void setUp() {
-        emailRepository.deleteAll();
+        emailAttachmentRepository.deleteAllInBatch();
+        emailContentRepository.deleteAllInBatch();
+        emailInlineImageRepository.deleteAllInBatch();
+        emailRepository.deleteAllInBatch();
     }
 
     @Test
     void shouldRejectApiRequestsWithoutCredentials() throws Exception {
         mockMvc.perform(get("/api/emails"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldRejectApiRequestsWithBasicAuthorizationHeader() throws Exception {
+        String basicAuthValue = Base64.getEncoder().encodeToString("testuser:testpass".getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(get("/api/emails")
+                        .header("Authorization", "Basic " + basicAuthValue))
                 .andExpect(status().isUnauthorized());
     }
 
