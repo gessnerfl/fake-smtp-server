@@ -166,7 +166,7 @@ management:
 
 ### Web UI Authentication
 
-You can optionally enable Basic Authentication for the web interface and REST API. When authentication is enabled, users will need to log in to access the web interface and API endpoints.
+You can optionally enable authentication for the web interface and REST API using a server-side session. When authentication is enabled, users will need to log in to access the web interface and API endpoints.
 
 To enable authentication, set the username and password in the application.yml file:
 
@@ -178,6 +178,9 @@ fakesmtp:
       username: admin
       # Password for web UI and API authentication
       password: password
+      # Maximum number of concurrent sessions per user (default: 1)
+      # Set to -1 for unlimited sessions (development mode)
+      concurrent-sessions: 1
 ```
 
 You can also set these values using environment variables:
@@ -185,26 +188,68 @@ You can also set these values using environment variables:
 ```
 FAKESMTP_WEBAPP_AUTH_USERNAME=admin
 FAKESMTP_WEBAPP_AUTH_PASSWORD=password
+FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES=10
+FAKESMTP_WEBAPP_AUTHENTICATION_CONCURRENT_SESSIONS=1
+FAKESMTP_WEBAPP_SSE_HEARTBEAT_INTERVAL_SECONDS=30
+FAKESMTP_WEBAPP_SSE_EVENT_SEND_TIMEOUT_SECONDS=5
+FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED=true
+FAKESMTP_WEBAPP_RATE_LIMITING_MAX_ATTEMPTS=5
+FAKESMTP_WEBAPP_RATE_LIMITING_WINDOW_MINUTES=1
+FAKESMTP_WEBAPP_RATE_LIMITING_WHITELIST_LOCALHOST=true
 ```
 
-If both username and password are not set, authentication will be disabled and the web interface and API endpoints will be accessible without authentication.
+If both username and password are not set, authentication will be disabled and the web interface and API endpoints will be accessible without authentication. Setting both values enables Web UI authentication; the UI presents a login form and email data is served exclusively from `/api/**`, guarded by a session cookie (HttpOnly).
 
 When authentication is enabled:
 - The web interface will show a custom login form
-- API endpoints will require Basic Authentication
+- API endpoints require an authenticated session (the UI shell is public only to render the login form; it does not include email data)
 - A logout button will be available in the navigation bar
+- The Web UI session expires after 10 minutes of inactivity and logs the user out by default; configure the timeout with `FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES` (maximum: 1440 minutes / 24 hours)
+- By default, logging in from a different browser invalidates the existing session (single session per user). To allow multiple concurrent sessions from different browsers/devices with the same credentials, set `FAKESMTP_WEBAPP_AUTHENTICATION_CONCURRENT_SESSIONS` to a value greater than 1 (e.g., 5). Default is 1 (secure behavior for production). Set to -1 to allow unlimited concurrent sessions (useful for development)
+- SSE heartbeat interval can be configured with `FAKESMTP_WEBAPP_SSE_HEARTBEAT_INTERVAL_SECONDS` (default: 30s) to prevent proxy timeouts
 - The following endpoints are protected and require authentication:
-  - Main web UI routes (`/`, `/emails/**`)
   - API endpoints (`/api/**`) except for `/api/meta-data`
 - The following endpoints remain public and do not require authentication:
   - `/api/meta-data` (provides application metadata including authentication status)
+  - Web UI shell routes (`/`, `/emails/**`) for rendering the login form
+  - Static resources (`/assets/**`, `/webjars/**`)
   - Swagger UI (`/swagger-ui.html`, `/swagger-ui/**`, `/v3/api-docs/**`)
   - Actuator endpoints (`/actuator/**`)
   - H2 console (`/h2-console/**`)
-  - Static resources (`/static/**`, `/css/**`, `/js/**`, `/images/**`, `/webjars/**`, `/favicon.ico`)
 
 > [!NOTE]  
 > The Web UI authentication is separate from the SMTP server authentication. The SMTP server authentication is configured under `fakesmtp.authentication` and is used for authenticating SMTP clients, while the Web UI authentication is configured under `fakesmtp.webapp.authentication` and is used for authenticating users accessing the web interface and API endpoints.
+
+### Rate Limiting for Login
+
+To protect against brute-force attacks on the login endpoint, rate limiting is enabled by default when Web UI authentication is active. The rate limiter tracks login attempts per client IP address and blocks further attempts after exceeding the configured limit.
+
+```yaml
+fakesmtp:
+  webapp:
+    rate-limiting:
+      # Enable/disable rate limiting (default: true)
+      enabled: true
+      # Maximum number of login attempts per time window (default: 5, max: 100)
+      max-attempts: 5
+      # Time window in minutes (default: 1, max: 60)
+      window-minutes: 1
+      # Cleanup interval for expired entries in minutes (default: 1)
+      cleanup-interval-minutes: 1
+      # Exempt localhost/loopback addresses from rate limiting (default: true)
+      whitelist-localhost: true
+```
+
+**Features:**
+- Returns HTTP 429 (Too Many Requests) with `Retry-After` header when limit is exceeded
+- Includes `X-RateLimit-Remaining` header in responses to show remaining attempts
+- Supports `X-Forwarded-For` and `X-Real-IP` headers for correct client IP detection behind proxies
+- Localhost addresses (127.0.0.1, ::1, localhost) are whitelisted by default
+- Thread-safe in-memory storage with automatic cleanup of expired entries
+
+### API Clients & CSRF
+
+When Web UI authentication is enabled, the server issues an HttpOnly session cookie after a successful login (`POST /api/auth/login` with form fields `username` and `password`). State-changing API requests (`POST`, `PUT`, `DELETE`) must include the `X-XSRF-TOKEN` header, which matches the `XSRF-TOKEN` cookie set by the server (use `GET /api/meta-data` to obtain it). Logging out is handled via `POST /api/auth/logout`.
     
 
 ## Real-Time Email Notifications
@@ -227,6 +272,26 @@ The Fake SMTP Server supports real-time email notifications using Server-Sent Ev
 ### Authentication Considerations
 
 When Web UI Authentication is enabled, the SSE connection is only established after successful login. This ensures that only authenticated users receive real-time notifications.
+
+### SSE Heartbeat & Connection Health
+
+The SSE implementation includes a server-sent heartbeat mechanism to ensure connection reliability:
+
+- **Server-Sent Heartbeat**: The server sends a ping event every 30 seconds (configurable via `FAKESMTP_WEBAPP_SSE_HEARTBEAT_INTERVAL_SECONDS`)
+- **Client Health Check**: The client monitors heartbeat reception and automatically reconnects if no ping is received within 60 seconds
+- **Proxy Compatibility**: Heartbeats prevent connection timeouts when running behind proxies or load balancers
+- **Connection Status UI**: A visual indicator in the navigation bar shows the current connection state (green: connected, yellow: reconnecting, red: disconnected)
+- **Automatic Reconnection**: The client uses exponential backoff with jitter (up to 30s) when attempting to reconnect
+
+### SSE Performance & Scalability
+
+The SSE implementation uses Java 21 Virtual Threads for optimal performance:
+
+- **Virtual Thread-based Delivery**: Email notifications are delivered concurrently to all clients using Java 21 Virtual Threads (Project Loom)
+- **Non-blocking Architecture**: Slow or unresponsive clients cannot block event delivery to others
+- **Per-Client Timeout**: Each client has a configurable timeout (default: 5s via `FAKESMTP_WEBAPP_SSE_EVENT_SEND_TIMEOUT_SECONDS`)
+- **Massive Scalability**: Supports thousands of concurrent SSE connections with minimal resource overhead
+- **Automatic Cleanup**: Failed connections are detected and removed automatically after each event broadcast
 
 ## REST API
 

@@ -3,11 +3,12 @@ import '@testing-library/jest-dom'
 import {screen} from '@testing-library/react'
 import Navigation from "./navigation";
 import {renderWithProviders} from "../test-utils";
-import { useGetMetaDataQuery } from "../store/rest-api";
+import { useGetMetaDataQuery, useLogoutMutation } from "../store/rest-api";
 
 jest.mock("../store/rest-api", () => {
     return {
-        useGetMetaDataQuery: jest.fn()
+        useGetMetaDataQuery: jest.fn(),
+        useLogoutMutation: jest.fn()
     };
 });
 
@@ -19,6 +20,10 @@ describe('Navigation', () => {
             data: { version: "local", authenticationEnabled: false },
             isLoading: false
         });
+        const mockLogout = jest.fn().mockReturnValue({
+            unwrap: jest.fn().mockResolvedValue({}),
+        });
+        (useLogoutMutation as jest.Mock).mockReturnValue([mockLogout]);
     });
 
     it('render navigation component', async () => {

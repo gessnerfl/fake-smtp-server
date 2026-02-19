@@ -1,12 +1,19 @@
 package de.gessnerfl.fakesmtp.controller;
 
 import de.gessnerfl.fakesmtp.config.WebappAuthenticationProperties;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.DefaultCsrfToken;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -21,21 +28,35 @@ class MetaDataControllerTest {
     @Mock
     private WebappAuthenticationProperties authProperties;
 
-    @InjectMocks
-    private MetaDataController sut;
+    @Mock
+    private CsrfTokenRepository csrfTokenRepository;
+
+    @Mock
+    private HttpServletRequest request;
+
+    @Mock
+    private HttpServletResponse response;
 
     @Test
     void shouldReturnApplicationVersionAndAuthenticationStatus() {
         final var version = "app-version";
         final var authEnabled = true;
+        final var timeoutMinutes = 10;
 
         when(buildProperties.getVersion()).thenReturn(version);
         when(authProperties.isAuthenticationEnabled()).thenReturn(authEnabled);
 
-        final var meta = sut.get();
+        MetaDataController sut = new MetaDataController(buildProperties, authProperties, csrfTokenRepository);
+        ReflectionTestUtils.setField(sut, "sessionTimeout", Duration.ofMinutes(timeoutMinutes));
+
+        final var authentication = new UsernamePasswordAuthenticationToken("user", "pass", java.util.Collections.emptyList());
+        final var csrfToken = new DefaultCsrfToken("X-XSRF-TOKEN", "XSRF-TOKEN", "token");
+        final var meta = sut.get(authentication, csrfToken, request, response);
 
         assertEquals(version, meta.getVersion());
         assertEquals(authEnabled, meta.isAuthenticationEnabled());
+        assertTrue(meta.isAuthenticated());
+        assertEquals(timeoutMinutes, meta.getSessionTimeoutMinutes());
         verify(buildProperties).getVersion();
         verify(authProperties).isAuthenticationEnabled();
     }
@@ -44,14 +65,20 @@ class MetaDataControllerTest {
     void shouldReturnApplicationVersionAndAuthenticationDisabled() {
         final var version = "app-version";
         final var authEnabled = false;
+        final var timeoutMinutes = 15;
 
         when(buildProperties.getVersion()).thenReturn(version);
         when(authProperties.isAuthenticationEnabled()).thenReturn(authEnabled);
 
-        final var meta = sut.get();
+        MetaDataController sut = new MetaDataController(buildProperties, authProperties, csrfTokenRepository);
+        ReflectionTestUtils.setField(sut, "sessionTimeout", Duration.ofMinutes(timeoutMinutes));
+
+        final var meta = sut.get(null, null, request, response);
 
         assertEquals(version, meta.getVersion());
         assertEquals(authEnabled, meta.isAuthenticationEnabled());
+        assertFalse(meta.isAuthenticated());
+        assertEquals(timeoutMinutes, meta.getSessionTimeoutMinutes());
         verify(buildProperties).getVersion();
         verify(authProperties).isAuthenticationEnabled();
     }

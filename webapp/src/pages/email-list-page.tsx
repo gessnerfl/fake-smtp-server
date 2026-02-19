@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {DataGrid, GridColDef, GridRowSelectionModel} from '@mui/x-data-grid';
-import {useGetEmailsQuery} from "../store/rest-api";
+import {useGetEmailsQuery, useGetMetaDataQuery} from "../store/rest-api";
 import {Email} from "../models/email";
 import {useSearchParams} from "react-router-dom";
 import Grid from '@mui/material/Grid';
@@ -10,6 +10,8 @@ import {parseJSON} from "date-fns";
 import {DeleteEmailButton} from "../components/email/delete-email-button";
 import './email-list-page.tsx.scss'
 import {DeleteAllEmailsButton} from "../components/email/delete-all-emails-button";
+import {useSelector} from "react-redux";
+import {RootState} from "../store/store";
 
 function EmailListPage() {
     const pageQueryParameter = "page";
@@ -20,7 +22,16 @@ function EmailListPage() {
     const [page, setPage] = useState(0)
     const [selectedRow, setSelectedRow] = useState<GridRowSelectionModel>({type: 'include', ids: new Set([])})
     const [searchParams, setSearchParams] = useSearchParams()
-    const {data, isLoading, refetch} = useGetEmailsQuery({page: page, pageSize: pageSize})
+    const {isAuthenticated} = useSelector((state: RootState) => state.auth);
+    const {data: metaData, isLoading: metaLoading} = useGetMetaDataQuery();
+    const skipQuery = useMemo(
+        () => !metaData || (metaData.authenticationEnabled && !isAuthenticated),
+        [metaData, isAuthenticated]
+    );
+    const {data, isLoading, refetch, isFetching} = useGetEmailsQuery(
+        {page: page, pageSize: pageSize},
+        {skip: skipQuery}
+    );
     const columns: GridColDef[] = [
         {
             field: 'id',
@@ -103,10 +114,10 @@ function EmailListPage() {
             setPageSizeOptions(pageSizeOptions)
             fetchNeeded = true
         }
-        if(fetchNeeded){
+        if(fetchNeeded && !skipQuery){
             refetch()
         }
-    }, [searchParams, refetch])
+    }, [searchParams, refetch, skipQuery])
 
     function renderGrid() {
         return <div>
@@ -170,6 +181,15 @@ function EmailListPage() {
             return (
                 renderGrid()
             )
+        }
+        if (!metaData || metaLoading) {
+            return (<div>Loading emails…</div>);
+        }
+        if (metaData.authenticationEnabled && !isAuthenticated) {
+            return <div>Please sign in to view emails.</div>;
+        }
+        if (isLoading || isFetching) {
+            return (<div>Loading emails…</div>);
         }
         return (<div>Inbox is empty</div>);
     }

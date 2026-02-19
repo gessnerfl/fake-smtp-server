@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 public class WebappAuthenticationProperties {
     private String username;
     private String password;
+    private int concurrentSessions = 1;
 
     public String getUsername() {
         return username;
@@ -23,6 +24,14 @@ public class WebappAuthenticationProperties {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getConcurrentSessions() {
+        return concurrentSessions;
+    }
+
+    public void setConcurrentSessions(int concurrentSessions) {
+        this.concurrentSessions = concurrentSessions;
     }
 
     public boolean isAuthenticationEnabled() {

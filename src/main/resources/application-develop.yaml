@@ -1,0 +1,17 @@
+server:
+  servlet:
+    session:
+      timeout: ${FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES:2}m
+
+fakesmtp:
+  webapp:
+    authentication:
+      username: myuser
+      password: mysecretpassword
+      concurrent-sessions: 2
+    session:
+      sse-event-send-timeout-seconds: ${FAKESMTP_WEBAPP_SSE_EVENT_SEND_TIMEOUT_SECONDS:5}
+
+logging:
+  level:
+    de.gessnerfl.fakesmtp.service.EmailSseEmitterService: DEBUG

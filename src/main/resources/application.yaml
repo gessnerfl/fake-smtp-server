@@ -1,6 +1,13 @@
 server:
   port: 8080
   shutdown: graceful
+  servlet:
+    session:
+      # Session timeout: 10 minutes default, maximum 24 hours (1440 minutes)
+      timeout: ${FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES:10}m
+      cookie:
+        http-only: true
+        same-site: Lax
 
 management:
   server:
@@ -61,4 +68,9 @@ fakesmtp:
     authentication:
       username: ${FAKESMTP_WEBAPP_AUTH_USERNAME:}
       password: ${FAKESMTP_WEBAPP_AUTH_PASSWORD:}
-
+    rate-limiting:
+      enabled: ${FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED:true}
+      max-attempts: ${FAKESMTP_WEBAPP_RATE_LIMITING_MAX_ATTEMPTS:5}
+      window-minutes: ${FAKESMTP_WEBAPP_RATE_LIMITING_WINDOW_MINUTES:1}
+      cleanup-interval-minutes: ${FAKESMTP_WEBAPP_RATE_LIMITING_CLEANUP_INTERVAL_MINUTES:1}
+      whitelist-localhost: ${FAKESMTP_WEBAPP_RATE_LIMITING_WHITELIST_LOCALHOST:true}

@@ -53,4 +53,23 @@ class WebappAuthenticationPropertiesTest {
 
         assertTrue(sut.isAuthenticationEnabled());
     }
+
+    @Test
+    void shouldReturnDefaultValueForConcurrentSessions() {
+        assertEquals(1, sut.getConcurrentSessions());
+    }
+
+    @Test
+    void shouldAllowSettingConcurrentSessions() {
+        sut.setConcurrentSessions(5);
+
+        assertEquals(5, sut.getConcurrentSessions());
+    }
+
+    @Test
+    void shouldAllowSettingUnlimitedConcurrentSessions() {
+        sut.setConcurrentSessions(-1);
+
+        assertEquals(-1, sut.getConcurrentSessions());
+    }
 }
