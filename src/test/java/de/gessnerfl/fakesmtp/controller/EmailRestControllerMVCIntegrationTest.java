@@ -153,16 +153,18 @@ class EmailRestControllerMVCIntegrationTest {
     @Test
     void shouldReturnErrorWhenAttachmentIsRequestedButAttachmentIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
+        var invalidAttachmentId = Long.MAX_VALUE;
 
-        this.mockMvc.perform(get("/api/emails/" + email.getId() + "/attachments/123"))
+        this.mockMvc.perform(get("/api/emails/" + email.getId() + "/attachments/" + invalidAttachmentId))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldReturnErrorWhenAttachmentIsRequestedButMailIdIsNotValid() throws Exception {
         var email = createRandomEmail(1);
+        var invalidMailId = Long.MAX_VALUE;
 
-        this.mockMvc.perform(get("/api/emails/123/attachments/" + email.getAttachments().get(0).getId()))
+        this.mockMvc.perform(get("/api/emails/" + invalidMailId + "/attachments/" + email.getAttachments().get(0).getId()))
                 .andExpect(status().isNotFound());
     }
 
