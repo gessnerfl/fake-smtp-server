@@ -18,9 +18,12 @@ import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -189,11 +192,12 @@ class EmailRestControllerMVCIntegrationTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void shouldReturn422WhenInlineImageDataIsInvalidBase64() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"%%%invalid%%%base64%%%", "not-base64!"})
+    void shouldReturn422WhenInlineImageDataIsInvalidBase64(String inlineImageData) throws Exception {
         var email = EmailControllerUtil.prepareEmailWithAllChildren(1);
         var inlineImage = email.getInlineImages().getFirst();
-        inlineImage.setData("%%%invalid%%%base64%%%");
+        inlineImage.setData(inlineImageData);
         var savedEmail = save(email);
 
         this.mockMvc.perform(get("/api/emails/" + savedEmail.getId() + "/inline-images/" + inlineImage.getId()))
@@ -202,17 +206,34 @@ class EmailRestControllerMVCIntegrationTest {
                 .andExpect(content().string(INVALID_INLINE_IMAGE_BASE64_MESSAGE));
     }
 
-    @Test
-    void shouldReturn422WhenInlineImageContentTypeIsInvalid() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"invalid-content-type", "text/", "/png"})
+    void shouldReturn422WhenInlineImageContentTypeIsInvalid(String inlineImageContentType) throws Exception {
         var email = EmailControllerUtil.prepareEmailWithAllChildren(1);
         var inlineImage = email.getInlineImages().getFirst();
-        inlineImage.setContentType("invalid-content-type");
+        inlineImage.setContentType(inlineImageContentType);
         var savedEmail = save(email);
 
         this.mockMvc.perform(get("/api/emails/" + savedEmail.getId() + "/inline-images/" + inlineImage.getId()))
                 .andExpect(status().is(422))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, startsWith(MediaType.TEXT_PLAIN_VALUE)))
                 .andExpect(content().string(INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE));
+    }
+
+    @Test
+    void shouldRejectPersistingInlineImageWithNullData() {
+        var email = EmailControllerUtil.prepareEmailWithAllChildren(1);
+        email.getInlineImages().getFirst().setData(null);
+
+        assertThrows(DataIntegrityViolationException.class, () -> emailRepository.saveAndFlush(email));
+    }
+
+    @Test
+    void shouldRejectPersistingInlineImageWithNullContentType() {
+        var email = EmailControllerUtil.prepareEmailWithAllChildren(1);
+        email.getInlineImages().getFirst().setContentType(null);
+
+        assertThrows(DataIntegrityViolationException.class, () -> emailRepository.saveAndFlush(email));
     }
 
     @Test
