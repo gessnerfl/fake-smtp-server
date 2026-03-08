@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +43,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -251,32 +257,32 @@ class EmailRestControllerTest {
 		assertEquals(message, new String(body.getByteArray(), StandardCharsets.UTF_8));
 	}
 
-	@Test
-	void shouldReturn422WhenInlineImageDataIsInvalidBase64() {
+	@ParameterizedTest
+	@MethodSource("invalidInlineImageBase64Values")
+	void shouldReturn422WhenInlineImageDataIsInvalidBase64(String inlineImageData) {
 		var emailId = 123L;
 		var inlineImageId = 456L;
-		var email = mock(Email.class);
-		var inlineImage = mock(InlineImage.class);
-
-		when(email.getId()).thenReturn(emailId);
-		when(inlineImage.getEmail()).thenReturn(email);
-		when(inlineImage.getContentType()).thenReturn(MediaType.IMAGE_PNG_VALUE);
-		when(inlineImage.getData()).thenReturn("%%%invalid%%%base64%%%");
-		when(emailInlineImageRepository.findById(inlineImageId)).thenReturn(Optional.of(inlineImage));
+		setUpInlineImage(emailId, inlineImageId, MediaType.IMAGE_PNG_VALUE, inlineImageData);
 
 		var result = sut.getEmailInlineImageById(emailId, inlineImageId);
 
-		assertEquals(422, result.getStatusCode().value());
-		var contentType = result.getHeaders().get(HttpHeaders.CONTENT_TYPE);
-		assertNotNull(contentType);
-		assertEquals(MediaType.TEXT_PLAIN_VALUE, contentType.getFirst());
-		var body = result.getBody();
-		assertNotNull(body);
-		assertEquals(INVALID_INLINE_IMAGE_BASE64_MESSAGE, new String(body.getByteArray(), StandardCharsets.UTF_8));
+		assertUnprocessableInlineImageResponse(result, INVALID_INLINE_IMAGE_BASE64_MESSAGE);
 	}
 
 	@Test
-	void shouldReturn422WhenInlineImageContentTypeIsInvalid() {
+	void shouldReturn422WhenInlineImageDataIsNull() {
+		var emailId = 123L;
+		var inlineImageId = 456L;
+		setUpInlineImage(emailId, inlineImageId, MediaType.IMAGE_PNG_VALUE, null);
+
+		var result = sut.getEmailInlineImageById(emailId, inlineImageId);
+
+		assertUnprocessableInlineImageResponse(result, INVALID_INLINE_IMAGE_BASE64_MESSAGE);
+	}
+
+	@ParameterizedTest
+	@MethodSource("invalidInlineImageContentTypes")
+	void shouldReturn422WhenInlineImageContentTypeIsInvalid(String inlineImageContentType) {
 		var emailId = 123L;
 		var inlineImageId = 456L;
 		var email = mock(Email.class);
@@ -284,18 +290,12 @@ class EmailRestControllerTest {
 
 		when(email.getId()).thenReturn(emailId);
 		when(inlineImage.getEmail()).thenReturn(email);
-		when(inlineImage.getContentType()).thenReturn("invalid-content-type");
+		when(inlineImage.getContentType()).thenReturn(inlineImageContentType);
 		when(emailInlineImageRepository.findById(inlineImageId)).thenReturn(Optional.of(inlineImage));
 
 		var result = sut.getEmailInlineImageById(emailId, inlineImageId);
 
-		assertEquals(422, result.getStatusCode().value());
-		var contentType = result.getHeaders().get(HttpHeaders.CONTENT_TYPE);
-		assertNotNull(contentType);
-		assertEquals(MediaType.TEXT_PLAIN_VALUE, contentType.getFirst());
-		var body = result.getBody();
-		assertNotNull(body);
-		assertEquals(INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE, new String(body.getByteArray(), StandardCharsets.UTF_8));
+		assertUnprocessableInlineImageResponse(result, INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE);
 	}
 
 	@Test
@@ -395,6 +395,44 @@ class EmailRestControllerTest {
 		verify(emitter).send(any(SseEmitter.SseEventBuilder.class));
 		verify(emitter).complete();
 		verifyNoMoreInteractions(emailSseEmitterService, emitter);
+	}
+
+	private void setUpInlineImage(long emailId, long inlineImageId, String contentType, String data) {
+		var email = mock(Email.class);
+		var inlineImage = mock(InlineImage.class);
+
+		when(email.getId()).thenReturn(emailId);
+		when(inlineImage.getEmail()).thenReturn(email);
+		when(inlineImage.getContentType()).thenReturn(contentType);
+		when(inlineImage.getData()).thenReturn(data);
+		when(emailInlineImageRepository.findById(inlineImageId)).thenReturn(Optional.of(inlineImage));
+	}
+
+	private void assertUnprocessableInlineImageResponse(ResponseEntity<ByteArrayResource> result, String expectedMessage) {
+		assertEquals(422, result.getStatusCode().value());
+		var contentType = result.getHeaders().get(HttpHeaders.CONTENT_TYPE);
+		assertNotNull(contentType);
+		assertEquals(MediaType.TEXT_PLAIN_VALUE, contentType.getFirst());
+		var body = result.getBody();
+		assertNotNull(body);
+		assertEquals(expectedMessage, new String(body.getByteArray(), StandardCharsets.UTF_8));
+	}
+
+	private static Stream<Arguments> invalidInlineImageBase64Values() {
+		return Stream.of(
+				Arguments.of("%%%invalid%%%base64%%%"),
+				Arguments.of("not-base64!"),
+				Arguments.of("%%%%")
+		);
+	}
+
+	private static Stream<Arguments> invalidInlineImageContentTypes() {
+		return Stream.of(
+				Arguments.of("invalid-content-type"),
+				Arguments.of("text/"),
+				Arguments.of("/png"),
+				Arguments.of((String) null)
+		);
 	}
 
 }

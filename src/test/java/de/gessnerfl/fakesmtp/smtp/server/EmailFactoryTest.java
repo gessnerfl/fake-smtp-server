@@ -164,6 +164,18 @@ class EmailFactoryTest {
     }
 
     @Test
+    void shouldSkipInlineImageWhenContentIdHeaderIsMissing() throws Exception {
+        var now = getUtcNow();
+        var rawData = createRawDataWithoutInlineImageContentIdHeader();
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        var result = assertDoesNotThrow(() -> sut.convert(rawData));
+
+        assertThat(result.getInlineImages(), empty());
+    }
+
+    @Test
     void shouldThrowExceptionWhenInlineImageIsBroken() throws Exception {
         var now = getUtcNow();
         var testFilename = "mail-with-subect-and-content-type-html-with-broken-inline-image.eml";
@@ -303,8 +315,16 @@ class EmailFactoryTest {
     }
 
     private RawData createRawDataWithInlineImageContentIdHeader(String contentIdHeaderValue) throws Exception {
+        return createRawDataWithInlineImageContentIdHeaderLine("Content-ID: " + contentIdHeaderValue);
+    }
+
+    private RawData createRawDataWithoutInlineImageContentIdHeader() throws Exception {
+        return createRawDataWithInlineImageContentIdHeaderLine("");
+    }
+
+    private RawData createRawDataWithInlineImageContentIdHeaderLine(String headerLine) throws Exception {
         var mail = TestResourceUtil.getTestFileContent("mail-with-subect-and-content-type-html-with-inline-image.eml")
-                .replace("Content-ID: <icon>", "Content-ID: " + contentIdHeaderValue);
+                .replace("Content-ID: <icon>", headerLine);
         return new RawData(SENDER, RECEIVER, mail.getBytes(StandardCharsets.UTF_8));
     }
 
