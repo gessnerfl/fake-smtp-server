@@ -52,6 +52,8 @@ public class EmailRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailRestController.class);
     private static final String DEFAULT_SORT_PROPERTY = "receivedOn";
+    private static final String INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE = "INVALID_INLINE_IMAGE_CONTENT_TYPE: Stored inline image content type is invalid";
+    private static final String INVALID_INLINE_IMAGE_BASE64_MESSAGE = "INVALID_INLINE_IMAGE_BASE64: Stored inline image data is invalid";
 
     private final EmailRepository emailRepository;
     private final EmailAttachmentRepository emailAttachmentRepository;
@@ -141,11 +143,48 @@ public class EmailRestController {
                     .body(new ByteArrayResource(message.getBytes(StandardCharsets.UTF_8)));
         }
 
-        var mediaType = MediaType.parseMediaType(inlineImage.getContentType());
-        var imageData = Base64.getDecoder().decode(inlineImage.getData());
+        var mediaType = parseInlineImageMediaType(inlineImage.getContentType(), mailId, inlineImageId);
+        if (mediaType == null) {
+            return unprocessableInlineImageResponse(INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE);
+        }
+
+        var imageData = decodeInlineImageData(inlineImage.getData(), mailId, inlineImageId);
+        if (imageData == null) {
+            return unprocessableInlineImageResponse(INVALID_INLINE_IMAGE_BASE64_MESSAGE);
+        }
+
         return ResponseEntity.ok()
                 .contentType(mediaType)
                 .body(new ByteArrayResource(imageData));
+    }
+
+    private MediaType parseInlineImageMediaType(String contentType, Long mailId, Long inlineImageId) {
+        try {
+            return MediaType.parseMediaType(contentType);
+        } catch (IllegalArgumentException ex) {
+            logger.warn("Inline image {} for mail {} has invalid content type", inlineImageId, mailId);
+            return null;
+        }
+    }
+
+    private byte[] decodeInlineImageData(String data, Long mailId, Long inlineImageId) {
+        if (data == null) {
+            logger.warn("Inline image {} for mail {} has no data", inlineImageId, mailId);
+            return null;
+        }
+
+        try {
+            return Base64.getDecoder().decode(data);
+        } catch (IllegalArgumentException ex) {
+            logger.warn("Inline image {} for mail {} contains invalid Base64 data", inlineImageId, mailId);
+            return null;
+        }
+    }
+
+    private ResponseEntity<ByteArrayResource> unprocessableInlineImageResponse(String message) {
+        return ResponseEntity.status(422)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(new ByteArrayResource(message.getBytes(StandardCharsets.UTF_8)));
     }
 
     @DeleteMapping("/{id}")

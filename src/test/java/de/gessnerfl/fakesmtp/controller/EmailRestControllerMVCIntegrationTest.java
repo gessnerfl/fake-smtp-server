@@ -53,6 +53,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class EmailRestControllerMVCIntegrationTest {
 
+    private static final String INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE = "INVALID_INLINE_IMAGE_CONTENT_TYPE: Stored inline image content type is invalid";
+    private static final String INVALID_INLINE_IMAGE_BASE64_MESSAGE = "INVALID_INLINE_IMAGE_BASE64: Stored inline image data is invalid";
+
     @Autowired
     private EmailRepository emailRepository;
 
@@ -184,6 +187,32 @@ class EmailRestControllerMVCIntegrationTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, startsWith(MediaType.IMAGE_PNG_VALUE)))
                 .andExpect(content().bytes(expectedImageData))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturn422WhenInlineImageDataIsInvalidBase64() throws Exception {
+        var email = EmailControllerUtil.prepareEmailWithAllChildren(1);
+        var inlineImage = email.getInlineImages().getFirst();
+        inlineImage.setData("%%%invalid%%%base64%%%");
+        var savedEmail = save(email);
+
+        this.mockMvc.perform(get("/api/emails/" + savedEmail.getId() + "/inline-images/" + inlineImage.getId()))
+                .andExpect(status().is(422))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, startsWith(MediaType.TEXT_PLAIN_VALUE)))
+                .andExpect(content().string(INVALID_INLINE_IMAGE_BASE64_MESSAGE));
+    }
+
+    @Test
+    void shouldReturn422WhenInlineImageContentTypeIsInvalid() throws Exception {
+        var email = EmailControllerUtil.prepareEmailWithAllChildren(1);
+        var inlineImage = email.getInlineImages().getFirst();
+        inlineImage.setContentType("invalid-content-type");
+        var savedEmail = save(email);
+
+        this.mockMvc.perform(get("/api/emails/" + savedEmail.getId() + "/inline-images/" + inlineImage.getId()))
+                .andExpect(status().is(422))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, startsWith(MediaType.TEXT_PLAIN_VALUE)))
+                .andExpect(content().string(INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE));
     }
 
     @Test

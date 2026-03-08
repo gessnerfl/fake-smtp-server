@@ -58,6 +58,9 @@ import jakarta.servlet.ServletContext;
 
 @ExtendWith(MockitoExtension.class)
 class EmailRestControllerTest {
+	private static final String INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE = "INVALID_INLINE_IMAGE_CONTENT_TYPE: Stored inline image content type is invalid";
+	private static final String INVALID_INLINE_IMAGE_BASE64_MESSAGE = "INVALID_INLINE_IMAGE_BASE64: Stored inline image data is invalid";
+
 	@Mock
 	private EmailRepository emailRepository;
 	@Mock
@@ -224,6 +227,75 @@ class EmailRestControllerTest {
 		var body = result.getBody();
 		assertNotNull(body);
 		assertArrayEquals(inlineImageBytes, body.getByteArray());
+	}
+
+	@Test
+	void shouldReturn413WhenInlineImageWasSkippedDuringProcessing() {
+		var emailId = 123L;
+		var inlineImageId = 456L;
+		var email = mock(Email.class);
+		var inlineImage = mock(InlineImage.class);
+		var message = "SKIPPED_TOO_LARGE: Inline image exceeded configured max attachment size";
+
+		when(email.getId()).thenReturn(emailId);
+		when(inlineImage.getEmail()).thenReturn(email);
+		when(inlineImage.getProcessingStatus()).thenReturn(EmailPartProcessingStatus.SKIPPED_TOO_LARGE);
+		when(inlineImage.getProcessingMessage()).thenReturn(message);
+		when(emailInlineImageRepository.findById(inlineImageId)).thenReturn(Optional.of(inlineImage));
+
+		var result = sut.getEmailInlineImageById(emailId, inlineImageId);
+
+		assertEquals(413, result.getStatusCode().value());
+		var body = result.getBody();
+		assertNotNull(body);
+		assertEquals(message, new String(body.getByteArray(), StandardCharsets.UTF_8));
+	}
+
+	@Test
+	void shouldReturn422WhenInlineImageDataIsInvalidBase64() {
+		var emailId = 123L;
+		var inlineImageId = 456L;
+		var email = mock(Email.class);
+		var inlineImage = mock(InlineImage.class);
+
+		when(email.getId()).thenReturn(emailId);
+		when(inlineImage.getEmail()).thenReturn(email);
+		when(inlineImage.getContentType()).thenReturn(MediaType.IMAGE_PNG_VALUE);
+		when(inlineImage.getData()).thenReturn("%%%invalid%%%base64%%%");
+		when(emailInlineImageRepository.findById(inlineImageId)).thenReturn(Optional.of(inlineImage));
+
+		var result = sut.getEmailInlineImageById(emailId, inlineImageId);
+
+		assertEquals(422, result.getStatusCode().value());
+		var contentType = result.getHeaders().get(HttpHeaders.CONTENT_TYPE);
+		assertNotNull(contentType);
+		assertEquals(MediaType.TEXT_PLAIN_VALUE, contentType.getFirst());
+		var body = result.getBody();
+		assertNotNull(body);
+		assertEquals(INVALID_INLINE_IMAGE_BASE64_MESSAGE, new String(body.getByteArray(), StandardCharsets.UTF_8));
+	}
+
+	@Test
+	void shouldReturn422WhenInlineImageContentTypeIsInvalid() {
+		var emailId = 123L;
+		var inlineImageId = 456L;
+		var email = mock(Email.class);
+		var inlineImage = mock(InlineImage.class);
+
+		when(email.getId()).thenReturn(emailId);
+		when(inlineImage.getEmail()).thenReturn(email);
+		when(inlineImage.getContentType()).thenReturn("invalid-content-type");
+		when(emailInlineImageRepository.findById(inlineImageId)).thenReturn(Optional.of(inlineImage));
+
+		var result = sut.getEmailInlineImageById(emailId, inlineImageId);
+
+		assertEquals(422, result.getStatusCode().value());
+		var contentType = result.getHeaders().get(HttpHeaders.CONTENT_TYPE);
+		assertNotNull(contentType);
+		assertEquals(MediaType.TEXT_PLAIN_VALUE, contentType.getFirst());
+		var body = result.getBody();
+		assertNotNull(body);
+		assertEquals(INVALID_INLINE_IMAGE_CONTENT_TYPE_MESSAGE, new String(body.getByteArray(), StandardCharsets.UTF_8));
 	}
 
 	@Test
