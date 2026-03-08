@@ -175,11 +175,33 @@ public class EmailFactory {
 
     private Optional<String> extractContentId(BodyPart part) throws MessagingException {
         var headerValues = part.getHeader("Content-ID");
-        if (headerValues != null && headerValues.length > 0) {
-            var contentId = headerValues[0];
-            return Optional.of(contentId.substring(1, contentId.length()-1));
+        if (headerValues == null || headerValues.length == 0) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        return normalizeContentIdHeaderValue(headerValues[0]);
+    }
+
+    private Optional<String> normalizeContentIdHeaderValue(String rawHeaderValue) {
+        var normalizedHeaderValue = normalizeContent(rawHeaderValue);
+        if (normalizedHeaderValue == null) {
+            return Optional.empty();
+        }
+
+        if (isWrappedInAngleBrackets(normalizedHeaderValue)) {
+            var unwrappedValue = normalizeContent(normalizedHeaderValue.substring(1, normalizedHeaderValue.length() - 1));
+            return Optional.ofNullable(unwrappedValue);
+        }
+
+        if (normalizedHeaderValue.startsWith("<") || normalizedHeaderValue.endsWith(">")) {
+            logger.debug("Malformed Content-ID header value '{}'. Using trimmed raw value instead.", normalizedHeaderValue);
+        }
+
+        return Optional.of(normalizedHeaderValue);
+    }
+
+    private boolean isWrappedInAngleBrackets(String value) {
+        return value.length() >= 2 && value.startsWith("<") && value.endsWith(">");
     }
 
     private EmailAttachment createAttachment(BodyPart part) throws MessagingException, IOException {

@@ -11,6 +11,8 @@ import de.gessnerfl.fakesmtp.util.TimestampProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -20,6 +22,7 @@ import org.springframework.util.unit.DataSize;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.*;
@@ -124,7 +127,40 @@ class EmailFactoryTest {
         assertThat(result.getAttachments(), empty());
         assertThat(result.getInlineImages(), hasSize(1));
         assertEquals(imageBase64, result.getInlineImages().getFirst().getData());
+        assertEquals("icon", result.getInlineImages().getFirst().getContentId());
         assertEquals("image/png", result.getInlineImages().getFirst().getContentType());
+    }
+
+    @Test
+    void shouldKeepUnwrappedContentIdForInlineImage() throws Exception {
+        var now = getUtcNow();
+        var rawData = createRawDataWithInlineImageContentIdHeader("icon");
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        var result = assertDoesNotThrow(() -> sut.convert(rawData));
+
+        assertThat(result.getInlineImages(), hasSize(1));
+        assertEquals("icon", result.getInlineImages().getFirst().getContentId());
+    }
+
+    @ParameterizedTest
+    @MethodSource("defensiveContentIdHeaderValues")
+    void shouldHandleMalformedContentIdHeaderDefensively(String headerValue, String expectedContentId) throws Exception {
+        var now = getUtcNow();
+        var rawData = createRawDataWithInlineImageContentIdHeader(headerValue);
+
+        when(timestampProvider.now()).thenReturn(now);
+
+        var result = assertDoesNotThrow(() -> sut.convert(rawData));
+
+        if (expectedContentId == null) {
+            assertThat(result.getInlineImages(), empty());
+            return;
+        }
+
+        assertThat(result.getInlineImages(), hasSize(1));
+        assertEquals(expectedContentId, result.getInlineImages().getFirst().getContentId());
     }
 
     @Test
@@ -264,6 +300,25 @@ class EmailFactoryTest {
         assertEquals(now, result.getReceivedOn());
         assertThat(result.getAttachments(), hasSize(2));
         assertThat(result.getAttachments().stream().map(EmailAttachment::getFilename).collect(toList()), containsInAnyOrder("customizing.css", "app-icon.png"));
+    }
+
+    private RawData createRawDataWithInlineImageContentIdHeader(String contentIdHeaderValue) throws Exception {
+        var mail = TestResourceUtil.getTestFileContent("mail-with-subect-and-content-type-html-with-inline-image.eml")
+                .replace("Content-ID: <icon>", "Content-ID: " + contentIdHeaderValue);
+        return new RawData(SENDER, RECEIVER, mail.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static Stream<Arguments> defensiveContentIdHeaderValues() {
+        return Stream.of(
+                Arguments.of("<", "<"),
+                Arguments.of(">", ">"),
+                Arguments.of("<icon", "<icon"),
+                Arguments.of("icon>", "icon>"),
+                Arguments.of("<>", null),
+                Arguments.of("< >", null),
+                Arguments.of("", null),
+                Arguments.of("   ", null)
+        );
     }
 
     private static ZonedDateTime getUtcNow() {
