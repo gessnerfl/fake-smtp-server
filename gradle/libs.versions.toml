@@ -18,6 +18,10 @@ npmVersion = "11.8.0"
 # Using BellSoft Liberica JDK with Alpaquita Linux (musl) - optimized for cloud-native Java
 docker-base-image = "bellsoft/liberica-runtime-container:jdk-25-slim-musl"
 
+# Third-party libraries
+commons-io = "2.21.0"
+springdoc-openapi = "3.0.1"
+
 [libraries]
 # Spring Boot Starters
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
@@ -29,8 +33,8 @@ spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-star
 spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 
 # Third-party libraries with explicit versions
-commons-io = { module = "commons-io:commons-io", version = "2.21.0" }
-springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version = "3.0.1" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc-openapi" }
 
 # Spring Boot managed (no version needed)
 snakeyaml = { module = "org.yaml:snakeyaml" }
