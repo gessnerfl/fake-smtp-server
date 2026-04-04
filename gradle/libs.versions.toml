@@ -2,7 +2,7 @@
 # Plugins
 axion-release = "1.21.1"
 spring-boot = "4.0.2"
-sonarqube = "7.2.2.6593"
+sonarqube = "7.2.3.7755"
 jib = "3.5.3"
 node-gradle = "7.1.0"
 ben-manes-versions = "0.53.0"
@@ -11,8 +11,8 @@ ben-manes-versions = "0.53.0"
 java = "25"
 
 # Node.js (LTS)
-nodejs = "24.13.1"
-npmVersion = "11.8.0"
+nodejs = "24.14.1"
+npmVersion = "11.11.0"
 
 # Docker Base Image
 # Using BellSoft Liberica JDK with Alpaquita Linux (musl) - optimized for cloud-native Java
@@ -20,7 +20,7 @@ docker-base-image = "bellsoft/liberica-runtime-container:jdk-25-slim-musl"
 
 # Third-party libraries
 commons-io = "2.21.0"
-springdoc-openapi = "3.0.1"
+springdoc-openapi = "3.0.2"
 
 [libraries]
 # Spring Boot Starters
