@@ -20,6 +20,8 @@ services:
       # Maximum attachment/inline image size (default: 10MB)
       # Increase for development if needed: FAKESMTP_MAX_ATTACHMENT_SIZE=50MB
       - FAKESMTP_MAX_ATTACHMENT_SIZE=10MB
+      # Optional legacy override. When omitted, STARTTLS only enables TLSv1.3 and TLSv1.2.
+#      - FAKESMTP_TLS_PROTOCOLS=TLSv1.3,TLSv1.2
     ports:
       - 8025:8025      #expose smtp port
       - 8080:8080      #expose web ui

@@ -34,6 +34,7 @@ public class FakeSmtpConfigurationProperties {
     private DataSize maxMessageSize;
     private DataSize maxAttachmentSize = DataSize.ofMegabytes(10);
     private boolean requireTLS = false;
+    private List<String> tlsProtocols;
     @Valid
     private KeyStore tlsKeystore;
     private boolean forwardEmails = false;
@@ -112,6 +113,14 @@ public class FakeSmtpConfigurationProperties {
 
     public void setRequireTLS(boolean requireTLS) {
         this.requireTLS = requireTLS;
+    }
+
+    public List<String> getTlsProtocols() {
+        return tlsProtocols;
+    }
+
+    public void setTlsProtocols(List<String> tlsProtocols) {
+        this.tlsProtocols = tlsProtocols;
     }
 
     public KeyStore getTlsKeystore() {

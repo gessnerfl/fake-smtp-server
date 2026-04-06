@@ -106,6 +106,11 @@ fakesmtp:
   #Configure if TLS is required to connect to the SMTP server. Defaults to false. See TLS section below
   requireTLS: false
 
+  #Optional override for STARTTLS server protocols. When omitted, Fake SMTP only enables TLSv1.3 and TLSv1.2.
+  tls-protocols:
+    - TLSv1.3
+    - TLSv1.2
+
   #When set to true emails will be forwarded to a configured target email system. Therefore
   #the spring boot mail system needs to be configured. See also 
   # https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-email
@@ -142,6 +147,7 @@ Equivalent environment variables:
 ```
 FAKESMTP_MAX_MESSAGE_SIZE=10MB
 FAKESMTP_MAX_ATTACHMENT_SIZE=10MB
+FAKESMTP_TLS_PROTOCOLS=TLSv1.3,TLSv1.2
 FAKESMTP_METRICS_INCLUDE_ADDRESS_TAGS=false
 ```
 
@@ -161,10 +167,12 @@ fakesmtp:
     password: mysecretpassword 
 ```
 
+SMTP `AUTH` command lines are redacted in debug logs. For example, a line such as `AUTH PLAIN <base64>` is logged as `Client: AUTH PLAIN <redacted>`.
+
 
 ### TLS
 Optionally TLS can be activated. To configure TLS support, a trust store needs to be provided 
-containing the TLS certificate used by the FakeSMTP Server.
+containing the TLS certificate used by the FakeSMTP Server. By default, Fake SMTP only enables `TLSv1.3` and `TLSv1.2` for STARTTLS and leaves JVM default enabled cipher suites in effect.
 
 ```yaml
 fakesmtp:
@@ -175,6 +183,20 @@ fakesmtp:
     location: /path/to/truststore.p12
     password: changeit
     type: PKCS12 # or JKS
+```
+
+If you need to support a narrower protocol set for compatibility testing, you can override the allowed STARTTLS protocols explicitly:
+
+```yaml
+fakesmtp:
+  tls-protocols:
+    - TLSv1.2
+```
+
+Equivalent environment variable:
+
+```
+FAKESMTP_TLS_PROTOCOLS=TLSv1.2
 ```
            
 ### Data Retention Settings

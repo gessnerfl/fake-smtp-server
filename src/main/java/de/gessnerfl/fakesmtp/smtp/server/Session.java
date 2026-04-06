@@ -215,7 +215,7 @@ public class Session implements Runnable, MessageContext {
             try {
                 Optional<String> line = readCommandLine();
                 if (line.isPresent()) {
-                    LOGGER.debug("Client: {}", line);
+                    LOGGER.debug("Client: {}", redactSensitiveCommand(line.get()));
                     this.server.getCommandHandler().handleCommand(this, line.get());
                 } else {
                     LOGGER.debug("no more lines from client");
@@ -251,6 +251,14 @@ public class Session implements Runnable, MessageContext {
             }
             return Optional.empty();
         }
+    }
+
+    private String redactSensitiveCommand(String line) {
+        final String[] parts = line.trim().split("\\s+", 3);
+        if (parts.length >= 3 && "AUTH".equalsIgnoreCase(parts[0])) {
+            return parts[0] + " " + parts[1] + " <redacted>";
+        }
+        return line;
     }
 
     /**

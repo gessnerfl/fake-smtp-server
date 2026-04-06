@@ -62,6 +62,8 @@ fakesmtp:
   port: 8025
   maxMessageSize: ${FAKESMTP_MAX_MESSAGE_SIZE:10MB}
   max-attachment-size: ${FAKESMTP_MAX_ATTACHMENT_SIZE:10MB}
+  # Optional STARTTLS protocol override. When omitted, Fake SMTP only enables TLSv1.3 and TLSv1.2.
+  # tls-protocols: TLSv1.3,TLSv1.2
   metrics:
     include-address-tags: ${FAKESMTP_METRICS_INCLUDE_ADDRESS_TAGS:false}
   webapp:
