@@ -350,6 +350,54 @@ class RateLimitingFilterIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("X-RateLimit-Remaining", "3")); // Before first attempt for client 2
     }
+
+    @Test
+    void shouldUseLeftmostForwardedIpForRateLimitBuckets() throws Exception {
+        String firstProxyChain = "10.0.0.42, 198.51.100.7";
+        String secondProxyChain = "10.0.0.42, 198.51.100.8";
+        String thirdProxyChain = "10.0.0.43, 198.51.100.7";
+
+        performFailedLogin(firstProxyChain)
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("X-RateLimit-Remaining", "3"));
+
+        performFailedLogin(secondProxyChain)
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("X-RateLimit-Remaining", "2"));
+
+        performFailedLogin(thirdProxyChain)
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("X-RateLimit-Remaining", "3"));
+    }
+
+    @Test
+    void shouldUseFirstNonEmptyForwardedValueWhenHeaderContainsEmptyEntries() throws Exception {
+        performFailedLogin(" ,  , 10.0.0.52")
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("X-RateLimit-Remaining", "3"));
+
+        performFailedLogin("10.0.0.52, 198.51.100.9")
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("X-RateLimit-Remaining", "2"));
+    }
+
+    private org.springframework.test.web.servlet.ResultActions performFailedLogin(String forwardedForHeader) throws Exception {
+        MvcResult metaResult = mockMvc.perform(get("/api/meta-data"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String csrfToken = extractCsrfTokenFromCookies(metaResult);
+        jakarta.servlet.http.Cookie csrfCookie = extractCsrfCookie(metaResult);
+        MockHttpSession session = new MockHttpSession();
+
+        return mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
+                .session(session)
+                .header("X-Forwarded-For", forwardedForHeader)
+                .param("username", "testuser")
+                .param("password", "wrongpass")
+                .cookie(csrfCookie)
+                .header("X-XSRF-TOKEN", csrfToken));
+    }
     
     private String extractCsrfTokenFromCookies(MvcResult result) {
         jakarta.servlet.http.Cookie cookie = extractCsrfCookie(result);

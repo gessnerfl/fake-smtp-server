@@ -97,51 +97,23 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private String extractClientIp(HttpServletRequest request) {
         if (properties.isTrustProxyHeaders()) {
             String xForwardedFor = request.getHeader("X-Forwarded-For");
-            if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-                String[] ips = xForwardedFor.split(",");
-                // Take the first IP from the chain if it's not a private IP
-                // If all IPs are private, fall back to remoteAddr
-                String firstIp = null;
-                for (String ip : ips) {
+            if (xForwardedFor != null && !xForwardedFor.isBlank()) {
+                // With trusted proxy headers enabled, the leftmost forwarded value
+                // is the client identity asserted by the reverse proxy.
+                for (String ip : xForwardedFor.split(",")) {
                     String trimmed = ip.trim();
                     if (!trimmed.isEmpty()) {
-                        if (firstIp == null) {
-                            firstIp = trimmed;
-                        }
-                        // Accept first non-private IP
-                        if (!isPrivateIp(trimmed)) {
-                            return trimmed;
-                        }
+                        return trimmed;
                     }
-                }
-                // All IPs are private, use first one or remoteAddr
-                if (firstIp != null) {
-                    return firstIp;
                 }
             }
 
             String xRealIp = request.getHeader("X-Real-IP");
-            if (xRealIp != null && !xRealIp.isEmpty()) {
+            if (xRealIp != null && !xRealIp.isBlank()) {
                 return xRealIp.trim();
             }
         }
         
         return request.getRemoteAddr();
-    }
-    
-    private boolean isPrivateIp(String ip) {
-        // Check for private IP ranges to prevent spoofing via X-Forwarded-For
-        if (ip.startsWith("10.") || ip.startsWith("192.168.") || ip.startsWith("172.16.")) {
-            return true;
-        }
-        if (ip.startsWith("172.")) {
-            try {
-                int secondOctet = Integer.parseInt(ip.split("\\.")[1]);
-                return secondOctet >= 16 && secondOctet <= 31;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-        return "127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "::1".equals(ip);
     }
 }
