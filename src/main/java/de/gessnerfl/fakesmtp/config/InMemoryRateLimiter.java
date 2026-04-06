@@ -20,16 +20,18 @@ public class InMemoryRateLimiter {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRateLimiter.class);
     
     private final RateLimitingProperties properties;
+    private final WebappAuthenticationProperties authProperties;
     private final Map<String, RateLimitEntry> attempts = new ConcurrentHashMap<>();
     private ScheduledExecutorService cleanupExecutor;
     
-    public InMemoryRateLimiter(RateLimitingProperties properties) {
+    public InMemoryRateLimiter(RateLimitingProperties properties, WebappAuthenticationProperties authProperties) {
         this.properties = properties;
+        this.authProperties = authProperties;
     }
     
     @PostConstruct
     public void init() {
-        if (properties.isEnabled()) {
+        if (isRateLimitingActive()) {
             cleanupExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
                 Thread thread = new Thread(r, "rate-limit-cleanup");
                 thread.setDaemon(true);
@@ -65,7 +67,7 @@ public class InMemoryRateLimiter {
     }
     
     public boolean isAllowed(String ip) {
-        if (!properties.isEnabled()) {
+        if (!isRateLimitingActive()) {
             return true;
         }
         
@@ -87,7 +89,7 @@ public class InMemoryRateLimiter {
     }
     
     public FailedAttemptResult recordFailedAttempt(String ip) {
-        if (!properties.isEnabled() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
+        if (!isRateLimitingActive() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
             return new FailedAttemptResult(false, Integer.MAX_VALUE, 0);
         }
 
@@ -136,7 +138,7 @@ public class InMemoryRateLimiter {
     }
     
     public int getRemainingAttempts(String ip) {
-        if (!properties.isEnabled() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
+        if (!isRateLimitingActive() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
             return Integer.MAX_VALUE;
         }
 
@@ -155,7 +157,7 @@ public class InMemoryRateLimiter {
     }
     
     public long getSecondsUntilReset(String ip) {
-        if (!properties.isEnabled() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
+        if (!isRateLimitingActive() || (isLocalhost(ip) && properties.isWhitelistLocalhost())) {
             return 0;
         }
         
@@ -206,6 +208,10 @@ public class InMemoryRateLimiter {
         if (removedCount > 0) {
             logger.debug("Cleaned up {} expired rate limit entries", removedCount);
         }
+    }
+
+    private boolean isRateLimitingActive() {
+        return properties.isEnabled() && authProperties.isAuthenticationEnabled();
     }
     
     private boolean isLocalhost(String ip) {

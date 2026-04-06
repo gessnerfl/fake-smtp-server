@@ -55,6 +55,61 @@ class WebappAuthenticationPropertiesTest {
     }
 
     @Test
+    void shouldReturnTrueWhenAuthenticationIsExplicitlyEnabledAndCredentialsAreProvided() {
+        sut.setEnabled(true);
+        sut.setUsername("username");
+        sut.setPassword("password");
+
+        assertTrue(sut.isAuthenticationEnabled());
+    }
+
+    @Test
+    void shouldReturnFalseWhenAuthenticationIsExplicitlyDisabledAndCredentialsAreMissing() {
+        sut.setEnabled(false);
+
+        assertFalse(sut.isAuthenticationEnabled());
+    }
+
+    @Test
+    void shouldValidateLegacyCompatibilityPathWhenEnabledFlagIsUnsetAndCredentialsAreProvided() {
+        sut.setUsername("username");
+        sut.setPassword("password");
+
+        assertDoesNotThrow(() -> sut.validateConfiguration());
+        assertTrue(sut.isAuthenticationEnabled());
+    }
+
+    @Test
+    void shouldRejectPartialCredentialsWhenEnabledFlagIsUnset() {
+        sut.setUsername("username");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> sut.validateConfiguration());
+
+        assertTrue(exception.getMessage().contains("Both username and password must be configured together"));
+    }
+
+    @Test
+    void shouldRejectEnabledAuthenticationWithoutCredentials() {
+        sut.setEnabled(true);
+        sut.setUsername("username");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> sut.validateConfiguration());
+
+        assertTrue(exception.getMessage().contains("requires non-empty username and password"));
+    }
+
+    @Test
+    void shouldRejectDisabledAuthenticationWhenCredentialsArePresent() {
+        sut.setEnabled(false);
+        sut.setUsername("username");
+        sut.setPassword("password");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> sut.validateConfiguration());
+
+        assertTrue(exception.getMessage().contains("must not configure username or password"));
+    }
+
+    @Test
     void shouldReturnDefaultValueForConcurrentSessions() {
         assertEquals(1, sut.getConcurrentSessions());
     }

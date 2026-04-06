@@ -69,7 +69,7 @@ fakesmtp:
       username: ${FAKESMTP_WEBAPP_AUTH_USERNAME:}
       password: ${FAKESMTP_WEBAPP_AUTH_PASSWORD:}
     rate-limiting:
-      enabled: ${FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED:false}
+      enabled: ${FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED:true}
       max-attempts: ${FAKESMTP_WEBAPP_RATE_LIMITING_MAX_ATTEMPTS:5}
       window-minutes: ${FAKESMTP_WEBAPP_RATE_LIMITING_WINDOW_MINUTES:1}
       cleanup-interval-minutes: ${FAKESMTP_WEBAPP_RATE_LIMITING_CLEANUP_INTERVAL_MINUTES:1}

@@ -33,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ActiveProfiles("mockserver")
 @SpringBootTest(properties = {
+        "fakesmtp.webapp.authentication.enabled=false",
         "fakesmtp.webapp.authentication.username=",
         "fakesmtp.webapp.authentication.password="
 })

@@ -1,6 +1,7 @@
 fakesmtp:
   webapp:
     authentication:
+      enabled: true
       username: myuser
       password: mysecretpassword
       concurrent-sessions: 2

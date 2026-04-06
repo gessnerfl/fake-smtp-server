@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "server.servlet.context-path=/fakesmtp",
+                "fakesmtp.webapp.authentication.enabled=true",
                 "fakesmtp.webapp.authentication.username=testuser",
                 "fakesmtp.webapp.authentication.password=testpass",
                 "fakesmtp.webapp.rate-limiting.enabled=true",

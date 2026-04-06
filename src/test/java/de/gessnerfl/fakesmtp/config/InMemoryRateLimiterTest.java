@@ -20,7 +20,7 @@ class InMemoryRateLimiterTest {
 
     @Test
     void shouldOnlyBlockCurrentRequestAfterMaxAttemptsAreExceeded() {
-        InMemoryRateLimiter rateLimiter = new InMemoryRateLimiter(createProperties(3));
+        InMemoryRateLimiter rateLimiter = new InMemoryRateLimiter(createProperties(3), createAuthProperties(true));
         String ip = "198.51.100.21";
 
         assertFalse(rateLimiter.recordFailedAttempt(ip).shouldBlockCurrentRequest());
@@ -33,7 +33,7 @@ class InMemoryRateLimiterTest {
     void shouldBlockParallelRequestsThatExceedLimit() throws Exception {
         int maxAttempts = 3;
         int requestCount = 10;
-        InMemoryRateLimiter rateLimiter = new InMemoryRateLimiter(createProperties(maxAttempts));
+        InMemoryRateLimiter rateLimiter = new InMemoryRateLimiter(createProperties(maxAttempts), createAuthProperties(true));
         String ip = "198.51.100.22";
 
         ExecutorService executor = Executors.newFixedThreadPool(requestCount);
@@ -67,7 +67,7 @@ class InMemoryRateLimiterTest {
     @Test
     void shouldReturnMaxRemainingAttemptsForExpiredWindow() throws Exception {
         int maxAttempts = 3;
-        InMemoryRateLimiter rateLimiter = new InMemoryRateLimiter(createProperties(maxAttempts));
+        InMemoryRateLimiter rateLimiter = new InMemoryRateLimiter(createProperties(maxAttempts), createAuthProperties(true));
         String ip = "198.51.100.23";
 
         Map<String, InMemoryRateLimiter.RateLimitEntry> attempts = attemptsMap(rateLimiter);
@@ -82,6 +82,14 @@ class InMemoryRateLimiterTest {
         properties.setMaxAttempts(maxAttempts);
         properties.setWindowMinutes(1);
         properties.setWhitelistLocalhost(false);
+        return properties;
+    }
+
+    private static WebappAuthenticationProperties createAuthProperties(boolean enabled) {
+        WebappAuthenticationProperties properties = new WebappAuthenticationProperties();
+        properties.setEnabled(enabled);
+        properties.setUsername("testuser");
+        properties.setPassword("testpass");
         return properties;
     }
 

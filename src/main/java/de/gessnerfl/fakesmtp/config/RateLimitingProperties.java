@@ -18,7 +18,7 @@ public class RateLimitingProperties {
     private static final int MAX_ALLOWED_ATTEMPTS = 100;
     private static final int MAX_WINDOW_MINUTES = 60;
     
-    private boolean enabled = false;
+    private boolean enabled = true;
     
     @Min(value = 1, message = "max-attempts must be at least 1")
     @Max(value = MAX_ALLOWED_ATTEMPTS, message = "max-attempts cannot exceed " + MAX_ALLOWED_ATTEMPTS)
@@ -31,7 +31,7 @@ public class RateLimitingProperties {
     @Min(value = 1, message = "cleanup-interval-minutes must be at least 1")
     private int cleanupIntervalMinutes = DEFAULT_CLEANUP_INTERVAL_MINUTES;
     
-    private boolean whitelistLocalhost = false;
+    private boolean whitelistLocalhost = true;
     private boolean trustProxyHeaders = false;
     
     public boolean isEnabled() {

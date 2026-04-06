@@ -248,6 +248,10 @@ To enable authentication, set the username and password in the application.yml f
 fakesmtp:
   webapp:
     authentication:
+      # Explicitly enable or disable Web UI authentication.
+      # If omitted, the legacy behavior still applies for compatibility:
+      # configuring both username and password implies enabled, but this is deprecated.
+      enabled: true
       # Username for web UI and API authentication
       username: admin
       # Password for web UI and API authentication
@@ -260,13 +264,14 @@ fakesmtp:
 You can also set these values using environment variables:
 
 ```
+FAKESMTP_WEBAPP_AUTHENTICATION_ENABLED=true
 FAKESMTP_WEBAPP_AUTH_USERNAME=admin
 FAKESMTP_WEBAPP_AUTH_PASSWORD=password
 FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES=10
 FAKESMTP_WEBAPP_AUTHENTICATION_CONCURRENT_SESSIONS=1
 FAKESMTP_WEBAPP_SSE_HEARTBEAT_INTERVAL_SECONDS=30
 FAKESMTP_WEBAPP_SSE_EVENT_SEND_TIMEOUT_SECONDS=5
-FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED=false
+FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED=true
 FAKESMTP_WEBAPP_RATE_LIMITING_MAX_ATTEMPTS=5
 FAKESMTP_WEBAPP_RATE_LIMITING_WINDOW_MINUTES=1
 FAKESMTP_WEBAPP_RATE_LIMITING_CLEANUP_INTERVAL_MINUTES=1
@@ -274,7 +279,14 @@ FAKESMTP_WEBAPP_RATE_LIMITING_WHITELIST_LOCALHOST=true
 FAKESMTP_WEBAPP_RATE_LIMITING_TRUST_PROXY_HEADERS=false
 ```
 
-If both username and password are not set, authentication will be disabled and the web interface and API endpoints will be accessible without authentication. Setting both values enables Web UI authentication; the UI presents a login form and email data is served exclusively from `/api/**`, guarded by a session cookie (HttpOnly).
+Current authentication semantics:
+
+- `enabled=true` requires non-empty `username` and `password`
+- `enabled=false` requires that `username` and `password` are not configured
+- If `enabled` is omitted, the legacy compatibility path still applies: configuring both `username` and `password` implies enabled authentication, but startup logs a deprecation warning recommending the explicit flag
+- Partial credential configuration is invalid and fails application startup
+
+If authentication is disabled, the web interface and API endpoints remain accessible without login. When authentication is enabled, the UI presents a login form and email data is served exclusively from `/api/**`, guarded by a session cookie (HttpOnly).
 
 When authentication is enabled:
 - The web interface will show a custom login form
@@ -300,14 +312,14 @@ Additional Actuator endpoints may be exposed explicitly, but they are not anonym
 
 ### Rate Limiting for Login
 
-To protect against brute-force attacks on the login endpoint, you can enable optional rate limiting. The rate limiter tracks login attempts per client IP address and blocks further attempts after exceeding the configured limit. It is configured independently from Web UI authentication.
+To protect against brute-force attacks on the login endpoint, Fake SMTP enables rate limiting by default. The rate limiter tracks login attempts per client IP address and blocks further attempts after exceeding the configured limit. It remains configurable, but it is only active when Web UI authentication is effectively enabled.
 
 ```yaml
 fakesmtp:
   webapp:
     rate-limiting:
-      # Enable/disable rate limiting (default: false)
-      enabled: false
+      # Enable/disable rate limiting (default: true)
+      enabled: true
       # Maximum number of login attempts per time window (default: 5, max: 100)
       max-attempts: 5
       # Time window in minutes (default: 1, max: 60)
@@ -323,6 +335,7 @@ fakesmtp:
 **Features:**
 - Returns HTTP 429 (Too Many Requests) with `Retry-After` header when limit is exceeded
 - Includes `X-RateLimit-Remaining` header in responses to show remaining attempts
+- Is inert when Web UI authentication is effectively disabled, even if `rate-limiting.enabled=true`
 - Supports `X-Forwarded-For` and `X-Real-IP` headers when `trust-proxy-headers` is enabled
 - Localhost addresses (127.0.0.1, ::1, localhost) are whitelisted by default
 - Thread-safe in-memory storage with automatic cleanup of expired entries
