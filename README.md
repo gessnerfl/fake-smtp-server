@@ -57,6 +57,9 @@ In order to run this application locally from sources, execute:
 
 Afterwards, the web interface is be availabe under http://localhost:8080.
 
+> [!IMPORTANT]
+> The provided `docker-compose.yml` is a local development/test convenience file that uses the `develop` profile and fixed local ports. It is not intended or supported as a production deployment manifest.
+
 # Configuration
 
 As the application is based on Spring Boot the same rules applies to the configuration as described in the Spring Boot 
@@ -91,7 +94,7 @@ fakesmtp:
 
   #Optional configuration option to specify the maximum allowed message size. The size can be 
   #defined using Spring Boot DataSize value type - https://docs.spring.io/spring-boot/docs/2.1.9.RELEASE/reference/html/boot-features-external-config.html#boot-features-external-config-conversion-datasize.
-  #Default: no limit
+  #Default: 10MB
   maxMessageSize: 10MB
 
   #Optional configuration option to specify the maximum allowed attachment/inline image size.
@@ -117,6 +120,33 @@ If an attachment or inline image exceeds `fakesmtp.maxAttachmentSize`:
 - the email remains processable and visible in the UI/API,
 - metadata is exposed via `processingStatus=SKIPPED_TOO_LARGE` and `processingMessage`,
 - downloading a skipped attachment from `/api/emails/{mailId}/attachments/{attachmentId}` returns HTTP `413`.
+
+#### Message Size Limit Behavior
+
+If the SMTP payload exceeds `fakesmtp.maxMessageSize`, Fake SMTP rejects the message during `DATA` with `552 5.3.4 Message size exceeds fixed limit`. This limit is enforced even if the client omits `MAIL FROM SIZE=...`.
+
+### Metrics and Management Endpoints
+
+By default, the management server only exposes `/actuator/health` and `/actuator/info` on port `8081`. If you explicitly expose additional Actuator endpoints, they are no longer anonymously reachable by default.
+
+Fake SMTP publishes the Micrometer metrics `messages.delivered` and `messages.blocked`. Sensitive email address tags (`from` and `recipient`) are disabled by default and must be explicitly enabled with:
+
+```yaml
+fakesmtp:
+  metrics:
+    include-address-tags: false
+```
+
+Equivalent environment variables:
+
+```
+FAKESMTP_MAX_MESSAGE_SIZE=10MB
+FAKESMTP_MAX_ATTACHMENT_SIZE=10MB
+FAKESMTP_METRICS_INCLUDE_ADDRESS_TAGS=false
+```
+
+> [!IMPORTANT]
+> The sensitive-data concern is the Actuator/Micrometer metrics exposure path, not `/api/meta-data`. The `/api/meta-data` endpoint only exposes application metadata such as `authenticationEnabled`.
     
 ### Authentication
 Optionally authentication can be turned on. Configuring authentication does not mean the authentication is enforced. It
@@ -201,7 +231,11 @@ spring:
 
 management:
   server:
-    port: 8081 
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info
 ```
 
 ### Web UI Authentication
@@ -256,8 +290,10 @@ When authentication is enabled:
   - Web UI shell routes (`/`, `/emails/**`) for rendering the login form
   - Static resources (`/assets/**`, `/webjars/**`)
   - Swagger UI (`/swagger-ui.html`, `/swagger-ui/**`, `/v3/api-docs/**`)
-  - Actuator endpoints (`/actuator/**`)
+  - `/actuator/health` and `/actuator/info`
   - H2 console (`/h2-console/**`)
+
+Additional Actuator endpoints may be exposed explicitly, but they are not anonymously reachable by default.
 
 > [!NOTE]  
 > The Web UI authentication is separate from the SMTP server authentication. The SMTP server authentication is configured under `fakesmtp.authentication` and is used for authenticating SMTP clients, while the Web UI authentication is configured under `fakesmtp.webapp.authentication` and is used for authenticating users accessing the web interface and API endpoints.

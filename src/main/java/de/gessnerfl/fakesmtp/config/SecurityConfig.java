@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -50,11 +51,14 @@ public class SecurityConfig {
 
     private final WebappAuthenticationProperties authProperties;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final WebEndpointProperties webEndpointProperties;
 
     public SecurityConfig(WebappAuthenticationProperties authProperties,
-                         CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+                         CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                         WebEndpointProperties webEndpointProperties) {
         this.authProperties = authProperties;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+        this.webEndpointProperties = webEndpointProperties;
     }
 
     @Bean
@@ -69,13 +73,14 @@ public class SecurityConfig {
         if (authProperties.isAuthenticationEnabled()) {
             http
                 .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers(actuatorEndpoint("/health"), actuatorEndpoint("/info")).permitAll()
+                    .requestMatchers(actuatorWildcard()).authenticated()
                     .requestMatchers("/api/meta-data").permitAll()
                     .requestMatchers("/api/auth/login", "/api/auth/logout", "/api/auth/status").permitAll()
                     .requestMatchers(HttpMethod.GET, "/", "/emails/**", "/assets/**").permitAll()
                     .requestMatchers("/api/**").authenticated()
                     .requestMatchers("/api/emails/events").authenticated()
                     .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                    .requestMatchers("/actuator/**").permitAll()
                     .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers("/webjars/**").permitAll()
                     .anyRequest().authenticated()
@@ -116,6 +121,8 @@ public class SecurityConfig {
         } else {
             http
                 .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers(actuatorEndpoint("/health"), actuatorEndpoint("/info")).permitAll()
+                    .requestMatchers(actuatorWildcard()).authenticated()
                     .anyRequest().permitAll()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -183,6 +190,35 @@ public class SecurityConfig {
                 || "/index.html".equals(path)
                 || "/emails".equals(path)
                 || path.startsWith("/emails/");
+    }
+
+    private String actuatorEndpoint(String endpointPath) {
+        String basePath = normalizeActuatorBasePath();
+        if ("/".equals(basePath)) {
+            return endpointPath;
+        }
+        return basePath + endpointPath;
+    }
+
+    private String actuatorWildcard() {
+        String basePath = normalizeActuatorBasePath();
+        if ("/".equals(basePath)) {
+            return "/**";
+        }
+        return basePath + "/**";
+    }
+
+    private String normalizeActuatorBasePath() {
+        String basePath = webEndpointProperties.getBasePath();
+        if (!StringUtils.hasText(basePath)) {
+            return "/actuator";
+        }
+        if (!basePath.startsWith("/")) {
+            return "/" + basePath;
+        }
+        return basePath.endsWith("/") && basePath.length() > 1
+                ? basePath.substring(0, basePath.length() - 1)
+                : basePath;
     }
 
     /**

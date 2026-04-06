@@ -1,5 +1,7 @@
 version: '3.8'
 
+# Development/test convenience only.
+# Do not use this file as a production deployment descriptor.
 services:
   # ./gradlew jibDockerBuild
   fake-smtp-server:
@@ -21,4 +23,4 @@ services:
     ports:
       - 8025:8025      #expose smtp port
       - 8080:8080      #expose web ui
-      - 8081:8081      #expose management api
+      - 8081:8081      #expose management api for local development/testing

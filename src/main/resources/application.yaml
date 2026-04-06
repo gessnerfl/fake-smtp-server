@@ -14,7 +14,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: health,info
 
 spring:
   profiles:
@@ -60,7 +60,10 @@ springdoc:
 
 fakesmtp:
   port: 8025
+  maxMessageSize: ${FAKESMTP_MAX_MESSAGE_SIZE:10MB}
   max-attachment-size: ${FAKESMTP_MAX_ATTACHMENT_SIZE:10MB}
+  metrics:
+    include-address-tags: ${FAKESMTP_METRICS_INCLUDE_ADDRESS_TAGS:false}
   webapp:
     authentication:
       username: ${FAKESMTP_WEBAPP_AUTH_USERNAME:}

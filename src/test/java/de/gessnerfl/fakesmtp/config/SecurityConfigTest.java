@@ -2,6 +2,7 @@ package de.gessnerfl.fakesmtp.config;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +21,12 @@ class SecurityConfigTest {
 
     @Mock
     private WebappAuthenticationProperties authProperties;
+
+    @Mock
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    @Mock
+    private WebEndpointProperties webEndpointProperties;
 
     @InjectMocks
     private SecurityConfig sut;
