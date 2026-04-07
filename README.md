@@ -132,7 +132,27 @@ If the SMTP payload exceeds `fakesmtp.maxMessageSize`, Fake SMTP rejects the mes
 
 ### Metrics and Management Endpoints
 
-By default, the management server only exposes `/actuator/health` and `/actuator/info` on port `8081`. If you explicitly expose additional Actuator endpoints, they are no longer anonymously reachable by default.
+By default, the management server exposes `/actuator/health` and `/actuator/info` on port `8081`.
+
+If you explicitly expose additional Actuator endpoints such as `/actuator/metrics`, they remain protected and are not anonymously reachable. Protected Actuator endpoints use HTTP Basic authentication with the same username and password configured under `fakesmtp.webapp.authentication`.
+
+This also applies when you set `management.endpoints.web.base-path=/`. In that mode:
+
+- `/health` and `/info` remain public
+- `/metrics` and other exposed Actuator endpoints still require authentication
+- regular application routes such as `/`, `/emails/**`, `/assets/**`, and `/api/meta-data` keep their normal access semantics
+
+Examples:
+
+```bash
+# Default management base path
+curl http://localhost:8081/actuator/health
+curl -u admin:password http://localhost:8081/actuator/metrics
+
+# Root management base path
+curl http://localhost:8081/health
+curl -u admin:password http://localhost:8081/metrics
+```
 
 Fake SMTP publishes the Micrometer metrics `messages.delivered` and `messages.blocked`. Sensitive email address tags (`from` and `recipient`) are disabled by default and must be explicitly enabled with:
 
@@ -308,7 +328,7 @@ Current authentication semantics:
 - If `enabled` is omitted, the legacy compatibility path still applies: configuring both `username` and `password` implies enabled authentication, but startup logs a deprecation warning recommending the explicit flag
 - Partial credential configuration is invalid and fails application startup
 
-If authentication is disabled, the web interface and API endpoints remain accessible without login. When authentication is enabled, the UI presents a login form and email data is served exclusively from `/api/**`, guarded by a session cookie (HttpOnly).
+If authentication is disabled, the web interface and API endpoints remain accessible without login. When authentication is enabled, the UI presents a login form and email data is served exclusively from `/api/**`, guarded by a session cookie (HttpOnly). Protected Actuator endpoints do not use that session-based login flow; they use HTTP Basic authentication instead.
 
 When authentication is enabled:
 - The web interface will show a custom login form
@@ -327,7 +347,9 @@ When authentication is enabled:
   - `/actuator/health` and `/actuator/info`
   - H2 console (`/h2-console/**`)
 
-Additional Actuator endpoints may be exposed explicitly, but they are not anonymously reachable by default.
+Additional Actuator endpoints may be exposed explicitly, but they are not anonymously reachable by default. Use HTTP Basic with the credentials from `fakesmtp.webapp.authentication.username` and `fakesmtp.webapp.authentication.password`.
+
+If you set `management.endpoints.web.base-path=/`, the public management endpoints move to `/health` and `/info`, while protected endpoints such as `/metrics` continue to require authentication.
 
 > [!NOTE]  
 > The Web UI authentication is separate from the SMTP server authentication. The SMTP server authentication is configured under `fakesmtp.authentication` and is used for authenticating SMTP clients, while the Web UI authentication is configured under `fakesmtp.webapp.authentication` and is used for authenticating users accessing the web interface and API endpoints.
