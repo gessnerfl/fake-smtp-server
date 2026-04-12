@@ -13,7 +13,8 @@
 - Backend tests: `src/test/java` and `src/test/resources`
 - Frontend (React + Vite + TypeScript): `webapp/src`, static files in `webapp/public`
 - Build and CI metadata: `build.gradle`, `gradle/libs.versions.toml`, `.github/workflows/*.yml`
-- Working notes for ongoing implementation: `agent/`
+- AI-assisted development artifacts: `agent/plans/`, `agent/tasks/`, `agent/process/`
+- Working notes and review artifacts: `agent/`
 
 ## Codex Development Setup
 - This repository includes a project-scoped Codex configuration in `.codex/config.toml` and `.codex/rules/dev.rules`.
@@ -28,7 +29,27 @@
 - `cd webapp && npm test`
 - `cd webapp && npm run lint`
 - `cd webapp && npm run dev`
-- Agent guidance should live in `AGENTS.md`, `webapp/AGENTS.md`, `docs/plans/`, and `agent/` rather than in ad-hoc scratch files.
+- Agent guidance should live in `AGENTS.md`, `webapp/AGENTS.md`, and `agent/` rather than in ad-hoc scratch files.
+
+## AI Artifact Flow
+- There is a strict separation between planning, execution tasks, and scratch material.
+- Implementation plans must be stored in `agent/plans/` using `YYYY-MM-DD-<topic>-implementation-plan.md`.
+- Developer task breakdowns must be stored in `agent/tasks/` using `YYYY-MM-DD-<topic>-tasks.md`.
+- The process definition for AI-assisted development lives in `agent/process/ai-development-flow.md`.
+- `agent/` is the canonical location for AI-assisted development artifacts in this repository.
+- `docs/` is reserved for product and project documentation, not AI execution planning.
+- Do not create new top-level planning files in the repository root.
+- If a task is small, the plan may be short, but the location still stays `agent/plans/`.
+- If subagents are used, the lead agent owns the plan and task files; subagents should primarily touch code and only write into `agent/` when explicitly instructed.
+
+## Required Execution Flow
+1. Capture scope from the user request or linked issue.
+2. Write or update the implementation plan in `agent/plans/`.
+3. Derive an executable task list in `agent/tasks/` from the approved plan when task slicing is useful.
+4. Execute code changes in the worktree or subagent worktrees.
+5. Store review notes, findings, screenshots, and MR text in `agent/`.
+6. Reflect durable user-facing behavior changes in `README.md` or other permanent docs.
+7. Verify with the relevant build, test, or lint commands before claiming completion.
 
 ## Build, Test, and Development Commands
 - `./gradlew bootRun`  
@@ -80,7 +101,10 @@
 - `gradle/libs.versions.toml`
 - `.github/workflows/**`
 - `.codex/**`
-- Use `docs/plans/` for execution plans and `agent/` for implementation notes or review artifacts.
+- `agent/plans/**`
+- `agent/tasks/**`
+- `agent/process/**`
+- Use `agent/plans/` for implementation plans, `agent/tasks/` for task slicing, `agent/process/` for the process definition, and `agent/` for implementation notes or review artifacts.
 
 ## Security & Configuration Tips
 - Never commit real credentials or tokens.

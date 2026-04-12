@@ -23,6 +23,15 @@ To change configuration parameters the corresponding configuration values have t
 For details check the Spring Boot (http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config)
 and docker documentation (https://docs.docker.com/engine/reference/run/#env-environment-variables).
 
+## Feature Documentation
+
+The durable feature documentation lives under `docs/features/`.
+
+- Overview: [docs/features/features-overview.md](docs/features/features-overview.md)
+- Frontend: [docs/features/frontend-features.md](docs/features/frontend-features.md)
+- Backend: [docs/features/backend-features.md](docs/features/backend-features.md)
+- Operations and security: [docs/features/operations-and-security-features.md](docs/features/operations-and-security-features.md)
+
 > [!NOTE]
 > Starting with version 2.6.0 the Docker image is based on `bellsoft/liberica-runtime-container:jdk-25-slim-musl` (Alpaquita Linux with musl libc).
 > This change significantly reduces the image size and improves startup performance.
@@ -65,6 +74,11 @@ This repository ships with a project-scoped Codex setup under `.codex/` so agent
 - Sandbox network access is enabled so Gradle/npm based build and test commands can run without interactive permission loops.
 - `.codex/rules/dev.rules` allows normal local development flows such as `git worktree add` while keeping `git commit` interactive and blocking `git push`.
 - Agent-specific repo guidance lives in `AGENTS.md` and `webapp/AGENTS.md`.
+- The required artifact flow is documented in `agent/process/ai-development-flow.md`.
+- Implementation plans belong in `agent/plans/`.
+- Developer task lists belong in `agent/tasks/`.
+- Scratch notes, review findings, screenshots, and MR drafts belong in `agent/`.
+- `docs/` remains reserved for durable documentation rather than AI execution artifacts.
 
 Restart Codex after changing `.codex/config.toml` or `.codex/rules/*.rules`, because those files are loaded when a session starts.
 
