@@ -8,7 +8,7 @@ This document describes the server-side behavior that matters to integrators, ba
 
 - Fake SMTP Server runs its SMTP listener in the same Spring Boot process as the web application.
 - The default SMTP port is `8025`.
-- The SMTP server can bind to all interfaces or to a configured bind address.
+- The SMTP server can bind to all interfaces or to a configured `bindAddress`.
 - SMTP worker execution can use virtual threads when enabled in the runtime.
 - STARTTLS support is optional.
 - When TLS is enabled and no explicit protocol override is configured, the SMTP server enables `TLSv1.3` and `TLSv1.2` by default.
@@ -31,16 +31,21 @@ This document describes the server-side behavior that matters to integrators, ba
   - `STARTTLS`
   - `VRFY`
   - `EXPN`
+- `EHLO` always advertises `8BITMIME` and conditionally advertises:
+  - `SIZE <bytes>` when a maximum message size is configured,
+  - `STARTTLS` when TLS is enabled,
+  - `AUTH <mechanisms>` when SMTP authentication is configured.
 - `VRFY` is intentionally disabled and returns `502 VRFY command is disabled`.
 - `EXPN` is intentionally disabled and returns `502 EXPN command is disabled`.
-- When `requireTLS` is active, the command wrappers enforce TLS before SMTP operations that should not proceed on an unprotected session.
-- When SMTP authentication is required, the command wrappers enforce authentication before mail-submission commands proceed.
+- `STARTTLS` rejects parameters with `501 Syntax error (no parameters allowed)`, returns `454 TLS not supported` when TLS is disabled, and returns `220 Ready to start TLS` before the handshake when TLS is available.
+- When `requireTLS` is active, the command wrappers enforce TLS before protocol steps such as `HELO`, `MAIL`, `RCPT`, `DATA`, and `HELP` proceed on an unprotected session.
+- When SMTP authentication is required, the command wrappers enforce authentication before mail-submission commands proceed and return `530 5.7.0 Authentication required` until the session authenticates.
 
 ## Message Acceptance And Filtering
 
 - Recipient blocking happens at SMTP acceptance time:
-  - blocked recipients are rejected before delivery processing starts.
-- Sender/recipient regex filters are applied after the raw SMTP payload has been received.
+  - `blockedRecipientAddresses` are rejected before delivery processing starts.
+- Sender/recipient regex filters from `filteredEmailRegexList` are applied after the raw SMTP payload has been received.
 - Filtered messages are ignored rather than persisted.
 - Ignored messages do not continue into storage, SSE notification, or forwarding.
 
@@ -50,6 +55,7 @@ This document describes the server-side behavior that matters to integrators, ba
 - The conversion layer supports:
   - plain-text messages,
   - HTML messages,
+  - top-level `application/octet-stream` payloads treated as regular message content,
   - `multipart/alternative`,
   - `multipart/mixed`,
   - `multipart/related`,
@@ -61,7 +67,7 @@ This document describes the server-side behavior that matters to integrators, ba
 
 ## Attachment And Inline Image Limits
 
-- The backend enforces a separate maximum size for attachments and inline images.
+- The backend reuses the configured `max-attachment-size` limit for both attachments and inline images; there is no separate inline-image size setting.
 - Oversized parts are skipped rather than truncated.
 - When a part is skipped, the email itself remains persisted and visible in the UI and API.
 - Skipped parts are marked with:
@@ -144,8 +150,9 @@ This document describes the server-side behavior that matters to integrators, ba
 
 - The application enforces a maximum retained email count through a scheduled retention job.
 - The retention job runs on a configurable fixed delay and initial delay.
-- When the stored email count exceeds the configured limit, the oldest emails are removed.
+- When the stored email count exceeds the configured limit, the oldest emails are removed. Retention ordering is deterministic: newer `received_on` values win, and equal timestamps are tie-broken by descending email ID.
 - Full deletion of all emails uses explicit batch deletes for attachments, content, inline images, and finally emails.
+- Bulk deletion is transactional. If cleanup of one dependent table fails, the delete request rolls back and leaves the full email graph intact.
 - Single-email deletion is flushed immediately after delete so the repository state is consistent for subsequent reads.
 
 ## Realtime Integration
@@ -153,6 +160,12 @@ This document describes the server-side behavior that matters to integrators, ba
 - After a message is saved, the backend publishes an `email-received` event through the SSE emitter service.
 - This lets the frontend invalidate and refetch the inbox without polling.
 - SSE emitter lifecycle management also cleans up dead or timed-out connections on the server side.
+
+## Backend-Side Observability
+
+- The backend publishes Micrometer counters for `messages.delivered` and `messages.blocked` through message-listener instrumentation.
+- These counters are generated entirely on the server side; the current browser UI does not expose them directly.
+- Operator-facing details such as metric names and optional address tags are described in [operations and security features](./operations-and-security-features.md).
 
 ## Optional Forwarding
 

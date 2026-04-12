@@ -12,9 +12,12 @@ This document describes the runtime, security, and operator-facing behavior of F
 - The application enables graceful shutdown and configures a short shutdown-phase timeout.
 - The default runtime profile keeps the H2 console disabled.
 - The `develop` profile enables:
-  - Web UI authentication,
+  - `fakesmtp.webapp.authentication.enabled=true`,
+  - seeded Web UI credentials for local use,
+  - `concurrent-sessions=2`,
+  - a shorter Web UI session timeout,
+  - localhost rate-limit whitelisting,
   - the H2 console,
-  - shorter Web UI session defaults,
   - operator-friendly local development settings.
 
 ## Web UI Authentication
@@ -27,6 +30,8 @@ This document describes the runtime, security, and operator-facing behavior of F
 - When `enabled=false`, username and password must not be configured.
 - The authenticated Web UI user is backed by an in-memory Spring Security user.
 - Concurrent session count is configurable and defaults to `1`.
+- The configured value is passed through to Spring Security's `maximumSessions(...)` with `maxSessionsPreventsLogin(false)`, so it does not turn into a hard login rejection gate.
+- Current property validation also accepts `-1` as unlimited concurrent sessions.
 
 ## Public And Protected Surfaces
 
@@ -40,6 +45,7 @@ This document describes the runtime, security, and operator-facing behavior of F
 - `/api/emails/events` also requires an authenticated session when authentication is enabled.
 - Swagger UI and OpenAPI documents remain reachable without login.
 - The H2 console remains reachable without login when it is enabled.
+- When Web UI authentication is disabled, `/api/auth/login` is not an active login surface and returns `404`.
 - Actuator uses a separate security chain:
   - `/actuator/health` and `/actuator/info` are public,
   - other exposed Actuator endpoints require authentication.
@@ -76,7 +82,7 @@ This document describes the runtime, security, and operator-facing behavior of F
   - localhost whitelisting enabled,
   - proxy-header trust disabled.
 - Rate limiting applies to the login endpoint rather than to unrelated API routes.
-- Failed login attempts emit the `X-RateLimit-Remaining` response header.
+- Login responses that participate in rate limiting emit the `X-RateLimit-Remaining` response header on both successful and failed attempts. The value reflects the remaining budget before the current attempt is committed.
 - When a client exceeds the configured limit, the login endpoint returns:
   - HTTP `429 Too Many Requests`
   - `Retry-After`
@@ -98,13 +104,22 @@ This document describes the runtime, security, and operator-facing behavior of F
 
 ## TLS And SMTP Authentication
 
-- SMTP AUTH support is optional and can be configured with username and password.
+- SMTP AUTH support is optional and is configured under `fakesmtp.authentication.*`.
 - SMTP authentication being configured does not by itself mean that authentication is enforced for every SMTP session.
+- When SMTP authentication is configured, `EHLO` advertises `AUTH <mechanisms>` and the server enables authenticated submission flows for SMTP clients.
 - SMTP AUTH command lines are redacted in debug logs so credentials are not written to logs verbatim.
 - STARTTLS support is optional.
 - `requireTLS` can be used to require a TLS handshake before protected SMTP commands proceed.
+- `EHLO` advertises `STARTTLS` only when TLS is enabled, and `STARTTLS` itself rejects parameters and reports `454 TLS not supported` when TLS is unavailable.
 - When no explicit protocol override is configured, STARTTLS enables `TLSv1.3` and `TLSv1.2`.
 - You can narrow the protocol list explicitly if compatibility testing requires it.
+
+## SMTP Runtime Controls
+
+- `bindAddress` can restrict the SMTP listener to a specific local interface instead of binding on all interfaces.
+- `blockedRecipientAddresses` rejects matching recipients during SMTP acceptance rather than after storage.
+- `filteredEmailRegexList` ignores matching messages after the raw payload has been received, so they are not persisted, forwarded, or published over SSE.
+- `forwardEmails` enables optional forwarding of accepted messages to an upstream mail system in addition to local capture.
 
 ## Metrics
 
@@ -115,6 +130,7 @@ This document describes the runtime, security, and operator-facing behavior of F
 - Address tags can be enabled explicitly with `fakesmtp.metrics.include-address-tags=true`.
 - Blocked-message metrics are incremented when a recipient is rejected by the blocklist.
 - Delivered-message metrics are incremented when a message is accepted for delivery processing.
+- These counters are backend-side observability features; the current browser UI does not surface them directly.
 
 ## Operational Behavior Worth Noting
 

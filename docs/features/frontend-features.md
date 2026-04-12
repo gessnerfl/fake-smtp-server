@@ -23,12 +23,14 @@ This document describes the user-facing behavior of the React/Vite web UI. It fo
 ## Authentication And Login UX
 
 - The login form is rendered only when the backend reports `authenticationEnabled = true` and the Redux auth state is not authenticated.
+- Before the login form is shown at all, the shell keeps rendering `Loading...` until `GET /api/meta-data` has resolved.
 - The form contains username and password fields and disables the submit button until both fields are populated.
 - During sign-in, the submit button switches from `Sign In` to `Signing In...` and stays disabled.
 - A successful login:
   - submits `POST /api/auth/login` as `application/x-www-form-urlencoded`,
   - refetches `/api/meta-data`,
   - marks the client as authenticated.
+- State-changing browser requests rely on the `XSRF-TOKEN` cookie and `X-XSRF-TOKEN` header pair; the full CSRF/session contract is described in [operations and security features](./operations-and-security-features.md).
 - Login errors are normalized into user-facing messages:
   - `401` or equivalent unauthorized failures become `Invalid username or password. Please try again.`
   - fetch/network failures become `Network error. Please check your connection.`
@@ -54,6 +56,12 @@ This document describes the user-facing behavior of the React/Vite web UI. It fo
 - The indicator also animates:
   - a short pulse on heartbeat events,
   - a longer, stronger pulse when a new email event arrives.
+- If the SSE stream fails with `401` or `403`, the client closes the stream, clears local auth state, and falls back to the logged-out UX instead of retrying forever with an invalid session.
+- Reconnect behavior is not immediate polling:
+  - the client tracks heartbeat freshness,
+  - treats missing heartbeats as unhealthy after roughly twice the configured heartbeat interval or at least 60 seconds,
+  - reconnects with exponential backoff plus small random jitter,
+  - stops after 10 consecutive reconnect attempts unless a later successful connection resets the retry counter.
 
 ## Session Timeout And Revalidation
 
@@ -88,7 +96,7 @@ This document describes the user-facing behavior of the React/Vite web UI. It fo
   - `page`
   - `pageSize`
 - This makes inbox views shareable and reload-stable.
-- `pageSize` accepts the default sizes `10`, `25`, `50`, and `100`. If a custom size is present in the URL, it is preserved in the selector as long as it is not above `100`.
+- `pageSize` accepts the default sizes `10`, `25`, `50`, and `100`. If a custom numeric size is present in the URL, it is preserved in the selector; values above `100` are clamped down to `100`.
 - Email loading is skipped until the bootstrap meta-data is known and, when authentication is enabled, until the user is authenticated.
 - The inbox grid shows the columns:
   - `ID`
@@ -125,7 +133,7 @@ This document describes the user-facing behavior of the React/Vite web UI. It fo
 
 - The direct detail route `/emails/:id` renders a standalone detail card for one email.
 - The page header includes a close button that returns to `/`.
-- If the route parameter is missing or the email cannot be loaded, the page shows a blocking error alert instead of a partial card.
+- The direct detail route currently has no dedicated loading placeholder. Until the fetch returns data, the page falls back to the same blocking error alert that is also used when the route parameter is missing or the email cannot be loaded.
 - The card itself is composed from:
   - a header section with the email metadata,
   - a content section with tabs,
