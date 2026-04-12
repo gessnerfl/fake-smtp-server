@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 import Tooltip from '@mui/material/Tooltip';
 import CircleIcon from '@mui/icons-material/Circle';
 import './navigation.scss'
@@ -23,6 +24,7 @@ function Navigation() {
     const [logout] = useLogoutMutation();
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
     const [lastPingSeconds, setLastPingSeconds] = useState<number>(0);
+    const [logoutError, setLogoutError] = useState<string | null>(null);
 
     // Animation state
     const [isPulsing, setIsPulsing] = useState(false);
@@ -87,12 +89,22 @@ function Navigation() {
         return () => clearInterval(interval);
     }, []);
 
-    const handleLogout = () => {
-        logout()
-            .unwrap()
-            .catch(() => undefined)
-            .finally(() => dispatch(clearAuthentication()));
+    const handleLogout = async () => {
+        setLogoutError(null);
+
+        try {
+            await logout().unwrap();
+            dispatch(clearAuthentication());
+        } catch {
+            setLogoutError('Logout failed. Please try again.');
+        }
     };
+
+    useEffect(() => {
+        if (!data?.authenticationEnabled || !isAuthenticated) {
+            setLogoutError(null);
+        }
+    }, [data?.authenticationEnabled, isAuthenticated]);
 
     const getStatusColor = () => {
         switch (connectionStatus) {
@@ -176,6 +188,11 @@ function Navigation() {
                     )}
 
                     <Typography variant="overline" component="div" sx={{ mr: 2 }}><span>Version:&nbsp;</span><span>{data?.version}</span></Typography>
+                    {logoutError && (
+                        <Alert severity="error" sx={{ mr: 2, py: 0.5 }}>
+                            {logoutError}
+                        </Alert>
+                    )}
                     {data?.authenticationEnabled && isAuthenticated && (
                         <Button color="inherit" onClick={handleLogout}>Logout</Button>
                     )}

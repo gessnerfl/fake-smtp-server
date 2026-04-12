@@ -4,12 +4,11 @@ import { clearAuthentication } from "../store/auth-slice";
 import { RootState } from "../store/store";
 import {
   clearAuthSessionStorage,
-  loadLastActivity,
   persistLastActivity,
   persistSessionTimeoutMs,
   resolveSessionTimeoutMs
 } from "../store/auth-session";
-import { useGetMetaDataQuery, useLogoutMutation } from "../store/rest-api";
+import { useGetMetaDataQuery } from "../store/rest-api";
 
 const ACTIVITY_EVENTS = [
   "mousemove",
@@ -19,72 +18,118 @@ const ACTIVITY_EVENTS = [
   "touchstart",
   "focus",
 ];
+const ACTIVITY_REVALIDATION_THROTTLE_MS = 5_000;
 
 const SessionTimeoutManager: React.FC = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const { data } = useGetMetaDataQuery();
+  const { data, refetch } = useGetMetaDataQuery();
   const dispatch = useDispatch();
-  const [logout] = useLogoutMutation();
   const timeoutRef = useRef<number | null>(null);
+  const revalidationInFlightRef = useRef(false);
+  const lastActivityCheckRef = useRef(0);
   const sessionTimeoutMs = resolveSessionTimeoutMs(data?.sessionTimeoutMinutes);
 
-  const triggerLogout = useCallback(() => {
-    logout()
-      .unwrap()
-      .catch(() => undefined)
-      .finally(() => dispatch(clearAuthentication()));
-  }, [dispatch, logout]);
-
-  const clearLogoutTimer = () => {
+  const clearSessionTimer = useCallback(() => {
     if (timeoutRef.current !== null) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+  }, []);
+
+  const clearSessionState = useCallback(() => {
+    clearSessionTimer();
+    lastActivityCheckRef.current = 0;
+    dispatch(clearAuthentication());
+    clearAuthSessionStorage();
+  }, [clearSessionTimer, dispatch]);
+
+  const isAuthFailure = (error: unknown): boolean => {
+    if (typeof error !== "object" || error === null || !("status" in error)) {
+      return false;
+    }
+
+    const status = (error as { status: unknown }).status;
+    return status === 401 || status === 403;
   };
 
-  const scheduleLogout = (delayMs: number) => {
-    clearLogoutTimer();
+  const revalidateSession = useCallback(async (reason: "activity" | "visibility" | "timer") => {
+    if (revalidationInFlightRef.current) {
+      return;
+    }
+
+    if (reason === "activity") {
+      const now = Date.now();
+      if (now - lastActivityCheckRef.current < ACTIVITY_REVALIDATION_THROTTLE_MS) {
+        return;
+      }
+      lastActivityCheckRef.current = now;
+    }
+
+    revalidationInFlightRef.current = true;
+
+    try {
+      const metaData = await refetch().unwrap();
+      if (metaData.authenticated === false) {
+        clearSessionState();
+      } else {
+        const refreshedTimeoutMs = resolveSessionTimeoutMs(metaData.sessionTimeoutMinutes);
+        const now = Date.now();
+
+        persistLastActivity(now);
+        persistSessionTimeoutMs(refreshedTimeoutMs);
+        clearSessionTimer();
+        timeoutRef.current = window.setTimeout(() => {
+          void revalidateSession("timer");
+        }, refreshedTimeoutMs);
+      }
+    } catch (error) {
+      if (isAuthFailure(error)) {
+        clearSessionState();
+      }
+    } finally {
+      revalidationInFlightRef.current = false;
+    }
+  }, [clearSessionState, clearSessionTimer, refetch]);
+
+  const scheduleSessionCheck = useCallback((delayMs: number) => {
+    clearSessionTimer();
     timeoutRef.current = window.setTimeout(() => {
-      triggerLogout();
+      void revalidateSession("timer");
     }, delayMs);
-  };
+  }, [clearSessionTimer, revalidateSession]);
 
-  const handleActivity = () => {
+  const handleActivity = useCallback(() => {
     if (!isAuthenticated) {
       return;
     }
-    const now = Date.now();
-    const lastActivity = loadLastActivity();
-    if (lastActivity !== null && now - lastActivity >= sessionTimeoutMs) {
-      triggerLogout();
-      return;
-    }
-    persistLastActivity(now);
-    scheduleLogout(sessionTimeoutMs);
-  };
+    void revalidateSession("activity");
+  }, [isAuthenticated, revalidateSession]);
 
   useEffect(() => {
     if (!isAuthenticated || typeof window === "undefined") {
-      clearLogoutTimer();
+      clearSessionTimer();
       clearAuthSessionStorage();
       return undefined;
     }
 
-    const now = Date.now();
-    const lastActivity = loadLastActivity();
-    if (lastActivity !== null && now - lastActivity >= sessionTimeoutMs) {
-      triggerLogout();
+    if (!data) {
       return undefined;
     }
 
-    persistLastActivity(lastActivity ?? now);
+    if (data.authenticated === false) {
+      clearSessionState();
+      return undefined;
+    }
+
+    const now = Date.now();
+    lastActivityCheckRef.current = 0;
+    persistLastActivity(now);
     persistSessionTimeoutMs(sessionTimeoutMs);
-    const remaining = Math.max(sessionTimeoutMs - (now - (lastActivity ?? now)), 0);
-    scheduleLogout(remaining);
+    scheduleSessionCheck(sessionTimeoutMs);
 
     const onVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        handleActivity();
+        void revalidateSession("visibility");
       }
     };
 
@@ -98,9 +143,9 @@ const SessionTimeoutManager: React.FC = () => {
         window.removeEventListener(eventName, handleActivity);
       });
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      clearLogoutTimer();
+      clearSessionTimer();
     };
-  }, [dispatch, isAuthenticated, sessionTimeoutMs, triggerLogout, data]);
+  }, [clearSessionState, clearSessionTimer, data, handleActivity, isAuthenticated, revalidateSession, scheduleSessionCheck, sessionTimeoutMs]);
 
   return null;
 };

@@ -48,7 +48,8 @@ public class MetaDataController {
                 buildProperties.getVersion(),
                 authProperties.isAuthenticationEnabled(),
                 isAuthenticated(authentication),
-                sessionProperties.getSessionTimeoutMinutes()
+                sessionProperties.getSessionTimeoutMinutes(),
+                sessionProperties.getSseHeartbeatIntervalSeconds()
         );
     }
 

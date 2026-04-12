@@ -333,8 +333,8 @@ If authentication is disabled, the web interface and API endpoints remain access
 When authentication is enabled:
 - The web interface will show a custom login form
 - API endpoints require an authenticated session (the UI shell is public only to render the login form; it does not include email data)
-- A logout button will be available in the navigation bar
-- The Web UI session expires after 10 minutes of inactivity and logs the user out by default; configure the timeout with `FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES` (maximum: 1440 minutes / 24 hours)
+- A logout button will be available in the navigation bar. If a logout request fails, the UI keeps the local authenticated state and shows the failure instead of clearing the session optimistically.
+- The Web UI session expires after 10 minutes of inactivity by default; configure the timeout with `FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES` (maximum: 1440 minutes / 24 hours). The browser timer is only a trigger: the UI revalidates the server session on timeout, activity checkpoints, and tab visibility changes before refreshing the local session state.
 - By default, logging in from a different browser invalidates the existing session (single session per user). To allow multiple concurrent sessions from different browsers/devices with the same credentials, set `FAKESMTP_WEBAPP_AUTHENTICATION_CONCURRENT_SESSIONS` to a value greater than 1 (e.g., 5). Default is 1 (secure behavior for production). Set to -1 to allow unlimited concurrent sessions (useful for development)
 - SSE heartbeat interval can be configured with `FAKESMTP_WEBAPP_SSE_HEARTBEAT_INTERVAL_SECONDS` (default: 30s) to prevent proxy timeouts
 - The following endpoints are protected and require authentication:
@@ -390,6 +390,8 @@ fakesmtp:
 ### API Clients & CSRF
 
 When Web UI authentication is enabled, the server issues an HttpOnly session cookie after a successful login (`POST /api/auth/login` with form fields `username` and `password`). State-changing API requests (`POST`, `PUT`, `DELETE`) must include the `X-XSRF-TOKEN` header, which matches the `XSRF-TOKEN` cookie set by the server (use `GET /api/meta-data` to obtain it). Logging out is handled via `POST /api/auth/logout`.
+
+If the UI cannot load `/api/meta-data`, protected content is not rendered. Instead, the shell shows an explicit error state with a retry action until the application state can be reloaded.
     
 
 ## Real-Time Email Notifications
@@ -418,7 +420,7 @@ When Web UI Authentication is enabled, the SSE connection is only established af
 The SSE implementation includes a server-sent heartbeat mechanism to ensure connection reliability:
 
 - **Server-Sent Heartbeat**: The server sends a ping event every 30 seconds (configurable via `FAKESMTP_WEBAPP_SSE_HEARTBEAT_INTERVAL_SECONDS`)
-- **Client Health Check**: The client monitors heartbeat reception and automatically reconnects if no ping is received within 60 seconds
+- **Client Health Check**: The client monitors heartbeat reception and automatically reconnects if no ping is received within `max(2 x heartbeat interval, 60s)`, so larger configured heartbeat intervals do not trigger premature reconnects
 - **Proxy Compatibility**: Heartbeats prevent connection timeouts when running behind proxies or load balancers
 - **Connection Status UI**: A visual indicator in the navigation bar shows the current connection state (green: connected, yellow: reconnecting, red: disconnected)
 - **Automatic Reconnection**: The client uses exponential backoff with jitter (up to 30s) when attempting to reconnect

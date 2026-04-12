@@ -82,6 +82,7 @@ const isAuthFailure = (status?: number): boolean => status === 401 || status ===
 const BASE_SSE_RETRY_DELAY_MS = 1000;
 const MAX_SSE_RETRY_DELAY_MS = 30000;
 const MAX_SSE_RETRY_COUNT = 10;
+type EmailEventSourceConfig = Pick<MetaData, "authenticationEnabled" | "sseHeartbeatIntervalSeconds">;
 let sseRetryCount = 0;
 let sseRetryTimer: number | null = null;
 
@@ -97,7 +98,20 @@ const resetSseRetry = () => {
   clearSseRetryTimer();
 };
 
-const scheduleSseReconnect = (store: any, authenticationEnabled?: boolean) => {
+const resolveSseConfig = (
+  config?: EmailEventSourceConfig | boolean
+): { authenticationEnabled?: boolean; heartbeatSeconds: number } => {
+  if (typeof config === "boolean") {
+    return { authenticationEnabled: config, heartbeatSeconds: 30 };
+  }
+
+  return {
+    authenticationEnabled: config?.authenticationEnabled,
+    heartbeatSeconds: config?.sseHeartbeatIntervalSeconds ?? 30,
+  };
+};
+
+const scheduleSseReconnect = (store: any, config?: EmailEventSourceConfig | boolean) => {
   if (typeof window === "undefined") {
     return;
   }
@@ -115,7 +129,7 @@ const scheduleSseReconnect = (store: any, authenticationEnabled?: boolean) => {
   sseRetryCount += 1;
   sseRetryTimer = window.setTimeout(() => {
     sseRetryTimer = null;
-    setupEmailEventSource(store, authenticationEnabled);
+    setupEmailEventSource(store, config);
   }, delay);
 };
 
@@ -350,9 +364,10 @@ export const restApi = createApi({
   }),
 })
 
-export const setupEmailEventSource = (store: any, authenticationEnabled?: boolean) => {
+export const setupEmailEventSource = (store: any, config?: EmailEventSourceConfig | boolean) => {
   const state = store.getState() as RootState;
   const {isAuthenticated} = state.auth;
+  const {authenticationEnabled, heartbeatSeconds} = resolveSseConfig(config);
 
   const shouldConnect = authenticationEnabled === false || isAuthenticated;
 
@@ -403,7 +418,7 @@ export const setupEmailEventSource = (store: any, authenticationEnabled?: boolea
 
   // Heartbeat tracking
   let lastPingTimestamp = Date.now();
-  const HEALTHY_TIMEOUT_MS = 60000; // 60s without ping = reconnect
+  const healthyTimeoutMs = Math.max(heartbeatSeconds * 2_000, 60_000);
   let healthCheckInterval: number | null = null;
 
   const pingListener = (event: MessageEvent<string>) => {
@@ -422,12 +437,12 @@ export const setupEmailEventSource = (store: any, authenticationEnabled?: boolea
     
     healthCheckInterval = window.setInterval(() => {
       const timeSinceLastPing = Date.now() - lastPingTimestamp;
-      if (timeSinceLastPing > HEALTHY_TIMEOUT_MS) {
+      if (timeSinceLastPing > healthyTimeoutMs) {
         console.warn("SSE heartbeat timeout after " + (timeSinceLastPing / 1000) + "s - reconnecting");
         resetSseRetry();
         eventSource.close();
         window.emailEventSource = undefined;
-        scheduleSseReconnect(store, authenticationEnabled);
+        scheduleSseReconnect(store, config);
       }
     }, 10000); // Check every 10s
   };
@@ -482,7 +497,7 @@ export const setupEmailEventSource = (store: any, authenticationEnabled?: boolea
       if (eventSource.readyState !== closedState) {
         eventSource.close();
       }
-      scheduleSseReconnect(store, authenticationEnabled);
+      scheduleSseReconnect(store, config);
     }
   };
 

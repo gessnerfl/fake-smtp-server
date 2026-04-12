@@ -37,37 +37,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub release and upload assets
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
           body: ${{ steps.release_notes.outputs.changelog }}
-          draft: false
-          prerelease: false
-
-      - name: Upload application jar
-        uses: actions/upload-release-asset@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/libs/fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}.jar
-          asset_name: fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}.jar
-          asset_content_type: application/java-archive
-
-      - name: Upload sources jar
-        uses: actions/upload-release-asset@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/libs/fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-sources.jar
-          asset_name: fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-sources.jar
-          asset_content_type: application/java-archive
+          files: |
+            ./build/libs/fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}.jar
+            ./build/libs/fake-smtp-server-${{ steps.get_version.outputs.APP_VERSION }}-sources.jar
 
       - name: Setup Login to DockerHub
         run: |

@@ -43,10 +43,12 @@ class MetaDataControllerTest {
         final var version = "app-version";
         final var authEnabled = true;
         final var timeoutMinutes = 10;
+        final var heartbeatSeconds = 30;
 
         when(buildProperties.getVersion()).thenReturn(version);
         when(authProperties.isAuthenticationEnabled()).thenReturn(authEnabled);
         when(sessionProperties.getSessionTimeoutMinutes()).thenReturn(timeoutMinutes);
+        when(sessionProperties.getSseHeartbeatIntervalSeconds()).thenReturn(heartbeatSeconds);
 
         MetaDataController sut = new MetaDataController(buildProperties, authProperties, csrfTokenRepository, sessionProperties);
 
@@ -58,8 +60,10 @@ class MetaDataControllerTest {
         assertEquals(authEnabled, meta.isAuthenticationEnabled());
         assertTrue(meta.isAuthenticated());
         assertEquals(timeoutMinutes, meta.getSessionTimeoutMinutes());
+        assertEquals(heartbeatSeconds, meta.getSseHeartbeatIntervalSeconds());
         verify(buildProperties).getVersion();
         verify(authProperties).isAuthenticationEnabled();
+        verify(sessionProperties).getSseHeartbeatIntervalSeconds();
     }
 
     @Test
@@ -67,10 +71,12 @@ class MetaDataControllerTest {
         final var version = "app-version";
         final var authEnabled = false;
         final var timeoutMinutes = 15;
+        final var heartbeatSeconds = 45;
 
         when(buildProperties.getVersion()).thenReturn(version);
         when(authProperties.isAuthenticationEnabled()).thenReturn(authEnabled);
         when(sessionProperties.getSessionTimeoutMinutes()).thenReturn(timeoutMinutes);
+        when(sessionProperties.getSseHeartbeatIntervalSeconds()).thenReturn(heartbeatSeconds);
 
         MetaDataController sut = new MetaDataController(buildProperties, authProperties, csrfTokenRepository, sessionProperties);
 
@@ -80,7 +86,9 @@ class MetaDataControllerTest {
         assertEquals(authEnabled, meta.isAuthenticationEnabled());
         assertFalse(meta.isAuthenticated());
         assertEquals(timeoutMinutes, meta.getSessionTimeoutMinutes());
+        assertEquals(heartbeatSeconds, meta.getSseHeartbeatIntervalSeconds());
         verify(buildProperties).getVersion();
         verify(authProperties).isAuthenticationEnabled();
+        verify(sessionProperties).getSseHeartbeatIntervalSeconds();
     }
 }

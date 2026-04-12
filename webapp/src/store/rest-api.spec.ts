@@ -51,6 +51,33 @@ describe('setupEmailEventSource', () => {
     expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
   });
 
+  it('delays heartbeat reconnects until the configured healthy timeout is exceeded', async () => {
+    jest.useFakeTimers();
+    const pendingFetch = new Promise<Response>(() => undefined);
+    const fetchSpy = jest.spyOn(global, 'fetch').mockImplementation(() => pendingFetch);
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    setupEmailEventSource(createStore(), {
+      authenticationEnabled: true,
+      sseHeartbeatIntervalSeconds: 40,
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(70_000);
+    await flushMicrotasks();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(20_000);
+    await flushMicrotasks();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(1_500);
+    await flushMicrotasks();
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  });
+
   it('reconnects authenticated SSE stream after retry delay', () => {
     jest.useFakeTimers();
     const pendingFetch = new Promise<Response>(() => undefined);

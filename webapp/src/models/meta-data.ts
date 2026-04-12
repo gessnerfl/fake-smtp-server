@@ -3,4 +3,5 @@ export interface MetaData {
     authenticationEnabled: boolean
     authenticated?: boolean
     sessionTimeoutMinutes?: number
+    sseHeartbeatIntervalSeconds?: number
 }

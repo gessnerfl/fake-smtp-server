@@ -44,43 +44,40 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
         
         String clientIp = extractClientIp(request);
-        
-        if (!rateLimiter.isAllowed(clientIp)) {
+
+        InMemoryRateLimiter.AttemptReservation reservation = rateLimiter.reserveLoginAttempt(clientIp);
+        if (reservation.blocked()) {
             logger.warn("Rate limit exceeded for IP: {} on path: {}", clientIp, request.getRequestURI());
-            
-            long retryAfterSeconds = rateLimiter.getSecondsUntilReset(clientIp);
-            long retryAfter = retryAfterSeconds > 0 ? retryAfterSeconds : properties.getWindowMinutes() * 60L;
-            
-            response.setStatus(429);
-            response.setHeader(RETRY_AFTER_HEADER, String.valueOf(retryAfter));
-            response.setHeader(RATE_LIMIT_REMAINING_HEADER, "0");
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\":\"Too many requests. Please try again later.\"}");
+            writeTooManyRequests(response, reservation.retryAfterSeconds());
             return;
         }
-        
-        int remainingAttempts = rateLimiter.getRemainingAttempts(clientIp);
-        if (remainingAttempts < Integer.MAX_VALUE) {
-            response.setHeader(RATE_LIMIT_REMAINING_HEADER, String.valueOf(remainingAttempts));
-        }
-        
-        filterChain.doFilter(request, response);
-        
-        if (response.getStatus() == LOGIN_FAILED_STATUS) {
-            InMemoryRateLimiter.FailedAttemptResult failedAttemptResult = rateLimiter.recordFailedAttempt(clientIp);
-            if (failedAttemptResult.shouldBlockCurrentRequest() && !response.isCommitted()) {
-                long retryAfter = failedAttemptResult.retryAfterSeconds() > 0
-                        ? failedAttemptResult.retryAfterSeconds()
-                        : properties.getWindowMinutes() * 60L;
 
-                response.resetBuffer();
-                response.setStatus(429);
-                response.setHeader(RETRY_AFTER_HEADER, String.valueOf(retryAfter));
-                response.setHeader(RATE_LIMIT_REMAINING_HEADER, "0");
-                response.setContentType("application/json");
-                response.getWriter().write("{\"error\":\"Too many requests. Please try again later.\"}");
+        if (reservation.remainingAttempts() < Integer.MAX_VALUE) {
+            response.setHeader(RATE_LIMIT_REMAINING_HEADER, String.valueOf(reservation.remainingAttempts()));
+        }
+
+        boolean failedLogin = false;
+        try {
+            filterChain.doFilter(request, response);
+            failedLogin = response.getStatus() == LOGIN_FAILED_STATUS;
+            if (failedLogin) {
+                rateLimiter.commitFailedAttempt(reservation);
+            }
+        } finally {
+            if (!failedLogin) {
+                rateLimiter.releaseAttempt(reservation);
             }
         }
+    }
+
+    private void writeTooManyRequests(HttpServletResponse response, long retryAfterSeconds) throws IOException {
+        long retryAfter = retryAfterSeconds > 0 ? retryAfterSeconds : properties.getWindowMinutes() * 60L;
+
+        response.setStatus(429);
+        response.setHeader(RETRY_AFTER_HEADER, String.valueOf(retryAfter));
+        response.setHeader(RATE_LIMIT_REMAINING_HEADER, "0");
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\":\"Too many requests. Please try again later.\"}");
     }
     
     private boolean isLoginRequest(HttpServletRequest request) {

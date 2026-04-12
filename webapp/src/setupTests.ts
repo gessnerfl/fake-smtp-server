@@ -133,7 +133,12 @@ export const handlers = [
         return new HttpResponse("Not found", { status: 404 })
     }),
     http.get(endpointUrl('/api/meta-data'), async () => {
-        const metaData: MetaData = { version: "local", authenticationEnabled: false, authenticated: false }
+        const metaData: MetaData = {
+            version: "local",
+            authenticationEnabled: false,
+            authenticated: false,
+            sseHeartbeatIntervalSeconds: 30
+        }
         await delay(150)
         return HttpResponse.json(metaData)
     }),

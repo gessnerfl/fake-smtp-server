@@ -27,7 +27,7 @@ describe('Shell', () => {
         expect(await screen.findByText('Shell content')).toBeInTheDocument()
     })
 
-    it('shows main content when metadata request fails', async () => {
+    it('does not render protected content when metadata request fails', async () => {
         server.use(
             http.get(endpointUrl('/api/meta-data'), async () => new HttpResponse('Backend unavailable', {status: 503}))
         );
@@ -35,6 +35,19 @@ describe('Shell', () => {
         renderShellWithOutlet();
 
         await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
-        expect(screen.getByText('Shell content')).toBeInTheDocument();
+        expect(screen.queryByText('Shell content')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
+    });
+
+    it('shows an error state when metadata request fails', async () => {
+        server.use(
+            http.get(endpointUrl('/api/meta-data'), async () => new HttpResponse('Backend unavailable', {status: 503}))
+        );
+
+        renderShellWithOutlet();
+
+        await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+        expect(screen.getByRole('alert')).toHaveTextContent(/unable to load application state/i);
+        expect(screen.queryByText('Shell content')).not.toBeInTheDocument();
     });
 })

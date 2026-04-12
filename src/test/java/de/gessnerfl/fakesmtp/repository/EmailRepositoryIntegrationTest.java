@@ -16,9 +16,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 
 import static org.hamcrest.MatcherAssert.*;
@@ -34,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class EmailRepositoryIntegrationTest {
 
     private static final Sort SORT_DESC_BY_RECEIVED_ON = Sort.by(Sort.Direction.DESC, "receivedOn");
+    private static final Sort SORT_DESC_BY_RECEIVED_ON_THEN_ID = Sort.by(Sort.Direction.DESC, "receivedOn")
+            .and(Sort.by(Sort.Direction.DESC, "id"));
     @Autowired
     private EmailRepository sut;
 
@@ -45,6 +50,9 @@ class EmailRepositoryIntegrationTest {
 
     @Autowired
     private EmailInlineImageRepository emailInlineImageRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @BeforeEach
     void init() {
@@ -133,6 +141,45 @@ class EmailRepositoryIntegrationTest {
         assertThat(emailInlineImageRepository.findAll(), empty());
     }
 
+    @Test
+    void shouldRetainTheNewestEmailsAndTheirChildrenWhenMultipleEmailsShareTheSameReceivedOnTimestamp() {
+        var receivedOn = ZonedDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.MILLIS);
+
+        var mail1 = createRandomEmailWithAllChildren(receivedOn);
+        var mail2 = createRandomEmailWithAllChildren(receivedOn);
+        var mail3 = createRandomEmailWithAllChildren(receivedOn);
+        var mail4 = createRandomEmailWithAllChildren(receivedOn);
+
+        var count = sut.deleteEmailsExceedingDateRetentionLimit(2);
+        assertEquals(2, count);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        var afterDeletion = sut.findAll(SORT_DESC_BY_RECEIVED_ON_THEN_ID);
+        assertThat(afterDeletion, hasSize(2));
+        assertThat(afterDeletion, contains(mail4, mail3));
+
+        assertThat(emailContentRepository.findAll().stream()
+                .filter(content -> content.getEmail().getId().equals(mail4.getId()))
+                .toList(), hasSize(1));
+        assertThat(emailContentRepository.findAll().stream()
+                .filter(content -> content.getEmail().getId().equals(mail3.getId()))
+                .toList(), hasSize(1));
+        assertThat(emailAttachmentRepository.findAll().stream()
+                .filter(attachment -> attachment.getEmail().getId().equals(mail4.getId()))
+                .toList(), hasSize(1));
+        assertThat(emailAttachmentRepository.findAll().stream()
+                .filter(attachment -> attachment.getEmail().getId().equals(mail3.getId()))
+                .toList(), hasSize(1));
+        assertThat(emailInlineImageRepository.findAll().stream()
+                .filter(inlineImage -> inlineImage.getEmail().getId().equals(mail4.getId()))
+                .toList(), hasSize(1));
+        assertThat(emailInlineImageRepository.findAll().stream()
+                .filter(inlineImage -> inlineImage.getEmail().getId().equals(mail3.getId()))
+                .toList(), hasSize(1));
+    }
+
     private Email createRandomEmail(int minusMinutes) {
         var randomToken = RandomStringUtils.insecure().nextAlphanumeric(6);
         var receivedOn = ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes(minusMinutes);
@@ -155,6 +202,16 @@ class EmailRepositoryIntegrationTest {
     private Email createRandomEmailWithAllChildren(int minusMinutes) {
         var randomToken = RandomStringUtils.insecure().nextAlphanumeric(6);
         var receivedOn = ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes(minusMinutes);
+
+        return createEmailWithAllChildren(randomToken, receivedOn);
+    }
+
+    private Email createRandomEmailWithAllChildren(ZonedDateTime receivedOn) {
+        var randomToken = RandomStringUtils.insecure().nextAlphanumeric(6);
+        return createEmailWithAllChildren(randomToken, receivedOn);
+    }
+
+    private Email createEmailWithAllChildren(String randomToken, ZonedDateTime receivedOn) {
 
         var content = new EmailContent();
         content.setContentType(ContentType.PLAIN);

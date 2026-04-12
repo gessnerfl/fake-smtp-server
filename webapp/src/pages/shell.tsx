@@ -2,7 +2,7 @@ import React from 'react';
 import './shell.scss';
 import Navigation from "../components/navigation";
 import {Outlet} from "react-router-dom";
-import {Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
+import {Alert, Button, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import {lightBlue, orange, yellow} from "@mui/material/colors";
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
@@ -39,7 +39,7 @@ const lightTheme = createTheme({
 function Shell() {
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch();
-    const { data, isLoading } = useGetMetaDataQuery();
+    const { data, isLoading, isError, refetch } = useGetMetaDataQuery();
 
     React.useEffect(() => {
         if (data) {
@@ -51,10 +51,10 @@ function Shell() {
     }, [data, dispatch]);
 
     const authenticationEnabled = data?.authenticationEnabled ?? false;
-    const metaDataLoadFailed = !isLoading && !data;
     const showLoading = isLoading;
-    const showLogin = !showLoading && !metaDataLoadFailed && authenticationEnabled && !isAuthenticated;
-    const showContent = !showLoading && (metaDataLoadFailed || !authenticationEnabled || isAuthenticated);
+    const showError = !showLoading && isError;
+    const showLogin = !showLoading && !showError && authenticationEnabled && !isAuthenticated;
+    const showContent = !showLoading && !showError && (!authenticationEnabled || isAuthenticated);
 
     return (
         <ThemeProvider theme={lightTheme}>
@@ -67,6 +67,20 @@ function Shell() {
                     </Container>
                 )}
                 {showLogin && <Login />}
+                {showError && (
+                    <Container className="content" maxWidth="xl">
+                        <Alert
+                            severity="error"
+                            action={(
+                                <Button color="inherit" size="small" onClick={() => refetch()}>
+                                    Retry
+                                </Button>
+                            )}
+                        >
+                            Unable to load application state. Retry to continue.
+                        </Alert>
+                    </Container>
+                )}
                 {showContent && (
                     <Container className="content" maxWidth="xl">
                         <Outlet/>
