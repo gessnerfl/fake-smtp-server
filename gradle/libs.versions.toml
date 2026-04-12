@@ -1,7 +1,7 @@
 [versions]
 # Plugins
 axion-release = "1.21.1"
-spring-boot = "4.0.2"
+spring-boot = "4.0.3"
 sonarqube = "7.2.3.7755"
 jib = "3.5.3"
 node-gradle = "7.1.0"
