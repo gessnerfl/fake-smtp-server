@@ -1,7 +1,7 @@
 [versions]
 # Plugins
 axion-release = "1.21.1"
-spring-boot = "4.0.3"
+spring-boot = "4.0.5"
 sonarqube = "7.2.3.7755"
 jib = "3.5.3"
 node-gradle = "7.1.0"
@@ -20,7 +20,7 @@ docker-base-image = "bellsoft/liberica-runtime-container:jdk-25-slim-musl"
 
 # Third-party libraries
 commons-io = "2.21.0"
-springdoc-openapi = "3.0.2"
+springdoc-openapi = "3.0.3"
 
 [libraries]
 # Spring Boot Starters
