@@ -2,9 +2,8 @@
 /bin/
 /build/
 /out/
-!gradle/wrapper/gradle-wrapper.jar
-/gradle/
 .qodana/
+.worktrees/
 dist/
 
 ### STS ###
