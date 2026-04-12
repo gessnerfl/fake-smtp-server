@@ -1,0 +1,100 @@
+# Allow isolated local worktree creation for subagent workflows.
+prefix_rule(
+    pattern = ["git", "worktree", "add"],
+    decision = "allow",
+    justification = "Creating local git worktrees is allowed for isolated Codex development.",
+    match = [
+        "git worktree add ../fake-smtp-server-task codex/task",
+        "git worktree add -b codex/task ../fake-smtp-server-task",
+    ],
+    not_match = [
+        "git worktree remove ../fake-smtp-server-task",
+    ],
+)
+
+# Allow creating local feature branches when a task explicitly needs one.
+prefix_rule(
+    pattern = ["git", "switch", "-c"],
+    decision = "allow",
+    justification = "Creating a local branch is allowed for isolated feature work.",
+    match = [
+        "git switch -c codex/example-branch",
+    ],
+    not_match = [
+        "git switch main",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "checkout", "-b"],
+    decision = "allow",
+    justification = "Creating a local branch is allowed for isolated feature work.",
+    match = [
+        "git checkout -b codex/example-branch",
+    ],
+    not_match = [
+        "git checkout main",
+    ],
+)
+
+# Allow staging only when the user later asks for a commit.
+prefix_rule(
+    pattern = ["git", "add"],
+    decision = "allow",
+    justification = "Staging files is allowed, but commits still require explicit approval.",
+    match = [
+        "git add README.md",
+        "git add src/main/java/de/gessnerfl/fakesmtp/FakeSmtpServer.java",
+    ],
+)
+
+# Commits stay interactive and require explicit user intent.
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "prompt",
+    justification = "Writing git history requires explicit user confirmation.",
+    match = [
+        "git commit -m \"Update Codex project configuration\"",
+        "git commit --amend --no-edit",
+    ],
+)
+
+# Pushing to remotes is explicitly forbidden for agent-driven work here.
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "forbidden",
+    justification = "git push is forbidden in this repository. Stop after local changes and let the user decide how to publish them.",
+    match = [
+        "git push",
+        "git push origin HEAD",
+    ],
+)
+
+# Block destructive history rewrites and bulk cleanup.
+prefix_rule(
+    pattern = ["git", "reset"],
+    decision = "forbidden",
+    justification = "git reset rewrites local history or index state. Use git diff and targeted edits instead.",
+    match = [
+        "git reset --hard",
+        "git reset HEAD README.md",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean"],
+    decision = "forbidden",
+    justification = "git clean removes files destructively. Delete only specific generated files when the user explicitly asks for it.",
+    match = [
+        "git clean -fd",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "rebase"],
+    decision = "forbidden",
+    justification = "git rebase rewrites history and is not part of the default agent workflow in this repository.",
+    match = [
+        "git rebase main",
+    ],
+)

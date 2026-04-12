@@ -1,5 +1,12 @@
 # Repository Guidelines
 
+## Project Overview
+- Fake SMTP Server is a Spring Boot backend with a bundled React/Vite frontend.
+- Backend sources live in `src/main/java/de/gessnerfl/fakesmtp`.
+- Frontend sources live in `webapp/src`.
+- The packaged application serves both backend APIs and frontend assets from one JAR.
+- SMTP traffic is accepted on `8025`, the web UI runs on `8080`, and Actuator runs on `8081`.
+
 ## Project Structure & Module Organization
 - Backend (Spring Boot): `src/main/java/de/gessnerfl/fakesmtp`
 - Backend config/resources: `src/main/resources` (Flyway migrations in `src/main/resources/db/migration`)
@@ -7,6 +14,21 @@
 - Frontend (React + Vite + TypeScript): `webapp/src`, static files in `webapp/public`
 - Build and CI metadata: `build.gradle`, `gradle/libs.versions.toml`, `.github/workflows/*.yml`
 - Working notes for ongoing implementation: `agent/`
+
+## Codex Development Setup
+- This repository includes a project-scoped Codex configuration in `.codex/config.toml` and `.codex/rules/dev.rules`.
+- The goal is asynchronous agent work with minimal approval prompts for normal development tasks while keeping critical git operations guarded.
+- Prefer local Gradle and npm commands over the Docker wrapper scripts in `sh/` for agent work. The `sh/*` scripts start containers and are intended for manual parity checks, not default Codex execution.
+- Safe default commands for agent work are:
+- `./gradlew test`
+- `./gradlew build`
+- `./gradlew compileJava`
+- `./gradlew bootRun`
+- `./gradlew jacocoTestReport`
+- `cd webapp && npm test`
+- `cd webapp && npm run lint`
+- `cd webapp && npm run dev`
+- Agent guidance should live in `AGENTS.md`, `webapp/AGENTS.md`, `docs/plans/`, and `agent/` rather than in ad-hoc scratch files.
 
 ## Build, Test, and Development Commands
 - `./gradlew bootRun`  
@@ -42,6 +64,23 @@
 - Add test evidence (commands run, for example `./gradlew test`).
 - Highlight configuration or environment variable changes (for example `FAKESMTP_*` variables).
 - Include screenshots/GIFs for user-visible frontend changes.
+
+## Git Policy For Agents
+- `git commit` is only allowed when the user explicitly asks for a commit.
+- `git push` is forbidden for agent-driven development in this repository.
+- Prefer `git worktree add` for isolated subagent work instead of mutating the main worktree.
+- Avoid destructive git commands such as `git reset`, `git clean`, `git rebase`, and `git checkout --` unless the user explicitly requests them.
+- Keep staging focused if a user explicitly requests a commit; do not stage unrelated files.
+
+## Subagent Coordination
+- Prefer disjoint write sets across backend, frontend, and workflow/docs changes.
+- Treat these as single-owner integration files unless the task explicitly says otherwise:
+- `README.md`
+- `build.gradle`
+- `gradle/libs.versions.toml`
+- `.github/workflows/**`
+- `.codex/**`
+- Use `docs/plans/` for execution plans and `agent/` for implementation notes or review artifacts.
 
 ## Security & Configuration Tips
 - Never commit real credentials or tokens.

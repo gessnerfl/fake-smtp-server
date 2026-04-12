@@ -57,6 +57,17 @@ In order to run this application locally from sources, execute:
 
 Afterwards, the web interface is be availabe under http://localhost:8080.
 
+## Codex Agent Development
+
+This repository ships with a project-scoped Codex setup under `.codex/` so agents can work asynchronously with fewer approval prompts.
+
+- `sandbox_mode = "workspace-write"` keeps edits local to the repository.
+- Sandbox network access is enabled so Gradle/npm based build and test commands can run without interactive permission loops.
+- `.codex/rules/dev.rules` allows normal local development flows such as `git worktree add` while keeping `git commit` interactive and blocking `git push`.
+- Agent-specific repo guidance lives in `AGENTS.md` and `webapp/AGENTS.md`.
+
+Restart Codex after changing `.codex/config.toml` or `.codex/rules/*.rules`, because those files are loaded when a session starts.
+
 > [!IMPORTANT]
 > The provided `docker-compose.yml` is a local development/test convenience file that uses the `develop` profile and fixed local ports. It is not intended or supported as a production deployment manifest.
 

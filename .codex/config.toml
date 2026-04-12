@@ -1,0 +1,8 @@
+# Project-scoped Codex defaults for async agent development.
+sandbox_mode = "workspace-write"
+approval_policy = { granular = { sandbox_approval = false, rules = true, mcp_elicitations = false, request_permissions = false, skill_approval = false } }
+
+[sandbox_workspace_write]
+network_access = true
+exclude_tmpdir_env_var = false
+exclude_slash_tmp = false
