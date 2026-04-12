@@ -47,7 +47,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation(libs.commonsIo)
     implementation(libs.snakeyaml)
-    implementation(libs.flywayCore)
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation(libs.jaxbRuntime)
     implementation(libs.jacksonDatatypeJsr310)
     implementation(libs.springdocOpenapi)
@@ -56,6 +56,7 @@ dependencies {
     runtimeOnly(libs.micrometerPrometheus)
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(libs.asm)
     testImplementation(libs.commonsLang3)
     testImplementation(libs.hamcrest)

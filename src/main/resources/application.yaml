@@ -47,8 +47,6 @@ spring:
         enabled: true
 
   jackson:
-    serialization:
-      write-dates-as-timestamps: false
     time-zone: "UTC"
 
 springdoc:

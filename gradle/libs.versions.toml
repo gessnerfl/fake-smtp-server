@@ -10,7 +10,6 @@ benManesVersions  = "0.53.0"
 # Production libraries
 commonsIo         = "2.21.0"
 snakeyaml         = "2.6"
-flyway            = "12.3.0"
 jaxbRuntime       = "4.0.7"
 jackson           = "2.21.2"
 springdocOpenapi  = "3.0.3"
@@ -27,7 +26,6 @@ hamcrest          = "3.0"
 [libraries]
 commonsIo              = { module = "commons-io:commons-io",                                          version.ref = "commonsIo" }
 snakeyaml              = { module = "org.yaml:snakeyaml",                                             version.ref = "snakeyaml" }
-flywayCore             = { module = "org.flywaydb:flyway-core",                                       version.ref = "flyway" }
 jaxbRuntime            = { module = "org.glassfish.jaxb:jaxb-runtime",                               version.ref = "jaxbRuntime" }
 jacksonDatatypeJsr310  = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",         version.ref = "jackson" }
 springdocOpenapi       = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui",              version.ref = "springdocOpenapi" }
