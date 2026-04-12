@@ -1,36 +1,40 @@
 import React from "react";
 import { screen, waitFor } from "@testing-library/react";
-import { renderWithProviders } from "../test-utils";
-import Login from "./login";
-import { useGetMetaDataQuery, useLoginMutation } from "../store/rest-api";
+import { jest } from '@jest/globals';
 
-jest.mock("../store/rest-api", () => {
+const mockUseGetMetaDataQuery = jest.fn();
+const mockUseLoginMutation = jest.fn();
+
+jest.unstable_mockModule("../store/rest-api", () => {
   return {
-    useGetMetaDataQuery: jest.fn(),
-    useLoginMutation: jest.fn()
+    useGetMetaDataQuery: mockUseGetMetaDataQuery,
+    useLoginMutation: mockUseLoginMutation
   };
 });
+
+const { renderWithProviders } = await import("../test-utils");
+const { default: Login } = await import("./login");
 
 describe("Login Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    (useGetMetaDataQuery as jest.Mock).mockReturnValue({
+    (mockUseGetMetaDataQuery as jest.Mock).mockReturnValue({
       data: {version: "test", authenticationEnabled: true},
       isLoading: false
     });
 
-    const mockUnwrap = jest.fn().mockResolvedValue({});
+    const mockUnwrap = jest.fn<() => Promise<unknown>>().mockResolvedValue({});
     const mockLogin = jest.fn().mockReturnValue({unwrap: mockUnwrap});
 
-    (useLoginMutation as jest.Mock).mockReturnValue([
+    (mockUseLoginMutation as jest.Mock).mockReturnValue([
       mockLogin,
       {isLoading: false}
     ]);
   });
 
   test("does not render when authentication is disabled", async () => {
-    (useGetMetaDataQuery as jest.Mock).mockReturnValue({
+    (mockUseGetMetaDataQuery as jest.Mock).mockReturnValue({
       data: {version: "test", authenticationEnabled: false},
       isLoading: false
     });
@@ -43,7 +47,7 @@ describe("Login Component", () => {
   });
 
   test("shows loading state when fetching metadata", async () => {
-    (useGetMetaDataQuery as jest.Mock).mockReturnValue({
+    (mockUseGetMetaDataQuery as jest.Mock).mockReturnValue({
       data: undefined,
       isLoading: true
     });
@@ -65,12 +69,12 @@ describe("Login Component", () => {
   });
 
   test("login button shows loading state during login", async () => {
-    const mockUnwrap = jest.fn().mockImplementation(() => new Promise(resolve => {
+    const mockUnwrap = jest.fn<() => Promise<unknown>>().mockImplementation(() => new Promise(resolve => {
       setTimeout(resolve, 10000);
     }));
     const mockLogin = jest.fn().mockReturnValue({unwrap: mockUnwrap});
 
-    (useLoginMutation as jest.Mock).mockReturnValue([
+    (mockUseLoginMutation as jest.Mock).mockReturnValue([
       mockLogin,
       {isLoading: true}
     ]);

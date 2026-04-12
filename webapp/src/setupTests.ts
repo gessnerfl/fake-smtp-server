@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { formatRFC3339 } from "date-fns";
 import { delay, http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
