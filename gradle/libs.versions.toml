@@ -1,0 +1,46 @@
+[versions]
+# Gradle plugins
+axionRelease      = "1.21.1"
+springBoot        = "4.0.3"
+sonarqube         = "7.2.3.7755"
+jib               = "3.5.3"
+nodeGradle        = "7.1.0"
+benManesVersions  = "0.53.0"
+
+# Production libraries
+commonsIo         = "2.21.0"
+snakeyaml         = "2.6"
+flyway            = "12.3.0"
+jaxbRuntime       = "4.0.7"
+jackson           = "2.21.2"
+springdocOpenapi  = "3.0.3"
+h2                = "2.4.240"
+
+# Runtime libraries
+micrometer        = "1.16.0"
+
+# Test libraries
+asm               = "9.9.1"
+commonsLang3      = "3.20.0"
+hamcrest          = "3.0"
+
+[libraries]
+commons-io              = { module = "commons-io:commons-io",                                          version.ref = "commonsIo" }
+snakeyaml               = { module = "org.yaml:snakeyaml",                                             version.ref = "snakeyaml" }
+flyway-core             = { module = "org.flywaydb:flyway-core",                                       version.ref = "flyway" }
+jaxb-runtime            = { module = "org.glassfish.jaxb:jaxb-runtime",                               version.ref = "jaxbRuntime" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",         version.ref = "jackson" }
+springdoc-openapi       = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui",              version.ref = "springdocOpenapi" }
+h2                      = { module = "com.h2database:h2",                                              version.ref = "h2" }
+micrometer-prometheus   = { module = "io.micrometer:micrometer-registry-prometheus",                   version.ref = "micrometer" }
+asm                     = { module = "org.ow2.asm:asm",                                                version.ref = "asm" }
+commons-lang3           = { module = "org.apache.commons:commons-lang3",                               version.ref = "commonsLang3" }
+hamcrest                = { module = "org.hamcrest:hamcrest",                                          version.ref = "hamcrest" }
+
+[plugins]
+axion-release      = { id = "pl.allegro.tech.build.axion-release",  version.ref = "axionRelease" }
+spring-boot        = { id = "org.springframework.boot",              version.ref = "springBoot" }
+sonarqube          = { id = "org.sonarqube",                         version.ref = "sonarqube" }
+jib                = { id = "com.google.cloud.tools.jib",            version.ref = "jib" }
+node-gradle        = { id = "com.github.node-gradle.node",           version.ref = "nodeGradle" }
+ben-manes-versions = { id = "com.github.ben-manes.versions",        version.ref = "benManesVersions" }
