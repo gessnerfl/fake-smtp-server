@@ -14,18 +14,31 @@ import { RootState, store } from "../store/store";
 const EmailEventSourceManager: React.FC = () => {
     const { isAuthenticated } = useSelector((state: RootState) => state.auth);
     const { data: metaData, isLoading } = useGetMetaDataQuery();
+    const authenticationEnabled = metaData?.authenticationEnabled;
+    const sseHeartbeatIntervalSeconds = metaData?.sseHeartbeatIntervalSeconds;
 
     useEffect(() => {
-        if (!isLoading && metaData) {
-            setupEmailEventSource(store, metaData.authenticationEnabled);
-            return () => {
-                if (window.emailEventSource) {
-                    window.emailEventSource.close();
-                    delete window.emailEventSource;
-                }
-            };
+        if (isLoading || authenticationEnabled === undefined) {
+            return;
         }
-    }, [isAuthenticated, metaData, isLoading]);
+
+        // Defer connection setup by one tick so StrictMode's mount/unmount probe
+        // can cancel the first attempt before opening a second SSE connection.
+        const setupTimer = window.setTimeout(() => {
+            setupEmailEventSource(store, {
+                authenticationEnabled,
+                sseHeartbeatIntervalSeconds,
+            });
+        }, 0);
+
+        return () => {
+            window.clearTimeout(setupTimer);
+            if (window.emailEventSource) {
+                window.emailEventSource.close();
+                delete window.emailEventSource;
+            }
+        };
+    }, [isAuthenticated, isLoading, authenticationEnabled, sseHeartbeatIntervalSeconds]);
 
     return null;
 };

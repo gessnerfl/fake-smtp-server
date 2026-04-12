@@ -71,6 +71,9 @@ public class BaseSmtpServerConfig implements SmtpServerConfig {
         }
         smtpServer.setRequireTLS(fakeSmtpConfigurationProperties.isRequireTLS());
         smtpServer.setEnableTLS(fakeSmtpConfigurationProperties.isRequireTLS() || fakeSmtpConfigurationProperties.getTlsKeystore() != null);
+        if (fakeSmtpConfigurationProperties.getTlsProtocols() != null) {
+            smtpServer.setTlsProtocols(fakeSmtpConfigurationProperties.getTlsProtocols());
+        }
 
         var tlsKeystoreConfig = fakeSmtpConfigurationProperties.getTlsKeystore();
         if (tlsKeystoreConfig != null) {

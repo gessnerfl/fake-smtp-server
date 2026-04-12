@@ -1,6 +1,12 @@
 server:
   port: 8080
   shutdown: graceful
+  servlet:
+    async-timeout: 5000
+    session:
+      cookie:
+        http-only: true
+        same-site: Lax
 
 management:
   server:
@@ -8,11 +14,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: health,info
 
 spring:
   profiles:
     active: default
+
+  lifecycle:
+    timeout-per-shutdown-phase: 5s
 
   threads:
     virtual:
@@ -37,18 +46,12 @@ spring:
         one-indexed-parameters: false
         max-page-size: 1000
 
-  h2:
-    console:
-      enabled: true
-
   mvc:
     hiddenmethod:
       filter:
         enabled: true
 
   jackson:
-    serialization:
-      write-dates-as-timestamps: false
     time-zone: "UTC"
 
 springdoc:
@@ -57,8 +60,25 @@ springdoc:
 
 fakesmtp:
   port: 8025
+  maxMessageSize: ${FAKESMTP_MAX_MESSAGE_SIZE:10MB}
+  max-attachment-size: ${FAKESMTP_MAX_ATTACHMENT_SIZE:10MB}
+  # Optional STARTTLS protocol override. When omitted, Fake SMTP only enables TLSv1.3 and TLSv1.2.
+  # tls-protocols: TLSv1.3,TLSv1.2
+  metrics:
+    include-address-tags: ${FAKESMTP_METRICS_INCLUDE_ADDRESS_TAGS:false}
   webapp:
     authentication:
       username: ${FAKESMTP_WEBAPP_AUTH_USERNAME:}
       password: ${FAKESMTP_WEBAPP_AUTH_PASSWORD:}
-
+    rate-limiting:
+      enabled: ${FAKESMTP_WEBAPP_RATE_LIMITING_ENABLED:true}
+      max-attempts: ${FAKESMTP_WEBAPP_RATE_LIMITING_MAX_ATTEMPTS:5}
+      window-minutes: ${FAKESMTP_WEBAPP_RATE_LIMITING_WINDOW_MINUTES:1}
+      cleanup-interval-minutes: ${FAKESMTP_WEBAPP_RATE_LIMITING_CLEANUP_INTERVAL_MINUTES:1}
+      whitelist-localhost: ${FAKESMTP_WEBAPP_RATE_LIMITING_WHITELIST_LOCALHOST:true}
+      trust-proxy-headers: ${FAKESMTP_WEBAPP_RATE_LIMITING_TRUST_PROXY_HEADERS:false}
+    session:
+      # Session timeout: 10 minutes default, maximum 24 hours (1440 minutes)
+      session-timeout-minutes: ${FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES:10}
+      sse-heartbeat-interval-seconds: ${FAKESMTP_WEBAPP_SSE_HEARTBEAT_INTERVAL_SECONDS:30}
+      sse-event-send-timeout-seconds: ${FAKESMTP_WEBAPP_SSE_EVENT_SEND_TIMEOUT_SECONDS:5}

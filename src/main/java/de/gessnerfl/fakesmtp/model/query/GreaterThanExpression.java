@@ -13,7 +13,7 @@ import static de.gessnerfl.fakesmtp.model.query.ExpressionValueHelper.convertDat
 @JsonTypeName("greater_than")
 public record GreaterThanExpression(@NotEmpty String property, @NotEmpty Object value) implements FilterExpression {
     @Override
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public <T> Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         Path<Comparable> path = root.get(property);
         return cb.greaterThan(path, (Comparable) convertDateIfApplicable(path, value));

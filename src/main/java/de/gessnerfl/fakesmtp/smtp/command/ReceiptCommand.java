@@ -22,6 +22,7 @@ public class ReceiptCommand extends BaseCommand {
 		final String args = this.getArgPredicate(commandString);
 		if (!args.toUpperCase(Locale.ENGLISH).startsWith("TO:")) {
 			sess.sendResponse("501 Syntax: RCPT TO: <address>  Error in parameters: \"" + args + "\"");
+			return;
 		}
 		final String recipientAddress = EmailUtils.extractEmailAddress(args, 3);
 		try {

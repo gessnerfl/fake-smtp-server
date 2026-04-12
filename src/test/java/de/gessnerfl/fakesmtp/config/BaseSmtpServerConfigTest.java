@@ -16,6 +16,7 @@ import org.springframework.core.io.ResourceLoader;
 
 import java.net.InetAddress;
 import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.instanceOf;
@@ -153,6 +154,16 @@ class BaseSmtpServerConfigTest {
         verify(smtpServer, never()).setAuthenticationHandlerFactory(any(AuthenticationHandlerFactory.class));
         verify(smtpServer, never()).setRequireAuth(true);
         verify(logger).error(startsWith("Password"));
+    }
+
+    @Test
+    void shouldConfigureTlsProtocolOverridesWhenProvided() {
+        when(fakeSmtpConfigurationProperties.getTlsProtocols()).thenReturn(List.of("TLSv1.2"));
+
+        SmtpServer result = sut.smtpServer();
+
+        assertSame(smtpServer, result);
+        verify(smtpServer).setTlsProtocols(List.of("TLSv1.2"));
     }
 
 }

@@ -1,6 +1,9 @@
 package de.gessnerfl.fakesmtp.smtp.server;
 
 import de.gessnerfl.fakesmtp.TestResourceUtil;
+import de.gessnerfl.fakesmtp.repository.EmailAttachmentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailContentRepository;
+import de.gessnerfl.fakesmtp.repository.EmailInlineImageRepository;
 import de.gessnerfl.fakesmtp.repository.EmailRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,11 +34,23 @@ class BaseMessageListenerIntegrationTest {
     private EmailRepository emailRepository;
 
     @Autowired
+    private EmailAttachmentRepository emailAttachmentRepository;
+
+    @Autowired
+    private EmailContentRepository emailContentRepository;
+
+    @Autowired
+    private EmailInlineImageRepository emailInlineImageRepository;
+
+    @Autowired
     private BaseMessageListener sut;
 
     @BeforeEach
     void setup(){
-        emailRepository.deleteAll();
+        emailAttachmentRepository.deleteAllInBatch();
+        emailContentRepository.deleteAllInBatch();
+        emailInlineImageRepository.deleteAllInBatch();
+        emailRepository.deleteAllInBatch();
     }
 
     @Test

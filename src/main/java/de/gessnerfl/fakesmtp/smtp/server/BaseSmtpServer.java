@@ -6,6 +6,10 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -43,6 +47,7 @@ public class BaseSmtpServer implements SmtpServer {
      */
     private static final String UNKNOWN_HOSTNAME = "localhost";
     private static final int BACKLOG = 50;
+    private static final List<String> DEFAULT_TLS_PROTOCOLS = List.of("TLSv1.3", "TLSv1.2");
 
     private InetAddress bindAddress = null; // default to all interfaces
     private int port = 25; // default to 25
@@ -68,6 +73,7 @@ public class BaseSmtpServer implements SmtpServer {
      */
     private boolean enableTLS = false;
     private SSLContext sslContext;
+    private List<String> tlsProtocols;
 
     /**
      * If true, a TLS handshake is required; ignored if enableTLS=false
@@ -257,10 +263,31 @@ public class BaseSmtpServer implements SmtpServer {
         final var remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
         final var tlsSocket = (SSLSocket) sf.createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
         tlsSocket.setUseClientMode(false);
-        tlsSocket.setEnabledProtocols(tlsSocket.getSupportedProtocols());
-        tlsSocket.setEnabledCipherSuites(tlsSocket.getSupportedCipherSuites());
+        tlsSocket.setEnabledProtocols(resolveEnabledTlsProtocols(tlsSocket));
         tlsSocket.setNeedClientAuth(false);
         return tlsSocket;
+    }
+
+    private String[] resolveEnabledTlsProtocols(SSLSocket tlsSocket) {
+        final List<String> requestedProtocols = tlsProtocols == null ? DEFAULT_TLS_PROTOCOLS : tlsProtocols;
+        final Set<String> supportedProtocols = Set.of(tlsSocket.getSupportedProtocols());
+
+        if (tlsProtocols != null) {
+            final List<String> unsupportedProtocols = requestedProtocols.stream()
+                    .filter(protocol -> !supportedProtocols.contains(protocol))
+                    .toList();
+            if (!unsupportedProtocols.isEmpty()) {
+                throw new IllegalArgumentException("Unsupported TLS protocols configured: " + unsupportedProtocols);
+            }
+        }
+
+        final List<String> enabledProtocols = requestedProtocols.stream()
+                .filter(supportedProtocols::contains)
+                .toList();
+        if (enabledProtocols.isEmpty()) {
+            throw new IllegalStateException("No supported TLS protocols available for SMTP server");
+        }
+        return enabledProtocols.toArray(String[]::new);
     }
 
     public String getDisplayableLocalSocketAddress() {
@@ -319,6 +346,22 @@ public class BaseSmtpServer implements SmtpServer {
 
     public void setSslContext(SSLContext sslContext) {
         this.sslContext = sslContext;
+    }
+
+    public void setTlsProtocols(List<String> tlsProtocols) {
+        if (tlsProtocols == null) {
+            this.tlsProtocols = null;
+            return;
+        }
+
+        final List<String> normalizedTlsProtocols = tlsProtocols.stream()
+                .map(String::trim)
+                .filter(protocol -> !protocol.isEmpty())
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+
+        this.tlsProtocols = normalizedTlsProtocols.isEmpty()
+                ? null
+                : List.copyOf(new LinkedHashSet<>(normalizedTlsProtocols));
     }
 
     public boolean getRequireTLS() {

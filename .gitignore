@@ -46,3 +46,4 @@ yarn-error.log*
 
 *.log
 *.patch
+/.gradle-local/

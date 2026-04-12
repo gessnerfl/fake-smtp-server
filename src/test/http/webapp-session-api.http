@@ -1,0 +1,199 @@
+@baseUrl = http://localhost:8080
+@username = myuser
+@password = mysecretpassword
+
+### Step 1: Get initial XSRF-TOKEN from meta-data endpoint (public, sets XSRF-TOKEN cookie)
+GET {{baseUrl}}/api/meta-data
+Accept: application/json
+
+> {%
+  client.log("Step 1: Getting initial XSRF-TOKEN from meta-data");
+  
+  const setCookieHeaders = response.headers.valuesOf("Set-Cookie") || [];
+  client.log("Set-Cookie headers count: " + setCookieHeaders.length);
+  
+  const cookies = {};
+  
+  for (const header of setCookieHeaders) {
+    client.log("Processing header: " + header);
+    if (header) {
+      const match = header.match(/^([^=]+)=([^;]+)/);
+      if (match && !header.includes("Max-Age=0")) {
+        cookies[match[1]] = match[2];
+        client.log("Found cookie: " + match[1] + "=" + match[2]);
+      }
+    }
+  }
+  
+  if (cookies["XSRF-TOKEN"]) {
+    client.global.set("xsrf", cookies["XSRF-TOKEN"]);
+    client.log("SUCCESS: Set xsrf variable: " + cookies["XSRF-TOKEN"]);
+  } else {
+    client.log("ERROR: No XSRF-TOKEN cookie received! Check if authentication is enabled.");
+  }
+%}
+
+### Step 2: Login (requires X-XSRF-TOKEN header); response should set JSESSIONID cookie
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/x-www-form-urlencoded
+X-XSRF-TOKEN: {{xsrf}}
+
+username={{username}}&password={{password}}
+
+> {%
+  client.log("Step 2: Logging in with XSRF token");
+  
+  if (response.status === 403) {
+    client.log("ERROR: Login returned 403 - XSRF token missing or invalid. xsrf variable: " + client.global.get("xsrf"));
+  } else if (response.status === 401) {
+    client.log("ERROR: Login returned 401 - Invalid credentials");
+  } else if (response.status === 204) {
+    client.log("SUCCESS: Login successful (204 No Content)");
+  } else {
+    client.log("Login response status: " + response.status);
+  }
+  
+  const setCookieHeaders = response.headers.valuesOf("Set-Cookie") || [];
+  client.log("Set-Cookie headers count: " + setCookieHeaders.length);
+  
+  const cookies = {};
+  
+  for (const header of setCookieHeaders) {
+    client.log("Processing header: " + header);
+    if (header) {
+      const match = header.match(/^([^=]+)=([^;]+)/);
+      if (match && !header.includes("Max-Age=0")) {
+        cookies[match[1]] = match[2];
+        client.log("Found cookie: " + match[1] + "=" + match[2]);
+      }
+    }
+  }
+  
+  if (cookies["XSRF-TOKEN"]) {
+    client.global.set("xsrf", cookies["XSRF-TOKEN"]);
+    client.log("Updated xsrf variable: " + cookies["XSRF-TOKEN"]);
+  }
+  if (cookies["JSESSIONID"]) {
+    client.global.set("jsessionid", cookies["JSESSIONID"]);
+    client.log("SUCCESS: Set jsessionid variable: " + cookies["JSESSIONID"]);
+  } else {
+    client.log("ERROR: No JSESSIONID cookie received!");
+  }
+%}
+
+### Step 3: Meta-data should now report authenticated=true (requires session)
+GET {{baseUrl}}/api/meta-data
+Accept: application/json
+Cookie: JSESSIONID={{jsessionid}}; XSRF-TOKEN={{xsrf}}
+
+> {%
+  client.log("Step 3: Checking meta-data after login");
+  const body = response.body;
+  if (body && body.authenticated === true) {
+    client.log("SUCCESS: User is authenticated");
+    client.log("Session timeout: " + body.sessionTimeoutMinutes + " minutes");
+  } else if (body && body.authenticated === false) {
+    client.log("ERROR: User is NOT authenticated - login may have failed");
+  } else {
+    client.log("Response: " + JSON.stringify(body));
+  }
+%}
+
+
+### Step 4: List emails (requires session)
+GET {{baseUrl}}/api/emails?page=0&size=1
+Accept: application/json
+Cookie: JSESSIONID={{jsessionid}}; XSRF-TOKEN={{xsrf}}
+
+> {%
+  client.log("Step 4: Listing emails");
+  if (response.status === 200) {
+    const content = response.body && response.body.content;
+    client.log("Found " + (content ? content.length : 0) + " emails");
+    if (content && content.length > 0) {
+      client.global.set("emailId", content[0].id);
+      client.log("Set emailId variable: " + content[0].id);
+    } else {
+      client.log("WARNING: No emails found - delete tests will fail without email data");
+    }
+  } else if (response.status === 401) {
+    client.log("ERROR: Got 401 - not authenticated. Check login step.");
+  } else {
+    client.log("Response status: " + response.status);
+  }
+%}
+
+### Delete a single email (requires X-XSRF-TOKEN header and session cookie)
+DELETE {{baseUrl}}/api/emails/{{emailId}}
+Cookie: JSESSIONID={{jsessionid}}; XSRF-TOKEN={{xsrf}}
+X-XSRF-TOKEN: {{xsrf}}
+
+### Delete all emails (requires X-XSRF-TOKEN header and session cookie)
+DELETE {{baseUrl}}/api/emails
+Cookie: JSESSIONID={{jsessionid}}; XSRF-TOKEN={{xsrf}}
+X-XSRF-TOKEN: {{xsrf}}
+
+### Step 5: Logout (requires X-XSRF-TOKEN header and session cookie)
+POST {{baseUrl}}/api/auth/logout
+Cookie: JSESSIONID={{jsessionid}}; XSRF-TOKEN={{xsrf}}
+X-XSRF-TOKEN: {{xsrf}}
+
+> {%
+  client.log("Step 5: Logging out");
+  if (response.status === 204) {
+    client.log("SUCCESS: Logout successful (204 No Content)");
+  } else if (response.status === 403) {
+    client.log("ERROR: Logout returned 403 - XSRF token missing or invalid");
+  } else if (response.status === 401) {
+    client.log("ERROR: Logout returned 401 - Not authenticated");
+  } else {
+    client.log("Logout response status: " + response.status);
+  }
+%}
+
+
+### ============================================
+### SECURITY TESTS - Negative Test Cases
+### ============================================
+
+### IMPORTANT: To test the DELETE endpoints below, you need at least one email in the system.
+### You can either:
+### 1. Send an email via SMTP to localhost:8025, OR
+### 2. Use the "List emails" request above to get an existing email ID
+###
+### After obtaining an email ID, set it manually:
+### @emailId = 123
+
+### Test: Delete email without authentication - should return 401
+# This test verifies that DELETE /api/emails/{id} requires authentication
+DELETE {{baseUrl}}/api/emails/1
+
+### Test: Delete all emails without authentication - should return 401
+# This test verifies that DELETE /api/emails requires authentication
+DELETE {{baseUrl}}/api/emails
+
+### Test: Delete email with session but without CSRF token - should return 403
+# First login (see login request above), then try to delete without X-XSRF-TOKEN header
+DELETE {{baseUrl}}/api/emails/{{emailId}}
+Cookie: JSESSIONID={{jsessionid}}
+
+### Test: Delete all emails with session but without CSRF token - should return 403
+# First login (see login request above), then try to delete without X-XSRF-TOKEN header
+DELETE {{baseUrl}}/api/emails
+Cookie: JSESSIONID={{jsessionid}}
+
+### Test: Get emails without authentication - should return 401
+GET {{baseUrl}}/api/emails
+Accept: application/json
+
+### Test: Get single email without authentication - should return 401
+GET {{baseUrl}}/api/emails/1
+Accept: application/json
+
+### Test: Get email attachment without authentication - should return 401
+GET {{baseUrl}}/api/emails/1/attachments/1
+
+### Test: Access SSE endpoint without authentication - should return 401
+GET {{baseUrl}}/api/emails/events
+Accept: text/event-stream
+

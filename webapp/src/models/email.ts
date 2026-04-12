@@ -9,11 +9,15 @@ export interface InlineImage {
     contentId: string
     contentType: string
     data: string
+    processingStatus?: string
+    processingMessage?: string
 }
 
 export interface EmailAttachment {
     id: number,
     filename: string,
+    processingStatus?: string,
+    processingMessage?: string,
 }
 
 export interface Email {

@@ -14,7 +14,7 @@ import static de.gessnerfl.fakesmtp.model.query.ExpressionValueHelper.convertDat
 public record LessThanOrEqualExpression(@NotEmpty String property, @NotEmpty Object value) implements FilterExpression {
 
     @Override
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public <T> Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         Path<Comparable> path = root.get(property);
         return cb.lessThanOrEqualTo(path, (Comparable) convertDateIfApplicable(path, value));

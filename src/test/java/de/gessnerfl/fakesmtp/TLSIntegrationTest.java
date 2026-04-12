@@ -23,7 +23,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ActiveProfiles({ "integrationtest_with_tls_required", "integrationtest", "default" })
+@ActiveProfiles({ "integrationtest_with_tls_required", "integrationtest", "mockserver", "default" })
 class TLSIntegrationTest {
 
     @Autowired

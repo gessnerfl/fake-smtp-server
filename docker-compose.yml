@@ -1,14 +1,28 @@
-version: '3'
+version: '3.8'
 
+# Development/test convenience only.
+# Do not use this file as a production deployment descriptor.
 services:
+  # ./gradlew jibDockerBuild
   fake-smtp-server:
-    image: gessnerfl/fake-smtp-server:2.2.1
+    image: gessnerfl/fake-smtp-server:latest
     hostname: "fake-smtp-server"
     restart: always
     environment:
-      - FAKESMTP_AUTHENTICATION_USERNAME=myuser
-      - FAKESMTP_AUTHENTICATION_PASSWORD=mysecretpassword
+      # Spring Profile (leer = default, "develop" für Entwicklung)
+      - SPRING_PROFILES_ACTIVE=develop
+#      - FAKESMTP_AUTHENTICATION_USERNAME=myuser
+#      - FAKESMTP_AUTHENTICATION_PASSWORD=mysecretpassword
+      - FAKESMTP_WEBAPP_AUTH_USERNAME=myuser
+      - FAKESMTP_WEBAPP_AUTH_PASSWORD=mysecretpassword
+      - FAKESMTP_WEBAPP_SESSION_TIMEOUT_MINUTES=2
+      - FAKESMTP_WEBAPP_AUTHENTICATION_CONCURRENT_SESSIONS=2
+      # Maximum attachment/inline image size (default: 10MB)
+      # Increase for development if needed: FAKESMTP_MAX_ATTACHMENT_SIZE=50MB
+      - FAKESMTP_MAX_ATTACHMENT_SIZE=10MB
+      # Optional legacy override. When omitted, STARTTLS only enables TLSv1.3 and TLSv1.2.
+#      - FAKESMTP_TLS_PROTOCOLS=TLSv1.3,TLSv1.2
     ports:
       - 8025:8025      #expose smtp port
       - 8080:8080      #expose web ui
-      - 8081:8081      #expose management api
+      - 8081:8081      #expose management api for local development/testing

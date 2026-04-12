@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCredentials, setAuthenticationRequired, setAuthError, clearAuthError } from '../store/auth-slice';
+import { setAuthenticated, setAuthError, clearAuthError } from '../store/auth-slice';
 import { useGetMetaDataQuery, useLoginMutation } from '../store/rest-api';
 import { Box, Button, Card, CardContent, Container, TextField, Typography, Alert } from '@mui/material';
 import { RootState } from '../store/store';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 const Login: React.FC = () => {
   const dispatch = useDispatch();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { data, isLoading } = useGetMetaDataQuery();
+  const { data, isLoading, refetch } = useGetMetaDataQuery();
   const [login, { isLoading: isLoggingIn }] = useLoginMutation();
   const error = useSelector((state: RootState) => state.auth.error);
-
-  useEffect(() => {
-    if (data) {
-      dispatch(setAuthenticationRequired(data.authenticationEnabled));
-    }
-  }, [data, dispatch]);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   useEffect(() => {
     dispatch(clearAuthError());
@@ -28,10 +24,27 @@ const Login: React.FC = () => {
 
     try {
       await login({ username, password }).unwrap();
-      dispatch(setCredentials({ username, password }));
-    } catch (error) {
-      console.error(error);
-      dispatch(setAuthError('Invalid username or password. Please try again.'));
+      refetch();
+      dispatch(setAuthenticated(true));
+    } catch (err) {
+      if (err && typeof err === 'object' && 'status' in err) {
+        const fetchErr = err as FetchBaseQueryError;
+        if (fetchErr.status === 401) {
+          dispatch(setAuthError('Invalid username or password. Please try again.'));
+        } else if (fetchErr.status === 0 || fetchErr.status === 'FETCH_ERROR') {
+          dispatch(setAuthError('Network error. Please check your connection.'));
+        } else {
+          dispatch(setAuthError('Login failed. Please try again.'));
+        }
+      } else if (err instanceof Error) {
+        if (err.message.includes('401') || err.message.toLowerCase().includes('unauthorized')) {
+          dispatch(setAuthError('Invalid username or password. Please try again.'));
+        } else {
+          dispatch(setAuthError('An unexpected error occurred.'));
+        }
+      } else {
+        dispatch(setAuthError('An unexpected error occurred.'));
+      }
     }
   };
 
@@ -39,7 +52,7 @@ const Login: React.FC = () => {
     return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>Loading...</Box>;
   }
 
-  if (!data?.authenticationEnabled) {
+  if (!data?.authenticationEnabled || isAuthenticated) {
     return null;
   }
 

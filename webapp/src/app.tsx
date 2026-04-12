@@ -5,11 +5,13 @@ import ErrorPage from "./pages/error-page";
 import EmailListPage from "./pages/email-list-page";
 import {EmailPage} from "./pages/email-page";
 import EmailEventSourceManager from "./components/EmailEventSourceManager";
+import SessionTimeoutManager from "./components/session-timeout-manager";
 
 function App() {
     return (
         <>
             <EmailEventSourceManager />
+            <SessionTimeoutManager />
 
             <Routes>
                 <Route path={"/"} element={<Shell/>} errorElement={<ErrorPage/>}>

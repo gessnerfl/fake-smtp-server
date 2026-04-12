@@ -25,6 +25,14 @@ public class EmailAttachment {
     @Basic(optional = false)
     private byte[] data;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "processing_status", nullable = false, length = 64)
+    @Basic(optional = false)
+    private EmailPartProcessingStatus processingStatus = EmailPartProcessingStatus.AVAILABLE;
+
+    @Column(name = "processing_message", length = 1024)
+    private String processingMessage;
+
     public Long getId() {
         return id;
     }
@@ -56,5 +64,21 @@ public class EmailAttachment {
 
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    public EmailPartProcessingStatus getProcessingStatus() {
+        return processingStatus;
+    }
+
+    public void setProcessingStatus(EmailPartProcessingStatus processingStatus) {
+        this.processingStatus = processingStatus;
+    }
+
+    public String getProcessingMessage() {
+        return processingMessage;
+    }
+
+    public void setProcessingMessage(String processingMessage) {
+        this.processingMessage = processingMessage;
     }
 }

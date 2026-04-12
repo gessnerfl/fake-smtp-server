@@ -1,10 +1,10 @@
 plugins {
-    id "pl.allegro.tech.build.axion-release" version "1.20.1"
-    id "org.springframework.boot" version "3.5.5"
-    id "org.sonarqube" version "6.3.1.5724"
-    id 'com.google.cloud.tools.jib' version '3.4.5'
-    id "com.github.node-gradle.node" version "7.1.0"
-    id "com.github.ben-manes.versions" version "0.52.0"
+    alias(libs.plugins.axion.release)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.sonarqube)
+    alias(libs.plugins.jib)
+    alias(libs.plugins.node.gradle)
+    alias(libs.plugins.ben.manes.versions)
 }
 
 apply plugin: "java"
@@ -23,51 +23,56 @@ scmVersion {
 group = "de.gessnerfl"
 description = """Fake SMTP Server :: Simple SMTP Server which stores emails in memory and lists email in a web ui"""
 project.version = project.findProperty("projectVersion") ?: scmVersion.version
-project.archivesBaseName = "fake-smtp-server"
+base { archivesName = "fake-smtp-server" }
 
 ext.scmUrl = "git@github.com:gessnerfl/fake-smtp-server.git"
 ext.projectUrl = "https://github.com/gessnerfl/fake-smtp-server"
-
-sourceCompatibility = 21
-targetCompatibility = 21
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("commons-io:commons-io:2.20.0")
-    implementation("org.yaml:snakeyaml:2.5")
-    implementation('org.flywaydb:flyway-core:11.11.2')
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
-    implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.11')
-
-    runtimeOnly("com.h2database:h2:2.3.232")
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.15.3")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.ow2.asm:asm:9.8")
-    testImplementation("org.apache.commons:commons-lang3:3.18.0")
-    testImplementation("org.hamcrest:hamcrest:3.0")
+    // Spring Boot Starters (versions managed by Spring Boot)
+    implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.thymeleaf)
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.validation)
+    implementation(libs.spring.boot.starter.mail)
+    implementation(libs.spring.boot.starter.security)
+    
+    // Third-party libraries with explicit versions
+    implementation(libs.commons.io)
+    implementation(libs.springdoc.openapi)
+    
+    // Spring Boot managed (no version needed)
+    implementation(libs.snakeyaml)
+    implementation(libs.spring.boot.starter.flyway)
+    implementation(libs.jaxb.runtime)
+    implementation(libs.jackson.datatype.jsr310)
+    implementation(libs.jackson.datatype.jdk8)
+    
+    // Runtime
+    runtimeOnly(libs.h2)
+    runtimeOnly(libs.prometheus)
+    
+    // Test
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.boot.starter.webmvc.test)
+    testImplementation(libs.asm)
+    testImplementation(libs.commons.lang3)
+    testImplementation(libs.hamcrest)
 }
 
 java {
     withSourcesJar()
-    toolchain { languageVersion = JavaLanguageVersion.of(21) }
+    toolchain { languageVersion = JavaLanguageVersion.of(libs.versions.java.get() as int) }
 }
 
 bootRun {
-    // für Spring Boot Gradle Plugin >=2.5
     javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(libs.versions.java.get() as int)
     }
 }
 
@@ -82,8 +87,8 @@ node {
     nodeProjectDir = file("${project.projectDir}/webapp")
     npmInstallCommand = System.getenv("CI") ? 'ci' : 'install'
     download = true
-    version = "24.7.0"
-    npmVersion = "11.5.1"
+    version = "${libs.versions.nodejs.get()}"
+    npmVersion = "${libs.versions.npmVersion.get()}"
 }
 
 tasks.register('webappClean', Delete) {
@@ -98,12 +103,32 @@ tasks.register('webappNpmBuild', NpmTask) {
     args = ["run", "build"]
 }
 
+tasks.register('copyStaticAssetsForBootRun', Sync) {
+    dependsOn(webappNpmBuild)
+    from(file('webapp/dist'))
+    into(file('build/resources/main/static/'))
+    exclude("index.html")
+}
+
+tasks.register('copyTemplateAssetsForBootRun', Copy) {
+    dependsOn(webappNpmBuild)
+    from(file('webapp/dist/index.html'))
+    into(file('build/resources/main/templates/'))
+    filter { line -> line.replaceAll(/(href|src)(=\")([^\"]+)(\")/, 'th:$1$2@{$3}$4').replaceAll(/(name="base-path"\s+)(content=")([^"]+)(")/, '$1th:$2@{$3}$4') }
+}
+
+// Ensure SPA assets exist before bootRun serves "/" and "/emails/**",
+// but avoid forcing the full frontend/backend test pipeline on local startup.
+tasks.named('bootRun') {
+    dependsOn('copyStaticAssetsForBootRun', 'copyTemplateAssetsForBootRun')
+}
+
 tasks.register('webappNpmTest', NpmTask) {
     dependsOn(webappNpmBuild)
     args = ["run", "test", "--", "--coverage", "--watchAll=false"]
 }
 
-tasks.register('copyStaticAssets', Copy) {
+tasks.register('copyStaticAssets', Sync) {
     dependsOn(compileJava, compileTestJava, webappNpmTest, resolveMainClassName)
     from(file('webapp/dist'))
     into(file('build/resources/main/static/'))
@@ -165,7 +190,7 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:21.0.8-al2023-headless'
+        image = libs.versions.docker.base.image.get()
         container {
             ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'

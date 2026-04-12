@@ -21,6 +21,9 @@ class SecurityConfigTest {
     @Mock
     private WebappAuthenticationProperties authProperties;
 
+    @Mock
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @InjectMocks
     private SecurityConfig sut;
 
