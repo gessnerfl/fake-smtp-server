@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "node16",
+    "ignoreDeprecations": "6.0",
+    "allowImportingTsExtensions": false
+  }
+}

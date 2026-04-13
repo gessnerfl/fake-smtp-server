@@ -1,21 +1,24 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import {screen} from '@testing-library/react'
-import Navigation from "./navigation";
-import {renderWithProviders} from "../test-utils";
-import { useGetMetaDataQuery } from "../store/rest-api";
+import { jest } from '@jest/globals';
 
-jest.mock("../store/rest-api", () => {
+const mockUseGetMetaDataQuery = jest.fn();
+
+jest.unstable_mockModule("../store/rest-api", () => {
     return {
-        useGetMetaDataQuery: jest.fn()
+        useGetMetaDataQuery: mockUseGetMetaDataQuery
     };
 });
+
+const { default: Navigation } = await import("./navigation");
+const { renderWithProviders } = await import("../test-utils");
 
 describe('Navigation', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        (useGetMetaDataQuery as jest.Mock).mockReturnValue({
+        mockUseGetMetaDataQuery.mockReturnValue({
             data: { version: "local", authenticationEnabled: false },
             isLoading: false
         });

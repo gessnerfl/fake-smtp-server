@@ -4,8 +4,12 @@ export default {
     testEnvironmentOptions: {
         customExportConditions: [''],
     },
+    extensionsToTreatAsEsm: ['.ts', '.tsx'],
     transform: {
-        "^.+\\.tsx?$": "ts-jest"
+        "^.+\\.tsx?$": ["ts-jest", {
+            useESM: true,
+            tsconfig: "./tsconfig.jest.json",
+        }]
     },
     setupFilesAfterEnv: ["@testing-library/jest-dom", "<rootDir>/src/setupTests.ts"],
     testTimeout: 10000,

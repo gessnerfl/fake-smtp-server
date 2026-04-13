@@ -15,7 +15,7 @@ export function getBasePath() {
 }
 
 function resolveBasePath() {
-    if (process.env.NODE_ENV === "test") {
+    if (import.meta.env?.MODE === "test" || (typeof process !== 'undefined' && process.env.NODE_ENV === "test")) {
         return TEST_BASE_PATH
     }
     const path = window.location.pathname;

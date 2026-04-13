@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // MSW v2 polyfills for Jest environment
 import { TextEncoder, TextDecoder } from 'util';
 

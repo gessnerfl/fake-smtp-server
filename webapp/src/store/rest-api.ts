@@ -30,7 +30,7 @@ export const restApi = createApi({
     fetchFn: async (input, init) => {
       // In test environment, create a new init object without the signal
       // to avoid AbortSignal compatibility issues with MSW
-      if (process.env.NODE_ENV === 'test') {
+      if (import.meta.env?.MODE === 'test' || (typeof process !== 'undefined' && process.env.NODE_ENV === 'test')) {
         const { signal, ...restInit } = init || {};
         return fetch(input, restInit);
       }
