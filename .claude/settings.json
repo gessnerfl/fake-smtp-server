@@ -9,9 +9,14 @@
       "Bash(./gradlew build:*)",
       "Bash(./gradlew:*)",
       "mcp__plugin_context7_context7__resolve-library-id",
-      "WebSearch",
       "mcp__plugin_context7_context7__query-docs",
-      "Bash(git check-ignore:*)"
+      "WebSearch",
+      "Bash(git check-ignore:*)",
+      "Bash(git worktree:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
