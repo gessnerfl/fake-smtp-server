@@ -30,9 +30,6 @@ base {
 ext.scmUrl = "git@github.com:gessnerfl/fake-smtp-server.git"
 ext.projectUrl = "https://github.com/gessnerfl/fake-smtp-server"
 
-sourceCompatibility = 21
-targetCompatibility = 21
-
 repositories {
     mavenCentral()
 }
@@ -64,13 +61,13 @@ dependencies {
 
 java {
     withSourcesJar()
-    toolchain { languageVersion = JavaLanguageVersion.of(21) }
+    toolchain { languageVersion = JavaLanguageVersion.of(25) }
 }
 
 bootRun {
     // für Spring Boot Gradle Plugin >=2.5
     javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -168,7 +165,7 @@ jacocoTestReport {
 
 jib {
     from {
-        image = 'amazoncorretto:21.0.8-al2023-headless'
+        image = 'amazoncorretto:25.0.2-al2023-headless'
         container {
             ports = ["8080", "8081", "8025"]
             creationTime = 'USE_CURRENT_TIMESTAMP'
