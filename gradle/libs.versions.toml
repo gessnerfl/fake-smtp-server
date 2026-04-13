@@ -11,7 +11,6 @@ benManesVersions  = "0.53.0"
 commonsIo         = "2.21.0"
 snakeyaml         = "2.6"
 jaxbRuntime       = "4.0.7"
-jackson           = "2.21.2"
 springdocOpenapi  = "3.0.3"
 h2                = "2.4.240"
 
@@ -27,7 +26,7 @@ hamcrest          = "3.0"
 commonsIo              = { module = "commons-io:commons-io",                                          version.ref = "commonsIo" }
 snakeyaml              = { module = "org.yaml:snakeyaml",                                             version.ref = "snakeyaml" }
 jaxbRuntime            = { module = "org.glassfish.jaxb:jaxb-runtime",                               version.ref = "jaxbRuntime" }
-jacksonDatatypeJsr310  = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",         version.ref = "jackson" }
+jacksonDatatypeJsr310  = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 springdocOpenapi       = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui",              version.ref = "springdocOpenapi" }
 h2                     = { module = "com.h2database:h2",                                              version.ref = "h2" }
 micrometerPrometheus   = { module = "io.micrometer:micrometer-registry-prometheus",                   version.ref = "micrometer" }
