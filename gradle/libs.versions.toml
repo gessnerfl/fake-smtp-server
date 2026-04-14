@@ -15,7 +15,7 @@ springdocOpenapi  = "3.0.3"
 h2                = "2.4.240"
 
 # Runtime libraries
-micrometer        = "1.16.0"
+micrometer        = "1.16.5"
 
 # Test libraries
 asm               = "9.9.1"
