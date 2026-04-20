@@ -5,7 +5,7 @@ springBoot        = "4.0.5"
 sonarqube         = "7.2.3.7755"
 jib               = "3.5.3"
 nodeGradle        = "7.1.0"
-benManesVersions  = "0.53.0"
+benManesVersions  = "0.54.0"
 
 # Production libraries
 commonsIo         = "2.21.0"
