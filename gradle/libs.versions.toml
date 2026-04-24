@@ -1,7 +1,7 @@
 [versions]
 # Gradle plugins
 axionRelease      = "1.21.1"
-springBoot        = "4.0.5"
+springBoot        = "4.0.6"
 sonarqube         = "7.2.3.7755"
 jib               = "3.5.3"
 nodeGradle        = "7.1.0"
